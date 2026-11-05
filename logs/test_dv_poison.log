@@ -1,0 +1,1146 @@
+TEST 0.000000s seed=1 topology=topo/dv_poison.topo noise=noise/no_noise.txt
+TEST 0.000000s directed links: 1 2 -54.0; 2 1 -54.0; 2 3 -54.0; 3 2 -54.0; 3 4 -54.0; 4 3 -54.0
+TEST 0.000000s boot nodes [1, 2, 3, 4] at ticks 1333 * ID; ticks/second=10000000000
+TEST 0.000000s wait 60s: node 2 reaches 4 through 3; node 1 is its other neighbor
+0:0:0.000000133 DEBUG (1): Booted
+0:0:0.000000143 DEBUG (1): Radio On
+0:0:0.000000266 DEBUG (2): Booted
+0:0:0.000000276 DEBUG (2): Radio On
+0:0:0.000000399 DEBUG (3): Booted
+0:0:0.000000409 DEBUG (3): Radio On
+0:0:0.000000533 DEBUG (4): Booted
+0:0:0.000000543 DEBUG (4): Radio On
+0:0:5.056640768 DEBUG (1): Node 1 timer fired
+0:0:5.056640768 DEBUG (1): Node 1 starting DV update
+0:0:5.056640768 DEBUG (1): Node 1 queued 2 routes for neighbor 2 starting at 0
+0:0:5.056640768 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:5.056640768 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:5.143554964 DEBUG (2): Node 2 timer fired
+0:0:5.143554964 DEBUG (2): Node 2 starting DV update
+0:0:5.143554964 DEBUG (2): Node 2 queued 3 routes for neighbor 3 starting at 0
+0:0:5.143554964 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:5.143554964 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:5.143554964 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:5.163711646 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:5.163711646 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:5.163711646 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:5.203125143 DEBUG (1): Node 1 finished sending DV updates
+0:0:5.230469159 DEBUG (3): Node 3 timer fired
+0:0:5.230469159 DEBUG (3): Node 3 starting DV update
+0:0:5.230469159 DEBUG (3): Node 3 queued 3 routes for neighbor 2 starting at 0
+0:0:5.230469159 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:5.230469159 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:5.230469159 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:5.273544673 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:5.273544673 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:5.273544673 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:5.273544673 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:5.290039339 DEBUG (2): Node 2 queued 1 routes for neighbor 3 starting at 3
+0:0:5.290039339 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:5.376953534 DEBUG (3): Node 3 queued 3 routes for neighbor 4 starting at 0
+0:0:5.376953534 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:5.376953534 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:5.376953534 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:5.437500276 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:5.437500276 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:5.437500276 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:5.437500276 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:5.437500276 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:5.439087180 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:5.439087180 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:5.439087180 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:5.439087180 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:5.484253299 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:5.484253299 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:5.484253299 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:5.484253299 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:5.501770244 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:5.501770244 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:5.523437909 DEBUG (3): Node 3 queued 1 routes for neighbor 4 starting at 3
+0:0:5.523437909 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:5.583984651 DEBUG (2): Node 2 finished sending DV updates
+0:0:5.626678737 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:5.626678737 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:5.626678737 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:5.626678737 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:5.626678737 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:5.669922284 DEBUG (3): Node 3 finished sending DV updates
+0:0:5.768265157 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:5.768265157 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:5.770508355 DEBUG (4): Node 4 timer fired
+0:0:5.770508355 DEBUG (4): Node 4 starting DV update
+0:0:5.770508355 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:5.770508355 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:5.770508355 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:5.770508355 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:5.770508355 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:5.916992730 DEBUG (4): Node 4 finished sending DV updates
+0:0:5.964127110 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:5.964127110 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:5.964127110 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:5.964127110 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:5.964127110 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:10.053711080 DEBUG (1): Node 1 timer fired
+0:0:10.053711080 DEBUG (1): Node 1 starting DV update
+0:0:10.053711080 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:10.053711080 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:10.053711080 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:10.053711080 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:10.053711080 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:10.200195455 DEBUG (1): Node 1 finished sending DV updates
+0:0:10.294464250 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:10.294464250 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:10.294464250 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:10.294464250 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:10.294464250 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:10.324219026 DEBUG (2): Node 2 timer fired
+0:0:10.324219026 DEBUG (2): Node 2 starting DV update
+0:0:10.324219026 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:10.324219026 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:10.324219026 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:10.324219026 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:10.324219026 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:10.470703401 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:10.470703401 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:10.470703401 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:10.470703401 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:10.470703401 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:10.501953534 DEBUG (3): Node 3 timer fired
+0:0:10.501953534 DEBUG (3): Node 3 starting DV update
+0:0:10.501953534 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:10.501953534 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:10.501953534 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:10.501953534 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:10.501953534 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:10.542953732 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:10.542953732 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:10.542953732 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:10.542953732 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:10.542953732 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:10.583450723 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:10.583450723 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:10.583450723 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:10.583450723 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:10.583450723 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:10.612671171 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:10.612671171 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:10.612671171 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:10.612671171 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:10.612671171 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:10.617187776 DEBUG (2): Node 2 finished sending DV updates
+0:0:10.648437909 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:10.648437909 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:10.648437909 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:10.648437909 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:10.648437909 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:10.778427503 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:10.778427503 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:10.778427503 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:10.778427503 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:10.778427503 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:10.794922284 DEBUG (3): Node 3 finished sending DV updates
+0:0:11.139648980 DEBUG (4): Node 4 timer fired
+0:0:11.139648980 DEBUG (4): Node 4 starting DV update
+0:0:11.139648980 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:11.139648980 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:11.139648980 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:11.139648980 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:11.139648980 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:11.263580841 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:11.263580841 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:11.263580841 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:11.263580841 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:11.263580841 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:11.286133355 DEBUG (4): Node 4 finished sending DV updates
+0:0:15.293945455 DEBUG (1): Node 1 timer fired
+0:0:15.293945455 DEBUG (1): Node 1 starting DV update
+0:0:15.293945455 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:15.293945455 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:15.293945455 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:15.293945455 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:15.293945455 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:15.440429830 DEBUG (1): Node 1 finished sending DV updates
+0:0:15.450210678 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:15.450210678 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:15.450210678 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:15.450210678 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:15.450210678 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:15.666015901 DEBUG (2): Node 2 timer fired
+0:0:15.666015901 DEBUG (2): Node 2 starting DV update
+0:0:15.666015901 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:15.666015901 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:15.666015901 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:15.666015901 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:15.666015901 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:15.695251723 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:15.695251723 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:15.695251723 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:15.695251723 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:15.695251723 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:15.812500276 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:15.812500276 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:15.812500276 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:15.812500276 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:15.812500276 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:15.923828534 DEBUG (3): Node 3 timer fired
+0:0:15.923828534 DEBUG (3): Node 3 starting DV update
+0:0:15.923828534 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:15.923828534 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:15.923828534 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:15.923828534 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:15.923828534 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:15.958984651 DEBUG (2): Node 2 finished sending DV updates
+0:0:16.070312909 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:16.070312909 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:16.070312909 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:16.070312909 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:16.070312909 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:16.078354104 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:16.078354104 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:16.078354104 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:16.078354104 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:16.078354104 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:16.095367790 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:16.095367790 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:16.095367790 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:16.095367790 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:16.095367790 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:16.216797284 DEBUG (3): Node 3 finished sending DV updates
+0:0:16.360870761 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:16.360870761 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:16.360870761 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:16.360870761 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:16.360870761 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:16.551758355 DEBUG (4): Node 4 timer fired
+0:0:16.551758355 DEBUG (4): Node 4 starting DV update
+0:0:16.551758355 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:16.551758355 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:16.551758355 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:16.551758355 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:16.551758355 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:16.633942162 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:16.633942162 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:16.633942162 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:16.633942162 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:16.633942162 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:16.698242730 DEBUG (4): Node 4 finished sending DV updates
+0:0:20.523437643 DEBUG (1): Node 1 timer fired
+0:0:20.523437643 DEBUG (1): Node 1 starting DV update
+0:0:20.523437643 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:20.523437643 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:20.523437643 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:20.523437643 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:20.523437643 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:20.533004868 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:20.533004868 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:20.533004868 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:20.533004868 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:20.533004868 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:20.669922018 DEBUG (1): Node 1 finished sending DV updates
+0:0:21.142578401 DEBUG (2): Node 2 timer fired
+0:0:21.142578401 DEBUG (2): Node 2 starting DV update
+0:0:21.142578401 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:21.142578401 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:21.142578401 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:21.142578401 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:21.142578401 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:21.185196194 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:21.185196194 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:21.185196194 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:21.185196194 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:21.185196194 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:21.289062776 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:21.289062776 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:21.289062776 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:21.289062776 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:21.289062776 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:21.389435045 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:21.389435045 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:21.389435045 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:21.389435045 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:21.389435045 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:21.435547151 DEBUG (2): Node 2 finished sending DV updates
+0:0:21.515625409 DEBUG (3): Node 3 timer fired
+0:0:21.515625409 DEBUG (3): Node 3 starting DV update
+0:0:21.515625409 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:21.515625409 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:21.515625409 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:21.515625409 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:21.515625409 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:21.647125609 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:21.647125609 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:21.647125609 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:21.647125609 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:21.647125609 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:21.662109784 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:21.662109784 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:21.662109784 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:21.662109784 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:21.662109784 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:21.808594159 DEBUG (3): Node 3 finished sending DV updates
+0:0:21.815155422 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:21.815155422 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:21.815155422 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:21.815155422 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:21.815155422 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:21.868164605 DEBUG (4): Node 4 timer fired
+0:0:21.868164605 DEBUG (4): Node 4 starting DV update
+0:0:21.868164605 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:21.868164605 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:21.868164605 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:21.868164605 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:21.868164605 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:21.894608085 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:21.894608085 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:21.894608085 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:21.894608085 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:21.894608085 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:22.014648980 DEBUG (4): Node 4 finished sending DV updates
+0:0:26.249023580 DEBUG (1): Node 1 timer fired
+0:0:26.249023580 DEBUG (1): Node 1 starting DV update
+0:0:26.249023580 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:26.249023580 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:26.249023580 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:26.249023580 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:26.249023580 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:26.349823127 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:26.349823127 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:26.349823127 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:26.349823127 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:26.349823127 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:26.395507955 DEBUG (1): Node 1 finished sending DV updates
+0:0:26.472656526 DEBUG (2): Node 2 timer fired
+0:0:26.472656526 DEBUG (2): Node 2 starting DV update
+0:0:26.472656526 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:26.472656526 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:26.472656526 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:26.472656526 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:26.472656526 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:26.619140901 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:26.619140901 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:26.619140901 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:26.619140901 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:26.619140901 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:26.644562008 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:26.644562008 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:26.644562008 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:26.644562008 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:26.644562008 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:26.765625276 DEBUG (2): Node 2 finished sending DV updates
+0:0:26.864502175 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:26.864502175 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:26.864502175 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:26.864502175 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:26.864502175 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:27.105469159 DEBUG (3): Node 3 timer fired
+0:0:27.105469159 DEBUG (3): Node 3 starting DV update
+0:0:27.105469159 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:27.105469159 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:27.105469159 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:27.105469159 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:27.105469159 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:27.251953534 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:27.251953534 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:27.251953534 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:27.251953534 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:27.251953534 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:27.298828668 DEBUG (4): Node 4 timer fired
+0:0:27.298828668 DEBUG (4): Node 4 starting DV update
+0:0:27.298828668 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:27.298828668 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:27.298828668 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:27.298828668 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:27.298828668 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:27.342026112 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:27.342026112 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:27.342026112 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:27.342026112 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:27.342026112 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:27.360016373 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:27.360016373 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:27.360016373 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:27.360016373 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:27.360016373 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:27.398437909 DEBUG (3): Node 3 finished sending DV updates
+0:0:27.445313043 DEBUG (4): Node 4 finished sending DV updates
+0:0:27.521698399 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:27.521698399 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:27.521698399 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:27.521698399 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:27.521698399 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:31.446289339 DEBUG (2): Node 2 timer fired
+0:0:31.446289339 DEBUG (2): Node 2 starting DV update
+0:0:31.446289339 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:31.446289339 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:31.446289339 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:31.446289339 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:31.446289339 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:31.592590562 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:31.592590562 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:31.592590562 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:31.592590562 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:31.592590562 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:31.592773714 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:31.592773714 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:31.592773714 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:31.592773714 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:31.592773714 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:31.660934667 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:31.660934667 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:31.660934667 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:31.660934667 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:31.660934667 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:31.739258089 DEBUG (2): Node 2 finished sending DV updates
+0:0:31.822265768 DEBUG (1): Node 1 timer fired
+0:0:31.822265768 DEBUG (1): Node 1 starting DV update
+0:0:31.822265768 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:31.822265768 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:31.822265768 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:31.822265768 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:31.822265768 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:31.904007084 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:31.904007084 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:31.904007084 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:31.904007084 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:31.904007084 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:31.968750143 DEBUG (1): Node 1 finished sending DV updates
+0:0:32.868164472 DEBUG (3): Node 3 timer fired
+0:0:32.868164472 DEBUG (3): Node 3 starting DV update
+0:0:32.868164472 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:32.868164472 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:32.868164472 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:32.868164472 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:32.868164472 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:32.930023582 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:32.930023582 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:32.930023582 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:32.930023582 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:32.930023582 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:32.935547418 DEBUG (4): Node 4 timer fired
+0:0:32.935547418 DEBUG (4): Node 4 starting DV update
+0:0:32.935547418 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:32.935547418 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:32.935547418 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:32.935547418 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:32.935547418 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:33.014648847 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:33.014648847 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:33.014648847 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:33.014648847 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:33.014648847 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:33.056747804 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:33.056747804 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:33.056747804 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:33.056747804 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:33.056747804 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:33.082031793 DEBUG (4): Node 4 finished sending DV updates
+0:0:33.161133222 DEBUG (3): Node 3 finished sending DV updates
+0:0:33.194107576 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:33.194107576 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:33.194107576 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:33.194107576 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:33.194107576 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:36.368164339 DEBUG (2): Node 2 timer fired
+0:0:36.368164339 DEBUG (2): Node 2 starting DV update
+0:0:36.368164339 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:36.368164339 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:36.368164339 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:36.368164339 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:36.368164339 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:36.384796400 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:36.384796400 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:36.384796400 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:36.384796400 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:36.384796400 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:36.514648714 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:36.514648714 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:36.514648714 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:36.514648714 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:36.514648714 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:36.649948340 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:36.649948340 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:36.649948340 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:36.649948340 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:36.649948340 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:36.661133089 DEBUG (2): Node 2 finished sending DV updates
+0:0:37.214843893 DEBUG (1): Node 1 timer fired
+0:0:37.214843893 DEBUG (1): Node 1 starting DV update
+0:0:37.214843893 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:37.214843893 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:37.214843893 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:37.214843893 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:37.214843893 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:37.361328268 DEBUG (1): Node 1 finished sending DV updates
+0:0:37.379409917 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:37.379409917 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:37.379409917 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:37.379409917 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:37.379409917 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:38.280273847 DEBUG (3): Node 3 timer fired
+0:0:38.280273847 DEBUG (3): Node 3 starting DV update
+0:0:38.280273847 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:38.280273847 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:38.280273847 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:38.280273847 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:38.280273847 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:38.297852105 DEBUG (4): Node 4 timer fired
+0:0:38.297852105 DEBUG (4): Node 4 starting DV update
+0:0:38.297852105 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:38.297852105 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:38.297852105 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:38.297852105 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:38.297852105 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:38.413269421 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:38.413269421 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:38.413269421 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:38.413269421 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:38.413269421 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:38.426758222 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:38.426758222 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:38.426758222 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:38.426758222 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:38.426758222 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:38.444336480 DEBUG (4): Node 4 finished sending DV updates
+0:0:38.484863686 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:38.484863686 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:38.484863686 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:38.484863686 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:38.484863686 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:38.568588768 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:38.568588768 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:38.568588768 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:38.568588768 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:38.568588768 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:38.573242597 DEBUG (3): Node 3 finished sending DV updates
+0:0:41.580078401 DEBUG (2): Node 2 timer fired
+0:0:41.580078401 DEBUG (2): Node 2 starting DV update
+0:0:41.580078401 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:41.580078401 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:41.580078401 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:41.580078401 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:41.580078401 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:41.667404413 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:41.667404413 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:41.667404413 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:41.667404413 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:41.667404413 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:41.726562776 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:41.726562776 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:41.726562776 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:41.726562776 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:41.726562776 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:41.873047151 DEBUG (2): Node 2 finished sending DV updates
+0:0:41.960205300 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:41.960205300 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:41.960205300 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:41.960205300 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:41.960205300 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:42.402343893 DEBUG (1): Node 1 timer fired
+0:0:42.402343893 DEBUG (1): Node 1 starting DV update
+0:0:42.402343893 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:42.402343893 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:42.402343893 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:42.402343893 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:42.402343893 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:42.517166264 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:42.517166264 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:42.517166264 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:42.517166264 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:42.517166264 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:42.548828268 DEBUG (1): Node 1 finished sending DV updates
+0:0:43.694336480 DEBUG (4): Node 4 timer fired
+0:0:43.694336480 DEBUG (4): Node 4 starting DV update
+0:0:43.694336480 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:43.694336480 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:43.694336480 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:43.694336480 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:43.694336480 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:43.701889558 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:43.701889558 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:43.701889558 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:43.701889558 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:43.701889558 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:43.802734784 DEBUG (3): Node 3 timer fired
+0:0:43.802734784 DEBUG (3): Node 3 starting DV update
+0:0:43.802734784 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:43.802734784 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:43.802734784 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:43.802734784 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:43.802734784 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:43.840820855 DEBUG (4): Node 4 finished sending DV updates
+0:0:43.949219159 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:43.949219159 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:43.949219159 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:43.949219159 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:43.949219159 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:44.096680097 DEBUG (3): Node 3 finished sending DV updates
+0:0:44.103683839 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:44.103683839 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:44.103683839 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:44.103683839 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:44.103683839 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:44.293487914 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:44.293487914 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:44.293487914 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:44.293487914 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:44.293487914 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:47.136719026 DEBUG (2): Node 2 timer fired
+0:0:47.136719026 DEBUG (2): Node 2 starting DV update
+0:0:47.136719026 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:47.136719026 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:47.136719026 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:47.136719026 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:47.136719026 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:47.172638198 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:47.172638198 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:47.172638198 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:47.172638198 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:47.172638198 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:47.283203401 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:47.283203401 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:47.283203401 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:47.283203401 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:47.283203401 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:47.313476705 DEBUG (1): Node 1 timer fired
+0:0:47.313476705 DEBUG (1): Node 1 starting DV update
+0:0:47.313476705 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:47.313476705 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:47.313476705 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:47.313476705 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:47.313476705 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:47.343002442 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:47.343002442 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:47.343002442 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:47.343002442 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:47.343002442 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:47.429687776 DEBUG (2): Node 2 finished sending DV updates
+0:0:47.459961080 DEBUG (1): Node 1 finished sending DV updates
+0:0:47.534912351 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:47.534912351 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:47.534912351 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:47.534912351 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:47.534912351 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:48.648438043 DEBUG (4): Node 4 timer fired
+0:0:48.648438043 DEBUG (4): Node 4 starting DV update
+0:0:48.648438043 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:48.648438043 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:48.648438043 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:48.648438043 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:48.648438043 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:48.794922418 DEBUG (4): Node 4 finished sending DV updates
+0:0:48.823776766 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:48.823776766 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:48.823776766 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:48.823776766 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:48.823776766 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:49.410156659 DEBUG (3): Node 3 timer fired
+0:0:49.410156659 DEBUG (3): Node 3 starting DV update
+0:0:49.410156659 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:49.410156659 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:49.410156659 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:49.410156659 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:49.410156659 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:49.461380370 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:49.461380370 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:49.461380370 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:49.461380370 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:49.461380370 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:49.556641034 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:49.556641034 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:49.556641034 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:49.556641034 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:49.556641034 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:49.584167882 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:49.584167882 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:49.584167882 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:49.584167882 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:49.584167882 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:49.703125409 DEBUG (3): Node 3 finished sending DV updates
+0:0:52.336914339 DEBUG (2): Node 2 timer fired
+0:0:52.336914339 DEBUG (2): Node 2 starting DV update
+0:0:52.336914339 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:52.336914339 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:52.336914339 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:52.336914339 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:52.336914339 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:52.365844998 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:52.365844998 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:52.365844998 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:52.365844998 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:52.365844998 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:52.483398714 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:52.483398714 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:52.483398714 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:52.483398714 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:52.483398714 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:52.565429830 DEBUG (1): Node 1 timer fired
+0:0:52.565429830 DEBUG (1): Node 1 starting DV update
+0:0:52.565429830 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:52.565429830 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:52.565429830 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:52.565429830 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:52.565429830 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:52.609955065 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:52.609955065 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:52.609955065 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:52.609955065 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:52.609955065 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:52.629883089 DEBUG (2): Node 2 finished sending DV updates
+0:0:52.711914205 DEBUG (1): Node 1 finished sending DV updates
+0:0:52.748855693 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:52.748855693 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:52.748855693 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:52.748855693 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:52.748855693 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:53.906250543 DEBUG (4): Node 4 timer fired
+0:0:53.906250543 DEBUG (4): Node 4 starting DV update
+0:0:53.906250543 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:53.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:53.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:53.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:53.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:54.021957890 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:54.021957890 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:54.021957890 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:54.021957890 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:54.021957890 DEBUG (3): Node 3 received a DV packet from Node 4
+0:0:54.052734918 DEBUG (4): Node 4 finished sending DV updates
+0:0:54.715820722 DEBUG (3): Node 3 timer fired
+0:0:54.715820722 DEBUG (3): Node 3 starting DV update
+0:0:54.715820722 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:0:54.715820722 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:0:54.715820722 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:54.715820722 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:0:54.715820722 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:0:54.862305097 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:0:54.862305097 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:0:54.862305097 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:0:54.862305097 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:0:54.862305097 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:0:54.940948840 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:54.940948840 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:0:54.940948840 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:0:54.940948840 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:0:54.940948840 DEBUG (2): Node 2 received a DV packet from Node 3
+0:0:55.008789472 DEBUG (3): Node 3 finished sending DV updates
+0:0:55.077743895 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:0:55.077743895 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:0:55.077743895 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:0:55.077743895 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:0:55.077743895 DEBUG (4): Node 4 received a DV packet from Node 3
+0:0:57.722656526 DEBUG (2): Node 2 timer fired
+0:0:57.722656526 DEBUG (2): Node 2 starting DV update
+0:0:57.722656526 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:0:57.722656526 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:0:57.722656526 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:57.722656526 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:0:57.722656526 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:0:57.844772585 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:57.844772585 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:0:57.844772585 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:0:57.844772585 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:0:57.844772585 DEBUG (3): Node 3 received a DV packet from Node 2
+0:0:57.869140901 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:0:57.869140901 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:0:57.869140901 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:0:57.869140901 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:0:57.869140901 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:0:58.015625276 DEBUG (2): Node 2 finished sending DV updates
+0:0:58.138183854 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:0:58.138183854 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:0:58.138183854 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:0:58.138183854 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:0:58.138183854 DEBUG (1): Node 1 received a DV packet from Node 2
+0:0:58.346679830 DEBUG (1): Node 1 timer fired
+0:0:58.346679830 DEBUG (1): Node 1 starting DV update
+0:0:58.346679830 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:0:58.346679830 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:0:58.346679830 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:0:58.346679830 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:0:58.346679830 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:0:58.493164205 DEBUG (1): Node 1 finished sending DV updates
+0:0:58.645919910 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:0:58.645919910 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:0:58.645919910 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:0:58.645919910 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:0:58.645919910 DEBUG (2): Node 2 received a DV packet from Node 1
+0:0:59.213867730 DEBUG (4): Node 4 timer fired
+0:0:59.213867730 DEBUG (4): Node 4 starting DV update
+0:0:59.213867730 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:0:59.213867730 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:0:59.213867730 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:0:59.213867730 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:0:59.213867730 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:0:59.360352105 DEBUG (4): Node 4 finished sending DV updates
+0:0:59.398987355 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:0:59.398987355 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:0:59.398987355 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:0:59.398987355 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:0:59.398987355 DEBUG (3): Node 3 received a DV packet from Node 4
+TEST 60.019531s finished waiting
+TEST 60.019531s command routeDMP(2)
+0:1:0.019531393 DEBUG (2): A Command has been Issued.
+0:1:0.019531393 DEBUG (2): Command Type: Route Table Dump
+0:1:0.019531393 DEBUG (2): Node 2 Routing Table
+0:1:0.019531393 DEBUG (2): Dest NextHop Cost State
+0:1:0.019531393 DEBUG (2): 2 2 0 VALID
+0:1:0.019531393 DEBUG (2): 3 3 1 VALID
+0:1:0.019531393 DEBUG (2): 1 1 1 VALID
+0:1:0.019531393 DEBUG (2): 4 3 2 VALID
+0:1:0.219726972 DEBUG (3): Node 3 timer fired
+0:1:0.219726972 DEBUG (3): Node 3 starting DV update
+0:1:0.219726972 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:1:0.219726972 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:1:0.219726972 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:0.219726972 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:1:0.219726972 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:1:0.366211347 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:1:0.366211347 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:1:0.366211347 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:1:0.366211347 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:1:0.366211347 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:1:0.414368054 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:0.414368054 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:1:0.414368054 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:1:0.414368054 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:1:0.414368054 DEBUG (2): Node 2 received a DV packet from Node 3
+0:1:0.512695722 DEBUG (3): Node 3 finished sending DV updates
+0:1:0.573486723 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:0.573486723 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:1:0.573486723 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:1:0.573486723 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:1:0.573486723 DEBUG (4): Node 4 received a DV packet from Node 3
+TEST 61.021485s PASS node 2 printed its table
+TEST 61.021485s PASS node 2 printed route entries
+TEST 61.021485s PASS 2 -> 4 expected (3, 2, 'VALID'), got (3, 2, 'VALID')
+TEST 61.021485s wait 12s: watch two DV update rounds
+0:1:2.781250276 DEBUG (2): Node 2 timer fired
+0:1:2.781250276 DEBUG (2): Node 2 starting DV update
+0:1:2.781250276 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:1:2.781250276 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:1:2.781250276 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:2.781250276 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:1:2.781250276 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:1:2.927734651 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:1:2.927734651 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:1:2.927734651 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:1:2.927734651 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:1:2.927734651 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:1:3.025604510 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:3.025604510 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:1:3.025604510 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:1:3.025604510 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:1:3.025604510 DEBUG (3): Node 3 received a DV packet from Node 2
+0:1:3.074219026 DEBUG (2): Node 2 finished sending DV updates
+0:1:3.159256216 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:3.159256216 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:1:3.159256216 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:1:3.159256216 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:1:3.159256216 DEBUG (1): Node 1 received a DV packet from Node 2
+0:1:3.853515768 DEBUG (1): Node 1 timer fired
+0:1:3.853515768 DEBUG (1): Node 1 starting DV update
+0:1:3.853515768 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:1:3.853515768 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:1:3.853515768 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:3.853515768 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:1:3.853515768 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:1:4.000000143 DEBUG (1): Node 1 finished sending DV updates
+0:1:4.024780373 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:1:4.024780373 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:1:4.024780373 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:1:4.024780373 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:1:4.024780373 DEBUG (2): Node 2 received a DV packet from Node 1
+0:1:4.802734918 DEBUG (4): Node 4 timer fired
+0:1:4.802734918 DEBUG (4): Node 4 starting DV update
+0:1:4.802734918 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:1:4.802734918 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:1:4.802734918 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:4.802734918 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:1:4.802734918 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:1:4.857910695 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:1:4.857910695 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:1:4.857910695 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:1:4.857910695 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:1:4.857910695 DEBUG (3): Node 3 received a DV packet from Node 4
+0:1:4.949219293 DEBUG (4): Node 4 finished sending DV updates
+0:1:5.333008222 DEBUG (3): Node 3 timer fired
+0:1:5.333008222 DEBUG (3): Node 3 starting DV update
+0:1:5.333008222 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:1:5.333008222 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:1:5.333008222 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:5.333008222 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:1:5.333008222 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:1:5.441376106 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:5.441376106 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:1:5.441376106 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:1:5.441376106 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:1:5.441376106 DEBUG (2): Node 2 received a DV packet from Node 3
+0:1:5.479492597 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:1:5.479492597 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:1:5.479492597 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:1:5.479492597 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:1:5.479492597 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:1:5.625976972 DEBUG (3): Node 3 finished sending DV updates
+0:1:5.703171173 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:5.703171173 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:1:5.703171173 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:1:5.703171173 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:1:5.703171173 DEBUG (4): Node 4 received a DV packet from Node 3
+0:1:8.488281526 DEBUG (2): Node 2 timer fired
+0:1:8.488281526 DEBUG (2): Node 2 starting DV update
+0:1:8.488281526 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:1:8.488281526 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:1:8.488281526 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:8.488281526 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:1:8.488281526 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:1:8.634765901 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:1:8.634765901 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:1:8.634765901 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:1:8.634765901 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:1:8.634765901 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:1:8.666672007 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:8.666672007 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:1:8.666672007 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:1:8.666672007 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:1:8.666672007 DEBUG (3): Node 3 received a DV packet from Node 2
+0:1:8.725723512 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:8.725723512 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:1:8.725723512 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:1:8.725723512 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:1:8.725723512 DEBUG (1): Node 1 received a DV packet from Node 2
+0:1:8.781250276 DEBUG (2): Node 2 finished sending DV updates
+0:1:9.061523580 DEBUG (1): Node 1 timer fired
+0:1:9.061523580 DEBUG (1): Node 1 starting DV update
+0:1:9.061523580 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:1:9.061523580 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:1:9.061523580 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:9.061523580 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:1:9.061523580 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:1:9.208007955 DEBUG (1): Node 1 finished sending DV updates
+0:1:9.320831420 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:1:9.320831420 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:1:9.320831420 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:1:9.320831420 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:1:9.320831420 DEBUG (2): Node 2 received a DV packet from Node 1
+0:1:10.214844293 DEBUG (4): Node 4 timer fired
+0:1:10.214844293 DEBUG (4): Node 4 starting DV update
+0:1:10.214844293 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:1:10.214844293 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:1:10.214844293 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:10.214844293 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:1:10.214844293 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:1:10.260956322 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:1:10.260956322 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:1:10.260956322 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:1:10.260956322 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:1:10.260956322 DEBUG (3): Node 3 received a DV packet from Node 4
+0:1:10.361328668 DEBUG (4): Node 4 finished sending DV updates
+0:1:10.801758222 DEBUG (3): Node 3 timer fired
+0:1:10.801758222 DEBUG (3): Node 3 starting DV update
+0:1:10.801758222 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:1:10.801758222 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:1:10.801758222 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:10.801758222 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:1:10.801758222 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:1:10.917633421 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:10.917633421 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:1:10.917633421 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:1:10.917633421 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:1:10.917633421 DEBUG (2): Node 2 received a DV packet from Node 3
+0:1:10.948242597 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:1:10.948242597 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:1:10.948242597 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:1:10.948242597 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:1:10.948242597 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:1:11.034546304 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:11.034546304 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:1:11.034546304 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:1:11.034546304 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:1:11.034546304 DEBUG (4): Node 4 received a DV packet from Node 3
+0:1:11.094726972 DEBUG (3): Node 3 finished sending DV updates
+TEST 73.045899s finished waiting
+TEST 73.045899s PASS node 2 sends cost 16 for destination 4 to node 3
+TEST 73.045899s PASS node 2 sends cost 2 for destination 4 to node 1
+TEST 73.045899s PASS node 3 received the poisoned route
+TEST 73.045899s PASS node 1 received the finite route
+TEST 73.045899s PASS self-route stays cost 0 for neighbor 1
+TEST 73.045899s PASS self-route stays cost 0 for neighbor 3
+TEST 73.045899s command routeDMP(3)
+0:1:13.045898581 DEBUG (3): A Command has been Issued.
+0:1:13.045898581 DEBUG (3): Command Type: Route Table Dump
+0:1:13.045898581 DEBUG (3): Node 3 Routing Table
+0:1:13.045898581 DEBUG (3): Dest NextHop Cost State
+0:1:13.045898581 DEBUG (3): 3 3 0 VALID
+0:1:13.045898581 DEBUG (3): 2 2 1 VALID
+0:1:13.045898581 DEBUG (3): 4 4 1 VALID
+0:1:13.045898581 DEBUG (3): 1 2 2 VALID
+0:1:13.772461214 DEBUG (2): Node 2 timer fired
+0:1:13.772461214 DEBUG (2): Node 2 starting DV update
+0:1:13.772461214 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:1:13.772461214 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:1:13.772461214 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:13.772461214 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:1:13.772461214 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:1:13.801910669 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:13.801910669 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:1:13.801910669 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:1:13.801910669 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:1:13.801910669 DEBUG (3): Node 3 received a DV packet from Node 2
+0:1:13.918945589 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:1:13.918945589 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:1:13.918945589 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:1:13.918945589 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:1:13.918945589 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:1:13.961273415 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:13.961273415 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:1:13.961273415 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:1:13.961273415 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:1:13.961273415 DEBUG (1): Node 1 received a DV packet from Node 2
+TEST 74.048828s PASS node 3 printed its table
+TEST 74.048828s PASS node 3 printed route entries
+TEST 74.048828s PASS 3 -> 4 expected (4, 1, 'VALID'), got (4, 1, 'VALID')
+TEST 74.048828s node 3 cannot use node 2 as a route back to 4, preventing a two-node loop
+TEST 74.048828s command ping(2, 4); expected paths [2, 3, 4] and [4, 3, 2]
+0:1:14.048828402 DEBUG (2): A Command has been Issued.
+0:1:14.048828402 DEBUG (2): Command Type: Ping
+0:1:14.048828402 DEBUG (2): Node 2 Routing Packet - src: 2, dest: 4, seq: 0, next hop: 3, cost: 2, TTL: 32
+0:1:14.065429964 DEBUG (2): Node 2 finished sending DV updates
+0:1:14.208343779 DEBUG (3): Node 3 Routing Packet - src: 2, dest: 4, seq: 0, next hop: 4, cost: 1, TTL: 31
+0:1:14.306640768 DEBUG (1): Node 1 timer fired
+0:1:14.306640768 DEBUG (1): Node 1 starting DV update
+0:1:14.306640768 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:1:14.306640768 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:1:14.306640768 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:14.306640768 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:1:14.306640768 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:1:14.327163832 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:1:14.327163832 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:1:14.327163832 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:1:14.327163832 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:1:14.327163832 DEBUG (2): Node 2 received a DV packet from Node 1
+0:1:14.440491119 DEBUG (4): Node 4 received PING from Node 2, seq: 0
+0:1:14.440491119 DEBUG (4): Node 4 Routing Packet - src: 4, dest: 2, seq: 0, next hop: 3, cost: 2, TTL: 32
+0:1:14.453125143 DEBUG (1): Node 1 finished sending DV updates
+0:1:14.518005859 DEBUG (3): Node 3 Routing Packet - src: 4, dest: 2, seq: 0, next hop: 2, cost: 1, TTL: 31
+0:1:14.628296299 DEBUG (2): Node 2 received PING REPLY from Node 4, seq: 0
+0:1:15.895508222 DEBUG (3): Node 3 timer fired
+0:1:15.895508222 DEBUG (3): Node 3 starting DV update
+0:1:15.895508222 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:1:15.895508222 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:1:15.895508222 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:15.895508222 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:1:15.895508222 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:1:15.906250543 DEBUG (4): Node 4 timer fired
+0:1:15.906250543 DEBUG (4): Node 4 starting DV update
+0:1:15.906250543 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:1:15.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:1:15.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:15.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:1:15.906250543 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:1:16.041992597 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:1:16.041992597 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:1:16.041992597 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:1:16.041992597 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:1:16.041992597 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:1:16.043915175 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:16.043915175 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:1:16.043915175 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:1:16.043915175 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:1:16.043915175 DEBUG (2): Node 2 received a DV packet from Node 3
+0:1:16.052734918 DEBUG (4): Node 4 finished sending DV updates
+0:1:16.164322422 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:1:16.164322422 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:1:16.164322422 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:1:16.164322422 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:1:16.164322422 DEBUG (3): Node 3 received a DV packet from Node 4
+0:1:16.188476972 DEBUG (3): Node 3 finished sending DV updates
+0:1:16.250076656 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:16.250076656 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:1:16.250076656 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:1:16.250076656 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:1:16.250076656 DEBUG (4): Node 4 received a DV packet from Node 3
+0:1:19.374023580 DEBUG (1): Node 1 timer fired
+0:1:19.374023580 DEBUG (1): Node 1 starting DV update
+0:1:19.374023580 DEBUG (1): Node 1 queued 4 routes for neighbor 2 starting at 0
+0:1:19.374023580 DEBUG (1): Node 1 to neighbor 2: Dest 1 Advertised Cost 0
+0:1:19.374023580 DEBUG (1): Node 1 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:19.374023580 DEBUG (1): Node 1 to neighbor 2: Dest 3 Advertised Cost 16
+0:1:19.374023580 DEBUG (1): Node 1 to neighbor 2: Dest 4 Advertised Cost 16
+0:1:19.378906526 DEBUG (2): Node 2 timer fired
+0:1:19.378906526 DEBUG (2): Node 2 starting DV update
+0:1:19.378906526 DEBUG (2): Node 2 queued 4 routes for neighbor 3 starting at 0
+0:1:19.378906526 DEBUG (2): Node 2 to neighbor 3: Dest 2 Advertised Cost 0
+0:1:19.378906526 DEBUG (2): Node 2 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:19.378906526 DEBUG (2): Node 2 to neighbor 3: Dest 1 Advertised Cost 1
+0:1:19.378906526 DEBUG (2): Node 2 to neighbor 3: Dest 4 Advertised Cost 16
+0:1:19.485870483 DEBUG (2): Node 2 received from neighbor 1: Dest 1 Advertised Cost 0
+0:1:19.485870483 DEBUG (2): Node 2 received from neighbor 1: Dest 2 Advertised Cost 16
+0:1:19.485870483 DEBUG (2): Node 2 received from neighbor 1: Dest 3 Advertised Cost 16
+0:1:19.485870483 DEBUG (2): Node 2 received from neighbor 1: Dest 4 Advertised Cost 16
+0:1:19.485870483 DEBUG (2): Node 2 received a DV packet from Node 1
+0:1:19.520507955 DEBUG (1): Node 1 finished sending DV updates
+0:1:19.525390901 DEBUG (2): Node 2 queued 4 routes for neighbor 1 starting at 0
+0:1:19.525390901 DEBUG (2): Node 2 to neighbor 1: Dest 2 Advertised Cost 0
+0:1:19.525390901 DEBUG (2): Node 2 to neighbor 1: Dest 3 Advertised Cost 1
+0:1:19.525390901 DEBUG (2): Node 2 to neighbor 1: Dest 1 Advertised Cost 16
+0:1:19.525390901 DEBUG (2): Node 2 to neighbor 1: Dest 4 Advertised Cost 2
+0:1:19.560730254 DEBUG (3): Node 3 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:19.560730254 DEBUG (3): Node 3 received from neighbor 2: Dest 3 Advertised Cost 16
+0:1:19.560730254 DEBUG (3): Node 3 received from neighbor 2: Dest 1 Advertised Cost 1
+0:1:19.560730254 DEBUG (3): Node 3 received from neighbor 2: Dest 4 Advertised Cost 16
+0:1:19.560730254 DEBUG (3): Node 3 received a DV packet from Node 2
+0:1:19.671875276 DEBUG (2): Node 2 finished sending DV updates
+0:1:19.788513410 DEBUG (1): Node 1 received from neighbor 2: Dest 2 Advertised Cost 0
+0:1:19.788513410 DEBUG (1): Node 1 received from neighbor 2: Dest 3 Advertised Cost 1
+0:1:19.788513410 DEBUG (1): Node 1 received from neighbor 2: Dest 1 Advertised Cost 16
+0:1:19.788513410 DEBUG (1): Node 1 received from neighbor 2: Dest 4 Advertised Cost 2
+0:1:19.788513410 DEBUG (1): Node 1 received a DV packet from Node 2
+0:1:20.897461480 DEBUG (4): Node 4 timer fired
+0:1:20.897461480 DEBUG (4): Node 4 starting DV update
+0:1:20.897461480 DEBUG (4): Node 4 queued 4 routes for neighbor 3 starting at 0
+0:1:20.897461480 DEBUG (4): Node 4 to neighbor 3: Dest 4 Advertised Cost 0
+0:1:20.897461480 DEBUG (4): Node 4 to neighbor 3: Dest 3 Advertised Cost 16
+0:1:20.897461480 DEBUG (4): Node 4 to neighbor 3: Dest 2 Advertised Cost 16
+0:1:20.897461480 DEBUG (4): Node 4 to neighbor 3: Dest 1 Advertised Cost 16
+0:1:20.952682999 DEBUG (3): Node 3 received from neighbor 4: Dest 4 Advertised Cost 0
+0:1:20.952682999 DEBUG (3): Node 3 received from neighbor 4: Dest 3 Advertised Cost 16
+0:1:20.952682999 DEBUG (3): Node 3 received from neighbor 4: Dest 2 Advertised Cost 16
+0:1:20.952682999 DEBUG (3): Node 3 received from neighbor 4: Dest 1 Advertised Cost 16
+0:1:20.952682999 DEBUG (3): Node 3 received a DV packet from Node 4
+0:1:21.043945855 DEBUG (4): Node 4 finished sending DV updates
+0:1:21.591797284 DEBUG (3): Node 3 timer fired
+0:1:21.591797284 DEBUG (3): Node 3 starting DV update
+0:1:21.591797284 DEBUG (3): Node 3 queued 4 routes for neighbor 2 starting at 0
+0:1:21.591797284 DEBUG (3): Node 3 to neighbor 2: Dest 3 Advertised Cost 0
+0:1:21.591797284 DEBUG (3): Node 3 to neighbor 2: Dest 2 Advertised Cost 16
+0:1:21.591797284 DEBUG (3): Node 3 to neighbor 2: Dest 4 Advertised Cost 1
+0:1:21.591797284 DEBUG (3): Node 3 to neighbor 2: Dest 1 Advertised Cost 16
+0:1:21.738281659 DEBUG (3): Node 3 queued 4 routes for neighbor 4 starting at 0
+0:1:21.738281659 DEBUG (3): Node 3 to neighbor 4: Dest 3 Advertised Cost 0
+0:1:21.738281659 DEBUG (3): Node 3 to neighbor 4: Dest 2 Advertised Cost 1
+0:1:21.738281659 DEBUG (3): Node 3 to neighbor 4: Dest 4 Advertised Cost 16
+0:1:21.738281659 DEBUG (3): Node 3 to neighbor 4: Dest 1 Advertised Cost 2
+0:1:21.841263189 DEBUG (2): Node 2 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:21.841263189 DEBUG (2): Node 2 received from neighbor 3: Dest 2 Advertised Cost 16
+0:1:21.841263189 DEBUG (2): Node 2 received from neighbor 3: Dest 4 Advertised Cost 1
+0:1:21.841263189 DEBUG (2): Node 2 received from neighbor 3: Dest 1 Advertised Cost 16
+0:1:21.841263189 DEBUG (2): Node 2 received a DV packet from Node 3
+0:1:21.884766034 DEBUG (3): Node 3 finished sending DV updates
+0:1:22.100174344 DEBUG (4): Node 4 received from neighbor 3: Dest 3 Advertised Cost 0
+0:1:22.100174344 DEBUG (4): Node 4 received from neighbor 3: Dest 2 Advertised Cost 1
+0:1:22.100174344 DEBUG (4): Node 4 received from neighbor 3: Dest 4 Advertised Cost 16
+0:1:22.100174344 DEBUG (4): Node 4 received from neighbor 3: Dest 1 Advertised Cost 2
+0:1:22.100174344 DEBUG (4): Node 4 received a DV packet from Node 3
+TEST 84.062501s PASS source queued the ping
+TEST 84.062501s PASS ping followed [2, 3]
+TEST 84.062501s PASS ping used the expected next hops
+TEST 84.062501s PASS ping used the expected route costs
+TEST 84.062501s PASS ping decreased TTL once at each relay
+TEST 84.062501s PASS reply followed [4, 3]
+TEST 84.062501s PASS reply used the expected next hops
+TEST 84.062501s PASS reply used the expected route costs
+TEST 84.062501s PASS reply decreased TTL once at each relay
+TEST 84.062501s PASS destination received the routed ping
+TEST 84.062501s PASS source received the reply for this ping
+TEST 84.062501s PASS ping and reply did not use flooding
+TEST 84.062501s test_dv_poison finished; all checks passed
