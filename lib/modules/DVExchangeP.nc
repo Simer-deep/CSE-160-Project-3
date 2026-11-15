@@ -243,6 +243,13 @@ implementation {
                 outgoing.payload[4 + entryCount * 2] =
                     sendCost;
 
+                dbg(ROUTING_CHANNEL,
+                "Node %d to neighbor %d: Dest %d Advertised Cost %d\n",
+                TOS_NODE_ID,
+                neighbor,
+                snapshotDestinations[i],
+                sendCost);
+
                 entryCount++;
             }
 
@@ -632,7 +639,7 @@ implementation {
             );
 
             dbg(ROUTING_CHANNEL,
-                "Node %d received from neighbor %d: Dest %d Cost %d\n",
+                "Node %d received from neighbor %d: Dest %d Advertised Cost %d\n",
                 TOS_NODE_ID,
                 neighbor,
                 destination,
