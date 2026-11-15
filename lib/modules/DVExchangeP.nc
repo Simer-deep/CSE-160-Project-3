@@ -482,6 +482,11 @@ implementation {
             }
         }
 
+        dbg(ROUTING_CHANNEL,
+            "Node %d received a DV packet from Node %d\n",
+            TOS_NODE_ID,
+            neighbor);
+
         // 7. Find temporary storage for this neighbor
         slotIndex = findReassemblySlot(neighbor);
 

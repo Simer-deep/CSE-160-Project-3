@@ -146,13 +146,24 @@ class TestSim:
         return self.injectRaw(source, receiver, 9, data)
 
     def injectDV(self, source, receiver, entries):
-        if len(entries) > 9:
-            raise ValueError("A DV packet holds at most nine entries")
-        body = struct.pack("B", len(entries))
+        if len(entries) > 8:
+            raise ValueError("A DV packet holds at most eight entries")
+
+        # DV metadata: count, packet index, total packets
+        body = struct.pack("BBB", len(entries), 0, 1)
+
         for destination, cost in entries:
             body += struct.pack("BB", destination, cost)
-        data = struct.pack("!HHHBB", receiver, source, 0, 1, 5)
-        return self.injectRaw(source, receiver, 8, data + body.ljust(20, b"\0"))
+
+        # Use a newer update ID for this isolated injected test.
+        data = struct.pack("!HHHBB", receiver, source, 1000, 1, 5)
+
+        return self.injectRaw(
+            source,
+            receiver,
+            8,
+            data + body.ljust(20, b"\0")
+        )
 
     def addChannel(self, channelName, out=sys.stdout):
         self.t.addChannel(channelName, out)

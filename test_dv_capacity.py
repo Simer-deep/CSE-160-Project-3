@@ -19,7 +19,7 @@ def main():
         entry = re.search(r"Node 1 to neighbor 2: Dest (\d+) Advertised Cost (\d+)", line)
         if entry:
             destination, cost = map(int, entry.groups())
-            if offset >= 9 and destination != 2 and cost < 16:
+            if offset >= 8 and destination != 2 and cost < 16:
                 later.append(destination)
     test.check(bool(later), "node 1 put routes in a second packet")
     destination = later[0]
