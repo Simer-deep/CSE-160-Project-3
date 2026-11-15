@@ -243,13 +243,6 @@ implementation {
                 outgoing.payload[4 + entryCount * 2] =
                     sendCost;
 
-                dbg(ROUTING_CHANNEL,
-                "Node %d to neighbor %d: Dest %d Advertised Cost %d\n",
-                TOS_NODE_ID,
-                neighbor,
-                snapshotDestinations[i],
-                sendCost);
-
                 entryCount++;
             }
 
@@ -269,6 +262,35 @@ implementation {
 
                 call SendTimer.startOneShot(250);
                 return;
+            }
+
+            dbg(ROUTING_CHANNEL,
+                "Node %d queued %d routes for neighbor %d starting at %d\n",
+                TOS_NODE_ID,
+                entryCount,
+                neighbor,
+                routeIndex);
+
+            for(i = routeIndex; i < routeIndex + entryCount; i++) 
+            {
+
+                sendCost = snapshotCosts[i];
+
+                if(snapshotDestinations[i] == TOS_NODE_ID) 
+                {
+                    sendCost = 0;
+                }
+                else if(snapshotNextHops[i] == neighbor) 
+                {
+                    sendCost = DV_INFINITY;
+                }
+
+                dbg(ROUTING_CHANNEL,
+                    "Node %d to neighbor %d: Dest %d Advertised Cost %d\n",
+                    TOS_NODE_ID,
+                    neighbor,
+                    snapshotDestinations[i],
+                    sendCost);
             }
 
             dbg(ROUTING_CHANNEL,
