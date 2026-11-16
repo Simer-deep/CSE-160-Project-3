@@ -142,7 +142,7 @@ class TestSim:
     def injectIP(self, source, dest, receiver, ttl, seq, payload="TTL"):
         if not isinstance(payload, bytes):
             payload = payload.encode("ascii")
-        data = struct.pack("!HHHBB20s", dest, source, seq, ttl, 0, payload)
+        data = struct.pack("!HHHBB21s", dest, source, seq, ttl, 0, payload)
         return self.injectRaw(source, receiver, 9, data)
 
     def injectDV(self, source, receiver, entries):
@@ -162,7 +162,7 @@ class TestSim:
             source,
             receiver,
             8,
-            data + body.ljust(20, b"\0")
+            data + body.ljust(21, b"\0")
         )
 
     def addChannel(self, channelName, out=sys.stdout):

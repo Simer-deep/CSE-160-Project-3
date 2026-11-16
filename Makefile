@@ -4,7 +4,7 @@ COMPONENT=NodeC
 INCLUDE=-IdataStructures
 INCLUDE+=-IdataStructures/interfaces/ -IdataStructures/modules
 INCLUDE+=-Ilib/interfaces -Ilib/modules
-CFLAGS += -DTOSH_DATA_LENGTH=28
+CFLAGS += -DTOSH_DATA_LENGTH=29
 CFLAGS+=$(INCLUDE)
 
 include $(TINYOS_ROOT_DIR)/Makefile.include
