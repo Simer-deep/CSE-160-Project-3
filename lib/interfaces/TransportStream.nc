@@ -1,8 +1,8 @@
 #include "../../includes/socket.h"
 
 interface TransportStream {
-    command void initialize(socket_store_t* socket, uint16_t sendSeq,
-        uint16_t receiveSeq, uint8_t peerWindow);
+    command void initialize(socket_store_t* socket, uint16_t sendSequence,
+        uint16_t receiveSequence, uint8_t peerWindow);
     command uint16_t write(socket_store_t* socket, uint8_t* buffer,
         uint16_t length);
     command uint16_t read(socket_store_t* socket, uint8_t* buffer,

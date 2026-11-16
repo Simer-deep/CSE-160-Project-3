@@ -47,9 +47,9 @@ typedef struct socket_store_t {
     uint16_t remoteAddr;
     socket_port_t remotePort;
 
-    uint16_t iss;
-    uint16_t irs;
-    uint16_t finSeq;
+    uint16_t initialSendSequence;
+    uint16_t initialReceiveSequence;
+    uint16_t finSequence;
 
     bool closeRequested;
     bool finSent;
@@ -60,24 +60,24 @@ typedef struct socket_store_t {
     uint32_t controlDeadline;
     uint32_t timeWaitDeadline;
 
-    uint8_t sendBuff[SOCKET_BUFFER_SIZE];
+    uint8_t sendBuffer[SOCKET_BUFFER_SIZE];
 
-    uint16_t sndUna;
-    uint16_t sndNxt;
-    uint16_t sndEnd;
+    uint16_t sendUnacked;
+    uint16_t sendNext;
+    uint16_t sendEnd;
 
     uint8_t sendHead;
     uint8_t sendUsed;
 
-    uint8_t peerWnd;
+    uint8_t peerWindow;
     uint8_t sendWindow;
 
-    uint8_t rcvdBuff[SOCKET_BUFFER_SIZE];
+    uint8_t receiveBuffer[SOCKET_BUFFER_SIZE];
 
-    uint16_t rcvNxt;
+    uint16_t receiveNext;
 
-    uint8_t recvHead;
-    uint8_t recvUsed;
+    uint8_t receiveHead;
+    uint8_t receiveUsed;
 
     uint32_t dataDeadline;
     uint8_t dataRetries;

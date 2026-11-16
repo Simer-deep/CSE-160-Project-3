@@ -12,26 +12,26 @@ implementation {
     }
 
     command void TransportStream.initialize(socket_store_t* socket,
-        uint16_t sendSeq, uint16_t receiveSeq, uint8_t peerWindow) {
+        uint16_t sendSequence, uint16_t receiveSequence, uint8_t peerWindow) {
         if (socket == NULL) {
             return;
         }
 
-        socket->sndUna = sendSeq;
-        socket->sndNxt = sendSeq;
-        socket->sndEnd = sendSeq;
+        socket->sendUnacked = sendSequence;
+        socket->sendNext = sendSequence;
+        socket->sendEnd = sendSequence;
         socket->sendHead = 0;
         socket->sendUsed = 0;
         socket->sendWindow = TRANSPORT_SEND_WINDOW;
-        socket->peerWnd = peerWindow;
+        socket->peerWindow = peerWindow;
 
-        if (socket->peerWnd > SOCKET_BUFFER_SIZE) {
-            socket->peerWnd = SOCKET_BUFFER_SIZE;
+        if (socket->peerWindow > SOCKET_BUFFER_SIZE) {
+            socket->peerWindow = SOCKET_BUFFER_SIZE;
         }
 
-        socket->rcvNxt = receiveSeq;
-        socket->recvHead = 0;
-        socket->recvUsed = 0;
+        socket->receiveNext = receiveSequence;
+        socket->receiveHead = 0;
+        socket->receiveUsed = 0;
         socket->dataDeadline = 0;
         socket->dataRetries = 0;
     }
@@ -53,12 +53,12 @@ implementation {
         }
 
         for (i = 0; i < count; i++) {
-            socket->sendBuff[(socket->sendHead + socket->sendUsed + i) %
+            socket->sendBuffer[(socket->sendHead + socket->sendUsed + i) %
                 SOCKET_BUFFER_SIZE] = buffer[i];
         }
 
         socket->sendUsed += count;
-        socket->sndEnd += count;
+        socket->sendEnd += count;
         return count;
     }
 
@@ -71,22 +71,22 @@ implementation {
             return 0;
         }
 
-        count = socket->recvUsed;
+        count = socket->receiveUsed;
         if (count > length) {
             count = length;
         }
 
         for (i = 0; i < count; i++) {
-            buffer[i] = socket->rcvdBuff[(socket->recvHead + i) %
+            buffer[i] = socket->receiveBuffer[(socket->receiveHead + i) %
                 SOCKET_BUFFER_SIZE];
         }
 
-        socket->recvHead = (socket->recvHead + count) % SOCKET_BUFFER_SIZE;
-        socket->recvUsed -= count;
+        socket->receiveHead = (socket->receiveHead + count) % SOCKET_BUFFER_SIZE;
+        socket->receiveUsed -= count;
 
         if (count > 0 && isConnected(socket)) {
-            signal TransportStream.ackNeeded(socket, socket->rcvNxt,
-                SOCKET_BUFFER_SIZE - socket->recvUsed);
+            signal TransportStream.ackNeeded(socket, socket->receiveNext,
+                SOCKET_BUFFER_SIZE - socket->receiveUsed);
         }
 
         return count;
@@ -103,20 +103,20 @@ implementation {
             return FAIL;
         }
 
-        if (sequence == socket->rcvNxt &&
-            length <= SOCKET_BUFFER_SIZE - socket->recvUsed) {
+        if (sequence == socket->receiveNext &&
+            length <= SOCKET_BUFFER_SIZE - socket->receiveUsed) {
             for (i = 0; i < length; i++) {
-                socket->rcvdBuff[(socket->recvHead + socket->recvUsed + i) %
+                socket->receiveBuffer[(socket->receiveHead + socket->receiveUsed + i) %
                     SOCKET_BUFFER_SIZE] = data[i];
             }
 
-            socket->recvUsed += length;
-            socket->rcvNxt += length;
+            socket->receiveUsed += length;
+            socket->receiveNext += length;
             result = SUCCESS;
         }
 
-        signal TransportStream.ackNeeded(socket, socket->rcvNxt,
-            SOCKET_BUFFER_SIZE - socket->recvUsed);
+        signal TransportStream.ackNeeded(socket, socket->receiveNext,
+            SOCKET_BUFFER_SIZE - socket->receiveUsed);
         return result;
     }
 
@@ -129,8 +129,8 @@ implementation {
             return FAIL;
         }
 
-        acknowledged = (uint16_t)(acknowledgement - socket->sndUna);
-        outstanding = (uint16_t)(socket->sndNxt - socket->sndUna);
+        acknowledged = (uint16_t)(acknowledgement - socket->sendUnacked);
+        outstanding = (uint16_t)(socket->sendNext - socket->sendUnacked);
 
         if (acknowledged > outstanding || acknowledged > socket->sendUsed) {
             return FAIL;
@@ -139,14 +139,14 @@ implementation {
         socket->sendHead = (socket->sendHead + acknowledged) %
             SOCKET_BUFFER_SIZE;
         socket->sendUsed -= acknowledged;
-        socket->sndUna = acknowledgement;
-        socket->peerWnd = window;
+        socket->sendUnacked = acknowledgement;
+        socket->peerWindow = window;
 
         if (acknowledged > 0) {
             socket->dataRetries = 0;
         }
 
-        if (socket->sndUna == socket->sndNxt) {
+        if (socket->sendUnacked == socket->sendNext) {
             socket->dataDeadline = 0;
         }
 
