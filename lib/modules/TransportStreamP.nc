@@ -97,13 +97,20 @@ implementation {
         uint8_t i;
         error_t result = FAIL;
 
-        if (!isConnected(socket) || socket->state == CLOSE_WAIT ||
-            socket->finReceived || data == NULL || length == 0 ||
+        if (socket == NULL || !socket->inUse || data == NULL || length == 0 ||
             length > TRANSPORT_MAX_DATA_SIZE) {
             return FAIL;
         }
 
-        if (sequence == socket->receiveNext &&
+        if (!isConnected(socket) && socket->state != LAST_ACK &&
+            socket->state != CLOSING && socket->state != TIME_WAIT) {
+            return FAIL;
+        }
+
+        if (!socket->finReceived &&
+            (socket->state == ESTABLISHED || socket->state == FIN_WAIT_1 ||
+             socket->state == FIN_WAIT_2) &&
+            sequence == socket->receiveNext &&
             length <= SOCKET_BUFFER_SIZE - socket->receiveUsed) {
             for (i = 0; i < length; i++) {
                 socket->receiveBuffer[(socket->receiveHead + socket->receiveUsed + i) %
