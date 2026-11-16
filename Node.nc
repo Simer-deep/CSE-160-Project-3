@@ -12,6 +12,8 @@ module Node {
    uses interface IPRouting;
 
    uses interface DistanceVector as DV;
+
+   uses interface Transport;
 }
 implementation {
    event void Boot.booted() {

@@ -797,7 +797,7 @@ extern void *malloc(size_t __size) __attribute((__leaf__)) __attribute((__nothro
 #line 483
 extern void free(void *__ptr) __attribute((__leaf__)) __attribute((__nothrow__)) ;
 #line 742
-typedef int (*__compar_fn_t)(const void *arg_0x71c0cab43020, const void *arg_0x71c0cab43320);
+typedef int (*__compar_fn_t)(const void *arg_0x7ffffb3dc020, const void *arg_0x7ffffb3dc320);
 #line 780
 __extension__ 
 #line 797
@@ -818,7 +818,7 @@ extern double fabs(double __x) __attribute((__leaf__)) __attribute((__nothrow__)
 
 extern double floor(double __x) __attribute((__leaf__)) __attribute((__nothrow__)) __attribute((const)) ;
 #line 250
-extern double erfc(double arg_0x71c0caabb5e0) __attribute((__leaf__)) __attribute((__nothrow__)) ;
+extern double erfc(double arg_0x7ffffb3545e0) __attribute((__leaf__)) __attribute((__nothrow__)) ;
 #line 326
 __extension__ 
 
@@ -1221,8 +1221,8 @@ typedef struct hashtable hashtable_t;
 #line 78
 struct hashtable *
 create_hashtable(unsigned int minsize, 
-unsigned int (*hashfunction)(void *arg_0x71c0ca85e3a0), 
-int (*key_eq_fn)(void *arg_0x71c0ca85eb70, void *arg_0x71c0ca85ee30));
+unsigned int (*hashfunction)(void *arg_0x7ffffb0f73a0), 
+int (*key_eq_fn)(void *arg_0x7ffffb0f7b70, void *arg_0x7ffffb0f7e30));
 #line 103
 #line 102
 int 
@@ -1258,7 +1258,7 @@ typedef struct sim_log_channel {
 } sim_log_channel_t;
 
 enum __nesc_unnamed4272 {
-  SIM_LOG_OUTPUT_COUNT = 261U
+  SIM_LOG_OUTPUT_COUNT = 266U
 };
 
 sim_log_output_t outputs[SIM_LOG_OUTPUT_COUNT];
@@ -1838,7 +1838,7 @@ struct tm;
 
 struct tm;
 # 46 "/opt/tinyos-main/tos/lib/tossim/randomlib.h"
-static inline void RandomInitialise(int arg_0x71c0ca64bc00, int arg_0x71c0ca64be80);
+static inline void RandomInitialise(int arg_0x7ffffaee4c00, int arg_0x7ffffaee4e80);
 static double RandomUniform(void );
 # 51 "/opt/tinyos-main/tos/lib/tossim/sim_noise.c"
 int numCase1 = 0;
@@ -2108,7 +2108,7 @@ typedef union message_metadata {
 #line 14
 typedef nx_struct message_t {
   nx_uint8_t header[sizeof(message_header_t )];
-  nx_uint8_t data[28];
+  nx_uint8_t data[29];
   nx_uint8_t footer[sizeof(message_footer_t )];
   nx_uint8_t metadata[sizeof(message_metadata_t )];
 } __attribute__((packed)) message_t;
@@ -3409,7 +3409,7 @@ enum __nesc_unnamed4295 {
 
   MAC_FOOTER_SIZE = sizeof(uint16_t ), 
 
-  MAC_PACKET_SIZE = MAC_HEADER_SIZE + 28 + MAC_FOOTER_SIZE, 
+  MAC_PACKET_SIZE = MAC_HEADER_SIZE + 29 + MAC_FOOTER_SIZE, 
 
   CC2420_SIZE = MAC_HEADER_SIZE + MAC_FOOTER_SIZE
 };
@@ -3728,7 +3728,7 @@ char FLOODING_CHANNEL[9] = "flooding";
 
 
 char ROUTING_CHANNEL[8] = "routing";
-# 9 "lib/interfaces/../../includes/protocol.h"
+# 9 "includes/protocol.h"
 enum __nesc_unnamed4297 {
   PROTOCOL_PING = 0, 
   PROTOCOL_PINGREPLY = 1, 
@@ -3738,10 +3738,10 @@ enum __nesc_unnamed4297 {
   PROTOCOL_DV = 5, 
   PROTOCOL_CMD = 99
 };
-# 12 "lib/interfaces/../../includes/packet.h"
+# 12 "includes/packet.h"
 enum __nesc_unnamed4298 {
   PACKET_HEADER_LENGTH = 8, 
-  PACKET_MAX_PAYLOAD_SIZE = 28 - PACKET_HEADER_LENGTH, 
+  PACKET_MAX_PAYLOAD_SIZE = 29 - PACKET_HEADER_LENGTH, 
   MAX_TTL = 32
 };
 
@@ -3766,21 +3766,150 @@ typedef nx_struct pack {
 enum __nesc_unnamed4299 {
   AM_PACK = 6
 };
-# 6 "lib/interfaces/../../includes/dv.h"
+# 4 "includes/socket.h"
 enum __nesc_unnamed4300 {
+  MAX_NUM_OF_SOCKETS = 3, 
+  ROOT_SOCKET_ADDR = 255, 
+  ROOT_SOCKET_PORT = 255, 
+  SOCKET_BUFFER_SIZE = 128, 
+  TRANSPORT_SEND_WINDOW = 48, 
+  TRANSPORT_MAX_RETRIES = 8, 
+  TRANSPORT_RTO_MS = 2000, 
+  TRANSPORT_TIME_WAIT_MS = 10000
+};
+
+enum socket_state {
+  CLOSED, 
+  LISTEN, 
+  SYN_SENT, 
+  SYN_RCVD, 
+  ESTABLISHED, 
+  FIN_WAIT_1, 
+  FIN_WAIT_2, 
+  CLOSE_WAIT, 
+  LAST_ACK, 
+  CLOSING, 
+  TIME_WAIT
+};
+
+typedef nx_uint8_t nx_socket_port_t;
+typedef uint8_t socket_port_t;
+
+
+
+
+#line 32
+typedef nx_struct socket_addr_t {
+  nx_socket_port_t port;
+  nx_uint16_t addr;
+} __attribute__((packed)) socket_addr_t;
+
+typedef uint8_t socket_t;
+#line 86
+#line 39
+typedef struct socket_store_t {
+
+  bool inUse;
+  enum socket_state state;
+
+  uint16_t localAddr;
+  socket_port_t localPort;
+
+  uint16_t remoteAddr;
+  socket_port_t remotePort;
+
+  uint16_t initialSendSequence;
+  uint16_t initialReceiveSequence;
+  uint16_t finSequence;
+
+  bool closeRequested;
+  bool finSent;
+  bool finAcked;
+  bool finReceived;
+
+  uint8_t controlRetries;
+  uint32_t controlDeadline;
+  uint32_t timeWaitDeadline;
+
+  uint8_t sendBuffer[SOCKET_BUFFER_SIZE];
+
+  uint16_t sendUnacked;
+  uint16_t sendNext;
+  uint16_t sendEnd;
+
+  uint8_t sendHead;
+  uint8_t sendUsed;
+
+  uint8_t peerWindow;
+  uint8_t sendWindow;
+
+  uint8_t receiveBuffer[SOCKET_BUFFER_SIZE];
+
+  uint16_t receiveNext;
+
+  uint8_t receiveHead;
+  uint8_t receiveUsed;
+
+  uint32_t dataDeadline;
+  uint8_t dataRetries;
+  uint32_t windowDeadline;
+} 
+socket_store_t;
+# 7 "includes/transport.h"
+enum __nesc_unnamed4301 {
+  TCP_FLAG_SYN = 0x01, 
+  TCP_FLAG_ACK = 0x02, 
+  TCP_FLAG_FIN = 0x04, 
+  TCP_FLAG_DATA = 0x08
+};
+
+enum __nesc_unnamed4302 {
+  TRANSPORT_HEADER_SIZE = 9, 
+  TRANSPORT_MAX_DATA_SIZE = 
+  PACKET_MAX_PAYLOAD_SIZE - TRANSPORT_HEADER_SIZE
+};
+
+
+
+
+
+
+
+
+
+#line 20
+typedef nx_struct transport_header_t {
+  nx_uint8_t srcPort;
+  nx_uint8_t destPort;
+  nx_uint8_t flags;
+  nx_uint16_t seq;
+  nx_uint16_t ack;
+  nx_uint8_t window;
+  nx_uint8_t length;
+} __attribute__((packed)) transport_header_t;
+# 6 "lib/interfaces/../../includes/dv.h"
+enum __nesc_unnamed4303 {
   DV_INFINITY = 16, 
   DV_ENTRY_SIZE = 2, 
+  DV_PACKET_HEADER_SIZE = 3, 
+
   DV_ROUTE_TIMEOUT = 20000, 
   DV_WITHDRAW_TIMEOUT = 30000, 
+  DV_REASSEMBLY_TIMEOUT = 10000, 
 
   DV_MAX_ENTRIES = (
-  PACKET_MAX_PAYLOAD_SIZE - 1) / DV_ENTRY_SIZE, 
+  PACKET_MAX_PAYLOAD_SIZE - DV_PACKET_HEADER_SIZE) / DV_ENTRY_SIZE, 
 
   DV_MAX_ROUTES = 32, 
+  DV_MAX_NEIGHBORS = 15, 
+
+  DV_MAX_PACKETS = (
+  DV_MAX_ROUTES + DV_MAX_ENTRIES - 1) / DV_MAX_ENTRIES, 
+
   DV_NO_NEXT_HOP = 0xFFFF
 };
 
-enum __nesc_unnamed4301 {
+enum __nesc_unnamed4304 {
   DV_ROUTE_UNUSED = 0, 
   DV_ROUTE_VALID = 1, 
   DV_ROUTE_WITHDRAWN = 2
@@ -3792,7 +3921,7 @@ enum __nesc_unnamed4301 {
 
 
 
-#line 25
+#line 33
 typedef struct dv_route {
   uint16_t destination;
   uint16_t nextHop;
@@ -3801,7 +3930,7 @@ typedef struct dv_route {
   uint32_t lastUpdated;
 } dv_route_t;
 # 10 "lib/modules/../../includes/CommandMsg.h"
-enum __nesc_unnamed4302 {
+enum __nesc_unnamed4305 {
   CMD_PACKET_HEADER_LENGTH = 3, 
   CMD_PACKET_MAX_PAYLOAD_SIZE = 28 - CMD_PACKET_HEADER_LENGTH
 };
@@ -3818,11 +3947,11 @@ typedef nx_struct CommandMsg {
   nx_uint8_t payload[CMD_PACKET_MAX_PAYLOAD_SIZE];
 } __attribute__((packed)) CommandMsg;
 
-enum __nesc_unnamed4303 {
+enum __nesc_unnamed4306 {
   AM_COMMANDMSG = 99
 };
 # 12 "lib/modules/../../includes/command.h"
-enum __nesc_unnamed4304 {
+enum __nesc_unnamed4307 {
   CMD_PING = 0, 
   CMD_NEIGHBOR_DUMP = 1, 
   CMD_LINKSTATE_DUMP = 2, 
@@ -3833,43 +3962,43 @@ enum __nesc_unnamed4304 {
   CMD_ERROR = 9
 };
 
-enum __nesc_unnamed4305 {
+enum __nesc_unnamed4308 {
   CMD_LENGTH = 1
 };
 # 41 "/opt/tinyos-main/tos/lib/timer/Timer.h"
-typedef struct __nesc_unnamed4306 {
+typedef struct __nesc_unnamed4309 {
 #line 41
   int notUsed;
 } 
 #line 41
 TSecond;
-typedef struct __nesc_unnamed4307 {
+typedef struct __nesc_unnamed4310 {
 #line 42
   int notUsed;
 } 
 #line 42
 TMilli;
-typedef struct __nesc_unnamed4308 {
+typedef struct __nesc_unnamed4311 {
 #line 43
   int notUsed;
 } 
 #line 43
 T32khz;
-typedef struct __nesc_unnamed4309 {
+typedef struct __nesc_unnamed4312 {
 #line 44
   int notUsed;
 } 
 #line 44
 TMicro;
 # 6 "lib/modules/../../includes/am_types.h"
-enum __nesc_unnamed4310 {
+enum __nesc_unnamed4313 {
   AM_FLOODING = 10, 
   AM_NEIGHBOR_DISCOVERY = 7, 
   AM_DV = 8, 
   AM_IP = 9
 };
 # 52 "/opt/tinyos-main/tos/chips/atm128/timer/Atm128Timer.h"
-enum __nesc_unnamed4311 {
+enum __nesc_unnamed4314 {
   ATM128_CLK8_OFF = 0x0, 
   ATM128_CLK8_NORMAL = 0x1, 
   ATM128_CLK8_DIVIDE_8 = 0x2, 
@@ -3880,7 +4009,7 @@ enum __nesc_unnamed4311 {
   ATM128_CLK8_DIVIDE_1024 = 0x7
 };
 
-enum __nesc_unnamed4312 {
+enum __nesc_unnamed4315 {
   ATM128_CLK16_OFF = 0x0, 
   ATM128_CLK16_NORMAL = 0x1, 
   ATM128_CLK16_DIVIDE_8 = 0x2, 
@@ -3892,14 +4021,14 @@ enum __nesc_unnamed4312 {
 };
 
 
-enum __nesc_unnamed4313 {
+enum __nesc_unnamed4316 {
   AVR_CLOCK_OFF = 0, 
   AVR_CLOCK_ON = 1, 
   AVR_CLOCK_DIVIDE_8 = 2
 };
 
 
-enum __nesc_unnamed4314 {
+enum __nesc_unnamed4317 {
   ATM128_WAVE8_NORMAL = 0, 
   ATM128_WAVE8_PWM, 
   ATM128_WAVE8_CTC, 
@@ -3907,7 +4036,7 @@ enum __nesc_unnamed4314 {
 };
 
 
-enum __nesc_unnamed4315 {
+enum __nesc_unnamed4318 {
   ATM128_COMPARE_OFF = 0, 
   ATM128_COMPARE_TOGGLE, 
   ATM128_COMPARE_CLEAR, 
@@ -3915,10 +4044,10 @@ enum __nesc_unnamed4315 {
 };
 #line 108
 #line 98
-typedef union __nesc_unnamed4316 {
+typedef union __nesc_unnamed4319 {
 
   uint8_t flat;
-  struct __nesc_unnamed4317 {
+  struct __nesc_unnamed4320 {
     uint8_t cs : 3;
     uint8_t wgm1 : 1;
     uint8_t com : 2;
@@ -3936,10 +4065,10 @@ typedef uint8_t Atm128_TCNT2_t;
 typedef uint8_t Atm128_OCR2_t;
 #line 130
 #line 120
-typedef union __nesc_unnamed4318 {
+typedef union __nesc_unnamed4321 {
 
   uint8_t flat;
-  struct __nesc_unnamed4319 {
+  struct __nesc_unnamed4322 {
     uint8_t tcr0ub : 1;
     uint8_t ocr0ub : 1;
     uint8_t tcn0ub : 1;
@@ -3949,10 +4078,10 @@ typedef union __nesc_unnamed4318 {
 } Atm128Assr_t;
 #line 146
 #line 133
-typedef union __nesc_unnamed4320 {
+typedef union __nesc_unnamed4323 {
 
   uint8_t flat;
-  struct __nesc_unnamed4321 {
+  struct __nesc_unnamed4324 {
     uint8_t toie0 : 1;
     uint8_t ocie0 : 1;
     uint8_t toie1 : 1;
@@ -3965,10 +4094,10 @@ typedef union __nesc_unnamed4320 {
 } Atm128_TIMSK_t;
 #line 163
 #line 150
-typedef union __nesc_unnamed4322 {
+typedef union __nesc_unnamed4325 {
 
   uint8_t flat;
-  struct __nesc_unnamed4323 {
+  struct __nesc_unnamed4326 {
     uint8_t tov0 : 1;
     uint8_t ocf0 : 1;
     uint8_t tov1 : 1;
@@ -3981,10 +4110,10 @@ typedef union __nesc_unnamed4322 {
 } Atm128_TIFR_t;
 #line 178
 #line 167
-typedef union __nesc_unnamed4324 {
+typedef union __nesc_unnamed4327 {
 
   uint8_t flat;
-  struct __nesc_unnamed4325 {
+  struct __nesc_unnamed4328 {
     uint8_t psr321 : 1;
     uint8_t psr0 : 1;
     uint8_t pud : 1;
@@ -3999,7 +4128,7 @@ typedef union __nesc_unnamed4324 {
 
 
 
-enum __nesc_unnamed4326 {
+enum __nesc_unnamed4329 {
   ATM128_TIMER_COMPARE_NORMAL = 0, 
   ATM128_TIMER_COMPARE_TOGGLE, 
   ATM128_TIMER_COMPARE_CLEAR, 
@@ -4007,10 +4136,10 @@ enum __nesc_unnamed4326 {
 };
 #line 202
 #line 193
-typedef union __nesc_unnamed4327 {
+typedef union __nesc_unnamed4330 {
 
   uint8_t flat;
-  struct __nesc_unnamed4328 {
+  struct __nesc_unnamed4331 {
     uint8_t wgm10 : 2;
     uint8_t comC : 2;
     uint8_t comB : 2;
@@ -4025,7 +4154,7 @@ typedef Atm128TimerCtrlCompare_t Atm128_TCCR1A_t;
 typedef Atm128TimerCtrlCompare_t Atm128_TCCR3A_t;
 
 
-enum __nesc_unnamed4329 {
+enum __nesc_unnamed4332 {
   ATM128_WAVE16_NORMAL = 0, 
   ATM128_WAVE16_PWM_8BIT, 
   ATM128_WAVE16_PWM_9BIT, 
@@ -4045,10 +4174,10 @@ enum __nesc_unnamed4329 {
 };
 #line 241
 #line 231
-typedef union __nesc_unnamed4330 {
+typedef union __nesc_unnamed4333 {
 
   uint8_t flat;
-  struct __nesc_unnamed4331 {
+  struct __nesc_unnamed4334 {
     uint8_t cs : 3;
     uint8_t wgm32 : 2;
     uint8_t rsvd : 1;
@@ -4064,10 +4193,10 @@ typedef Atm128TimerCtrlCapture_t Atm128_TCCR1B_t;
 typedef Atm128TimerCtrlCapture_t Atm128_TCCR3B_t;
 #line 259
 #line 250
-typedef union __nesc_unnamed4332 {
+typedef union __nesc_unnamed4335 {
 
   uint8_t flat;
-  struct __nesc_unnamed4333 {
+  struct __nesc_unnamed4336 {
     uint8_t rsvd : 5;
     uint8_t focC : 1;
     uint8_t focB : 1;
@@ -4111,10 +4240,10 @@ typedef uint8_t Atm128_ICR3H_t;
 typedef uint8_t Atm128_ICR3L_t;
 #line 309
 #line 297
-typedef union __nesc_unnamed4334 {
+typedef union __nesc_unnamed4337 {
 
   uint8_t flat;
-  struct __nesc_unnamed4335 {
+  struct __nesc_unnamed4338 {
     uint8_t ocie1c : 1;
     uint8_t ocie3c : 1;
     uint8_t toie3 : 1;
@@ -4126,10 +4255,10 @@ typedef union __nesc_unnamed4334 {
 } Atm128_ETIMSK_t;
 #line 324
 #line 312
-typedef union __nesc_unnamed4336 {
+typedef union __nesc_unnamed4339 {
 
   uint8_t flat;
-  struct __nesc_unnamed4337 {
+  struct __nesc_unnamed4340 {
     uint8_t ocf1c : 1;
     uint8_t ocf3c : 1;
     uint8_t tov3 : 1;
@@ -4140,7 +4269,7 @@ typedef union __nesc_unnamed4336 {
   } bits;
 } Atm128_ETIFR_t;
 # 8 "lib/modules/../../includes/sendInfo.h"
-enum __nesc_unnamed4338 {
+enum __nesc_unnamed4341 {
   SEND_BUFFER_SIZE = 128
 };
 
@@ -4188,7 +4317,7 @@ typedef uint16_t RandomMlcgC__SeedInit__parameter;
 typedef sendInfo /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0__Pool__t;
 typedef sendInfo */*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0__Queue__t;
 typedef TMilli /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0__sendTimer__precision_tag;
-enum AMQueueP____nesc_unnamed4339 {
+enum AMQueueP____nesc_unnamed4342 {
   AMQueueP__NUM_CLIENTS = 4U
 };
 typedef sendInfo /*NeighborDiscoveryC.Sender.PoolC*/PoolC__1__pool_t;
@@ -4228,11 +4357,11 @@ static error_t PlatformC__Init__init(void );
 # 67 "/opt/tinyos-main/tos/interfaces/TaskBasic.nc"
 static error_t SimSchedulerBasicP__TaskBasic__postTask(
 # 49 "/opt/tinyos-main/tos/lib/tossim/SimSchedulerBasicP.nc"
-uint8_t arg_0x71c0ca51f020);
+uint8_t arg_0x7ffffadb8020);
 # 75 "/opt/tinyos-main/tos/interfaces/TaskBasic.nc"
 static void SimSchedulerBasicP__TaskBasic__default__runTask(
 # 49 "/opt/tinyos-main/tos/lib/tossim/SimSchedulerBasicP.nc"
-uint8_t arg_0x71c0ca51f020);
+uint8_t arg_0x7ffffadb8020);
 # 57 "/opt/tinyos-main/tos/interfaces/Scheduler.nc"
 static void SimSchedulerBasicP__Scheduler__init(void );
 
@@ -4275,7 +4404,7 @@ static long long int SimMoteP__SimMote__getStartTime(void );
 # 80 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 static error_t TossimActiveMessageC__AMSend__send(
 # 47 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca36ac70, 
+am_id_t arg_0x7ffffac03c70, 
 # 80 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -4298,7 +4427,7 @@ message_t *
 
 TossimActiveMessageC__Snoop__default__receive(
 # 49 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca34fa50, 
+am_id_t arg_0x7ffffabe8a50, 
 # 71 "/opt/tinyos-main/tos/interfaces/Receive.nc"
 message_t * msg, 
 void * payload, 
@@ -4345,7 +4474,7 @@ message_t *
 
 TossimActiveMessageC__Receive__default__receive(
 # 48 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca350e30, 
+am_id_t arg_0x7ffffabe9e30, 
 # 71 "/opt/tinyos-main/tos/interfaces/Receive.nc"
 message_t * msg, 
 void * payload, 
@@ -4620,19 +4749,19 @@ static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__f
 #line 136
 static uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950);
+uint8_t arg_0x7ffffa5a8950);
 # 83 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__default__fired(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950);
+uint8_t arg_0x7ffffa5a8950);
 # 92 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 static bool /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__isRunning(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950);
+uint8_t arg_0x7ffffa5a8950);
 # 64 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__startPeriodic(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950, 
+uint8_t arg_0x7ffffa5a8950, 
 # 64 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 uint32_t dt);
 
@@ -4645,7 +4774,7 @@ uint32_t dt);
 
 static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__startOneShot(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950, 
+uint8_t arg_0x7ffffa5a8950, 
 # 73 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 uint32_t dt);
 # 82 "/opt/tinyos-main/tos/lib/timer/Counter.nc"
@@ -4697,7 +4826,7 @@ error_t error);
 # 110 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__sendDone(
 # 48 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x71c0c9c234d0, 
+am_id_t arg_0x7ffffa49b4d0, 
 # 103 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4710,7 +4839,7 @@ error_t error);
 # 75 "/opt/tinyos-main/tos/interfaces/Send.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__send(
 # 46 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x71c0c9c252a0, 
+uint8_t arg_0x7ffffa49c2a0, 
 # 67 "/opt/tinyos-main/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4724,7 +4853,7 @@ uint8_t len);
 #line 100
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__default__sendDone(
 # 46 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x71c0c9c252a0, 
+uint8_t arg_0x7ffffa49c2a0, 
 # 96 "/opt/tinyos-main/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5106,11 +5235,11 @@ int sim_main_start_mote(void )   ;
 # 75 "/opt/tinyos-main/tos/interfaces/TaskBasic.nc"
 static void SimSchedulerBasicP__TaskBasic__runTask(
 # 49 "/opt/tinyos-main/tos/lib/tossim/SimSchedulerBasicP.nc"
-uint8_t arg_0x71c0ca51f020);
+uint8_t arg_0x7ffffadb8020);
 
 
 
-enum SimSchedulerBasicP____nesc_unnamed4340 {
+enum SimSchedulerBasicP____nesc_unnamed4343 {
 
   SimSchedulerBasicP__NUM_TASKS = 13U, 
   SimSchedulerBasicP__NO_TASK = 255
@@ -5294,7 +5423,7 @@ static am_addr_t TossimActiveMessageC__amAddress(void );
 # 110 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 static void TossimActiveMessageC__AMSend__sendDone(
 # 47 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca36ac70, 
+am_id_t arg_0x7ffffac03c70, 
 # 103 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -5313,7 +5442,7 @@ message_t *
 
 TossimActiveMessageC__Snoop__receive(
 # 49 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca34fa50, 
+am_id_t arg_0x7ffffabe8a50, 
 # 71 "/opt/tinyos-main/tos/interfaces/Receive.nc"
 message_t * msg, 
 void * payload, 
@@ -5332,7 +5461,7 @@ message_t *
 
 TossimActiveMessageC__Receive__receive(
 # 48 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
-am_id_t arg_0x71c0ca350e30, 
+am_id_t arg_0x7ffffabe9e30, 
 # 71 "/opt/tinyos-main/tos/interfaces/Receive.nc"
 message_t * msg, 
 void * payload, 
@@ -5480,7 +5609,7 @@ double reverseGain);
 static bool TossimPacketModelC__GainRadioModel__clearChannel(void );
 static void TossimPacketModelC__GainRadioModel__setPendingTransmission(void );
 # 96 "/opt/tinyos-main/tos/lib/tossim/TossimPacketModelC.nc"
-enum TossimPacketModelC____nesc_unnamed4341 {
+enum TossimPacketModelC____nesc_unnamed4344 {
 #line 96
   TossimPacketModelC__startDoneTask = 0U
 };
@@ -5490,14 +5619,14 @@ typedef int TossimPacketModelC____nesc_sillytask_startDoneTask[TossimPacketModel
 
 
 
-enum TossimPacketModelC____nesc_unnamed4342 {
+enum TossimPacketModelC____nesc_unnamed4345 {
 #line 101
   TossimPacketModelC__stopDoneTask = 1U
 };
 #line 101
 typedef int TossimPacketModelC____nesc_sillytask_stopDoneTask[TossimPacketModelC__stopDoneTask];
 #line 145
-enum TossimPacketModelC____nesc_unnamed4343 {
+enum TossimPacketModelC____nesc_unnamed4346 {
 #line 145
   TossimPacketModelC__sendDoneTask = 2U
 };
@@ -5595,7 +5724,7 @@ static void CpmModelC__Model__acked(message_t *msg);
 
 static bool CpmModelC__Model__shouldAck(message_t *msg);
 # 528 "/opt/tinyos-main/tos/lib/tossim/CpmModelC.nc"
-enum CpmModelC____nesc_unnamed4344 {
+enum CpmModelC____nesc_unnamed4347 {
 #line 528
   CpmModelC__read_rssi_task = 3U
 };
@@ -5737,14 +5866,14 @@ static void Node__DV__printTable(void );
 static void Node__DV__start(void );
 # 3 "lib/interfaces/IPRouting.nc"
 static void Node__IPRouting__ping(uint16_t destination, uint8_t *payload);
-# 16 "Node.nc"
+# 19 "Node.nc"
 static inline void Node__Boot__booted(void );
 
 
 
 
 static inline void Node__AMControl__startDone(error_t err);
-#line 33
+#line 36
 static inline void Node__AMControl__stopDone(error_t err);
 
 static inline void Node__CommandHandler__ping(uint16_t destination, uint8_t *payload);
@@ -5823,7 +5952,7 @@ static void CommandHandlerP__CommandHandler__printRouteTable(void );
 #line 3
 static void CommandHandlerP__CommandHandler__ping(uint16_t destination, uint8_t *payload);
 # 24 "lib/modules/CommandHandlerP.nc"
-enum CommandHandlerP____nesc_unnamed4345 {
+enum CommandHandlerP____nesc_unnamed4348 {
 #line 24
   CommandHandlerP__processCommand = 4U
 };
@@ -5982,7 +6111,7 @@ uint32_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAs
 
 
 
-enum /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0____nesc_unnamed4346 {
+enum /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0____nesc_unnamed4349 {
   Atm128AlarmAsyncP__0__MINDT = 2, 
   Atm128AlarmAsyncP__0__MAXT = 230
 };
@@ -6220,7 +6349,7 @@ static void /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__stop(void )
 # 83 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
 static void /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Timer__fired(void );
 # 74 "/opt/tinyos-main/tos/lib/timer/AlarmToTimerC.nc"
-enum /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0____nesc_unnamed4347 {
+enum /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0____nesc_unnamed4350 {
 #line 74
   AlarmToTimerC__0__fired = 5U
 };
@@ -6262,16 +6391,16 @@ static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__s
 
 static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__fired(
 # 48 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x71c0c9d30950);
+uint8_t arg_0x7ffffa5a8950);
 #line 71
-enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4348 {
+enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4351 {
 #line 71
   VirtualizeTimerC__0__updateFromTimer = 6U
 };
 #line 71
 typedef int /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_sillytask_updateFromTimer[/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__updateFromTimer];
 #line 53
-enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4349 {
+enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4352 {
 
   VirtualizeTimerC__0__NUM_TIMERS = 8U, 
   VirtualizeTimerC__0__END_OF_LIST = 255
@@ -6285,7 +6414,7 @@ enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4349 
 
 
 #line 59
-typedef struct /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4350 {
+typedef struct /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0____nesc_unnamed4353 {
 
   uint32_t t0;
   uint32_t dt;
@@ -6416,7 +6545,7 @@ static bool /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0__sendTimer__
 #line 73
 static void /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0__sendTimer__startOneShot(uint32_t dt);
 # 74 "lib/modules/SimpleSendP.nc"
-enum /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0____nesc_unnamed4351 {
+enum /*NeighborDiscoveryC.Sender.SimpleSendP*/SimpleSendP__0____nesc_unnamed4354 {
 #line 74
   SimpleSendP__0__sendBufferTask = 7U
 };
@@ -6506,7 +6635,7 @@ static inline void /*NeighborDiscoveryC.Sender.AMSenderC.SenderC.AMQueueEntryP*/
 # 80 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__send(
 # 48 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x71c0c9c234d0, 
+am_id_t arg_0x7ffffa49b4d0, 
 # 80 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -6523,7 +6652,7 @@ uint8_t len);
 # 100 "/opt/tinyos-main/tos/interfaces/Send.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__sendDone(
 # 46 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x71c0c9c252a0, 
+uint8_t arg_0x7ffffa49c2a0, 
 # 96 "/opt/tinyos-main/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -6553,14 +6682,14 @@ static am_id_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMPacket__type(
 #line 143
 message_t * amsg);
 # 126 "/opt/tinyos-main/tos/system/AMQueueImplP.nc"
-enum /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4352 {
+enum /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4355 {
 #line 126
   AMQueueImplP__0__CancelTask = 8U
 };
 #line 126
 typedef int /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_sillytask_CancelTask[/*AMQueueP.AMQueueImplP*/AMQueueImplP__0__CancelTask];
 #line 169
-enum /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4353 {
+enum /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4356 {
 #line 169
   AMQueueImplP__0__errorTask = 9U
 };
@@ -6568,7 +6697,7 @@ enum /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4353 {
 typedef int /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_sillytask_errorTask[/*AMQueueP.AMQueueImplP*/AMQueueImplP__0__errorTask];
 #line 57
 #line 55
-typedef struct /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4354 {
+typedef struct /*AMQueueP.AMQueueImplP*/AMQueueImplP__0____nesc_unnamed4357 {
   message_t * msg;
 } /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__queue_entry_t;
 
@@ -6742,7 +6871,7 @@ static bool /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1__sendTimer__isRunning
 #line 73
 static void /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1__sendTimer__startOneShot(uint32_t dt);
 # 74 "lib/modules/SimpleSendP.nc"
-enum /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1____nesc_unnamed4355 {
+enum /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1____nesc_unnamed4358 {
 #line 74
   SimpleSendP__1__sendBufferTask = 10U
 };
@@ -6910,25 +7039,76 @@ uint8_t cost);
 static am_addr_t DVExchangeP__AMPacket__source(
 #line 84
 message_t * amsg);
-# 73 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
+# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
+static uint32_t DVExchangeP__Timer__getNow(void );
+#line 73
 static void DVExchangeP__Timer__startOneShot(uint32_t dt);
 # 25 "lib/modules/DVExchangeP.nc"
 bool DVExchangeP__started[1000];
 bool DVExchangeP__sending[1000];
 
+uint16_t DVExchangeP__updateSequence[1000];
+uint16_t DVExchangeP__currentUpdateId[1000];
+
+uint8_t DVExchangeP__totalPackets[1000];
+uint8_t DVExchangeP__snapshotCount[1000];
+
+uint8_t DVExchangeP__snapshotDestinations[1000][DV_MAX_ROUTES];
+uint8_t DVExchangeP__snapshotCosts[1000][DV_MAX_ROUTES];
+uint16_t DVExchangeP__snapshotNextHops[1000][DV_MAX_ROUTES];
+
 uint8_t DVExchangeP__neighborIndex[1000];
 uint16_t DVExchangeP__currentNeighbor[1000];
 uint16_t DVExchangeP__routeIndex[1000];
+#line 62
+#line 42
+typedef struct DVExchangeP____nesc_unnamed4359 {
+
+  bool active;
+  bool hasRetired;
+
+  uint16_t neighbor;
+  uint16_t updateId;
+  uint16_t lastRetiredId;
+
+  uint8_t totalPackets;
+  uint8_t receivedMask;
+  uint8_t lastPacketCount;
+
+  uint8_t packetCounts[DV_MAX_PACKETS];
+
+  uint32_t lastActivity;
+
+  uint8_t destinations[DV_MAX_ROUTES];
+  uint8_t costs[DV_MAX_ROUTES];
+} 
+DVExchangeP__dv_reassembly_t;
+
+DVExchangeP__dv_reassembly_t DVExchangeP__incomingUpdates[1000][DV_MAX_NEIGHBORS];
 
 static inline void DVExchangeP__DVExchange__start(void );
-#line 47
+#line 81
+static inline void DVExchangeP__expireIncompleteUpdates(void );
+
 static inline void DVExchangeP__Timer__fired(void );
-#line 60
+#line 98
+static inline bool DVExchangeP__isNewerUpdate(uint16_t candidate, uint16_t reference);
+
+
+
+
+
+
+static inline uint8_t DVExchangeP__findReassemblySlot(uint16_t neighbor);
+#line 142
+static inline void DVExchangeP__expireIncompleteUpdates(void );
+#line 173
 static void DVExchangeP__sendNextPacket(void );
-#line 186
+#line 319
 static inline void DVExchangeP__DVExchange__sendUpdate(void );
-#line 205
+#line 389
 static inline void DVExchangeP__SendTimer__fired(void );
+
 
 
 
@@ -7001,7 +7181,7 @@ static bool /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2__sendTimer__isRunni
 #line 73
 static void /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2__sendTimer__startOneShot(uint32_t dt);
 # 74 "lib/modules/SimpleSendP.nc"
-enum /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2____nesc_unnamed4356 {
+enum /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2____nesc_unnamed4360 {
 #line 74
   SimpleSendP__2__sendBufferTask = 11U
 };
@@ -7271,7 +7451,7 @@ static bool /*IPRoutingC.Sender.SimpleSendP*/SimpleSendP__3__sendTimer__isRunnin
 #line 73
 static void /*IPRoutingC.Sender.SimpleSendP*/SimpleSendP__3__sendTimer__startOneShot(uint32_t dt);
 # 74 "lib/modules/SimpleSendP.nc"
-enum /*IPRoutingC.Sender.SimpleSendP*/SimpleSendP__3____nesc_unnamed4357 {
+enum /*IPRoutingC.Sender.SimpleSendP*/SimpleSendP__3____nesc_unnamed4361 {
 #line 74
   SimpleSendP__3__sendBufferTask = 12U
 };
@@ -7736,7 +7916,7 @@ static inline sim_event_t *TossimActiveMessageC__allocate_deliver_event(int node
 static inline uint8_t TossimActiveMessageC__Packet__maxPayloadLength(void )
 #line 185
 {
-  return 28;
+  return 29;
 }
 
 # 89 "/opt/tinyos-main/tos/lib/tossim/ActiveMessageAddressC.nc"
@@ -8127,71 +8307,6 @@ static inline message_t *FloodingP__Receive__receive(message_t *msg, void *paylo
   return msg;
 }
 
-# 222 "/opt/tinyos-main/tos/chips/atm128/timer/Atm128AlarmAsyncP.nc"
-static inline uint32_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Alarm__getNow(void )
-#line 222
-{
-  return /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Counter__get();
-}
-
-# 109 "/opt/tinyos-main/tos/lib/timer/Alarm.nc"
-inline static /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__size_type /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__getNow(void ){
-#line 109
-  unsigned int __nesc_result;
-#line 109
-
-#line 109
-  __nesc_result = /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Alarm__getNow();
-#line 109
-
-#line 109
-  return __nesc_result;
-#line 109
-}
-#line 109
-# 96 "/opt/tinyos-main/tos/lib/timer/AlarmToTimerC.nc"
-static inline uint32_t /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Timer__getNow(void )
-{
-#line 97
-  return /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__getNow();
-}
-
-# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
-inline static uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__getNow(void ){
-#line 136
-  unsigned int __nesc_result;
-#line 136
-
-#line 136
-  __nesc_result = /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Timer__getNow();
-#line 136
-
-#line 136
-  return __nesc_result;
-#line 136
-}
-#line 136
-# 189 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
-static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(uint8_t num)
-{
-  return /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__getNow();
-}
-
-# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
-inline static uint32_t DistanceVectorP__MaintenanceTimer__getNow(void ){
-#line 136
-  unsigned int __nesc_result;
-#line 136
-
-#line 136
-  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(6U);
-#line 136
-
-#line 136
-  return __nesc_result;
-#line 136
-}
-#line 136
 # 4 "lib/interfaces/NeighborDiscovery.nc"
 inline static bool DistanceVectorP__ND__isNeighbor(uint16_t nodeId){
 #line 4
@@ -8287,7 +8402,7 @@ uint8_t cost)
         {
           if (DistanceVectorP__routingTable[sim_node()][i].state == DV_ROUTE_WITHDRAWN) 
             {
-              sim_log_debug(229U, ROUTING_CHANNEL, "Node %d recovered route to %d via %d cost %d\n", TOS_NODE_ID, destination, from, newCost);
+              sim_log_debug(234U, ROUTING_CHANNEL, "Node %d recovered route to %d via %d cost %d\n", TOS_NODE_ID, destination, from, newCost);
             }
 
 
@@ -8314,6 +8429,79 @@ inline static void DVExchangeP__DV__acceptEntry(uint16_t from, uint16_t destinat
 #line 16
 }
 #line 16
+# 98 "lib/modules/DVExchangeP.nc"
+static inline bool DVExchangeP__isNewerUpdate(uint16_t candidate, uint16_t reference)
+{
+  uint16_t difference = candidate - reference;
+
+  return difference != 0 && difference < 0x8000;
+}
+
+# 222 "/opt/tinyos-main/tos/chips/atm128/timer/Atm128AlarmAsyncP.nc"
+static inline uint32_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Alarm__getNow(void )
+#line 222
+{
+  return /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Counter__get();
+}
+
+# 109 "/opt/tinyos-main/tos/lib/timer/Alarm.nc"
+inline static /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__size_type /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__getNow(void ){
+#line 109
+  unsigned int __nesc_result;
+#line 109
+
+#line 109
+  __nesc_result = /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__Alarm__getNow();
+#line 109
+
+#line 109
+  return __nesc_result;
+#line 109
+}
+#line 109
+# 96 "/opt/tinyos-main/tos/lib/timer/AlarmToTimerC.nc"
+static inline uint32_t /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Timer__getNow(void )
+{
+#line 97
+  return /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Alarm__getNow();
+}
+
+# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
+inline static uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC__0__Timer__getNow();
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
+# 189 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
+static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(uint8_t num)
+{
+  return /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__TimerFrom__getNow();
+}
+
+# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
+inline static uint32_t DVExchangeP__Timer__getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(3U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
 # 4 "lib/interfaces/NeighborDiscovery.nc"
 inline static bool DVExchangeP__ND__isNeighbor(uint16_t nodeId){
 #line 4
@@ -8329,6 +8517,44 @@ inline static bool DVExchangeP__ND__isNeighbor(uint16_t nodeId){
 #line 4
 }
 #line 4
+# 105 "lib/modules/DVExchangeP.nc"
+static inline uint8_t DVExchangeP__findReassemblySlot(uint16_t neighbor)
+{
+  uint8_t i;
+
+  for (i = 0; i < DV_MAX_NEIGHBORS; i++) 
+    {
+      if (DVExchangeP__incomingUpdates[sim_node()][i].active && 
+      !DVExchangeP__ND__isNeighbor(DVExchangeP__incomingUpdates[sim_node()][i].neighbor)) 
+        {
+          DVExchangeP__incomingUpdates[sim_node()][i].active = FALSE;
+          DVExchangeP__incomingUpdates[sim_node()][i].receivedMask = 0;
+        }
+
+      if (DVExchangeP__incomingUpdates[sim_node()][i].active && 
+      DVExchangeP__incomingUpdates[sim_node()][i].neighbor == neighbor) 
+        {
+          return i;
+        }
+    }
+
+  for (i = 0; i < DV_MAX_NEIGHBORS; i++) 
+    {
+      if (! DVExchangeP__incomingUpdates[sim_node()][i].active) 
+        {
+          memset(&DVExchangeP__incomingUpdates[sim_node()][i], 0, 
+          sizeof(DVExchangeP__dv_reassembly_t ));
+
+          DVExchangeP__incomingUpdates[sim_node()][i].active = TRUE;
+          DVExchangeP__incomingUpdates[sim_node()][i].neighbor = neighbor;
+
+          return i;
+        }
+    }
+
+  return 0xFF;
+}
+
 # 65 "/opt/tinyos-main/tos/lib/tossim/TossimActiveMessageC.nc"
 static inline tossim_header_t *TossimActiveMessageC__getHeader(message_t *amsg)
 #line 65
@@ -8361,19 +8587,29 @@ inline static am_addr_t DVExchangeP__AMPacket__source(message_t * amsg){
 #line 88
 }
 #line 88
-# 210 "lib/modules/DVExchangeP.nc"
+# 395 "lib/modules/DVExchangeP.nc"
 static inline message_t *DVExchangeP__Receive__receive(message_t *msg, void *payload, uint8_t len)
-#line 210
 {
-
   uint16_t i;
   uint16_t destination;
-  uint8_t cost;
-
   uint16_t neighbor;
+
+  uint8_t cost;
   uint8_t count;
+  uint8_t packetIndex;
+  uint8_t totalPackets;
+
+  uint8_t slotIndex;
+  uint8_t packetBit;
+  uint8_t completeMask;
+  uint8_t offset;
+  uint8_t totalEntries;
+
+  uint32_t now;
 
   pack *incoming;
+  DVExchangeP__dv_reassembly_t *update;
+
 
   if (len != sizeof(pack )) {
       return msg;
@@ -8381,51 +8617,273 @@ static inline message_t *DVExchangeP__Receive__receive(message_t *msg, void *pay
 
   incoming = (pack *)payload;
 
-  if (__nesc_ntoh_uint8(incoming->protocol.nxdata) != PROTOCOL_DV || __nesc_ntoh_uint16(incoming->dest.nxdata) != TOS_NODE_ID) {
+
+  if (__nesc_ntoh_uint8(incoming->protocol.nxdata) != PROTOCOL_DV || __nesc_ntoh_uint16(
+  incoming->dest.nxdata) != TOS_NODE_ID) {
       return msg;
     }
+
 
   neighbor = DVExchangeP__AMPacket__source(msg);
 
   if (!DVExchangeP__ND__isNeighbor(neighbor)) {
-      sim_log_debug(203U, ROUTING_CHANNEL, "Received DV packet from non-neighbor %d\n", neighbor);
+      sim_log_debug(204U, ROUTING_CHANNEL, "Received DV packet from non-neighbor %d\n", neighbor);
 
 
       return msg;
     }
+
 
   count = __nesc_ntoh_uint8(incoming->payload[0].nxdata);
+  packetIndex = __nesc_ntoh_uint8(incoming->payload[1].nxdata);
+  totalPackets = __nesc_ntoh_uint8(incoming->payload[2].nxdata);
 
-  if (count > DV_MAX_ENTRIES) {
-      sim_log_debug(204U, ROUTING_CHANNEL, "Invalid DV packet\n");
+
+
+
+
+  if ((((
+#line 446
+  count == 0 || 
+  count > DV_MAX_ENTRIES) || 
+  totalPackets == 0) || 
+  totalPackets > DV_MAX_PACKETS) || 
+  packetIndex >= totalPackets) {
+
+      sim_log_debug(205U, ROUTING_CHANNEL, "Node %d received invalid DV packet metadata\n", TOS_NODE_ID);
+
+
+
       return msg;
     }
+
+
+  if (packetIndex < totalPackets - 1 && 
+  count != DV_MAX_ENTRIES) {
+
+      sim_log_debug(206U, ROUTING_CHANNEL, "Node %d received incomplete DV packet\n", TOS_NODE_ID);
+
+
+
+      return msg;
+    }
+
 
   for (i = 0; i < count; i++) {
 
-      cost = __nesc_ntoh_uint8(incoming->payload[2 + i * 2].nxdata);
+      cost = __nesc_ntoh_uint8(incoming->payload[4 + i * 2].nxdata);
 
       if (cost > DV_INFINITY) {
-          sim_log_debug(205U, ROUTING_CHANNEL, "Invalid cost in DV packet\n");
+
+          sim_log_debug(207U, ROUTING_CHANNEL, "Node %d received invalid DV cost\n", TOS_NODE_ID);
+
+
+
           return msg;
         }
     }
 
+  sim_log_debug(208U, ROUTING_CHANNEL, "Node %d received a DV packet from Node %d\n", TOS_NODE_ID, neighbor);
+
+
+
+
+
+  slotIndex = DVExchangeP__findReassemblySlot(neighbor);
+
+  if (slotIndex == 0xFF) {
+
+      sim_log_debug(209U, ROUTING_CHANNEL, "Node %d has no DV reassembly slot\n", TOS_NODE_ID);
+
+
+
+      return msg;
+    }
+
+  update = &DVExchangeP__incomingUpdates[sim_node()][slotIndex];
+
+  now = DVExchangeP__Timer__getNow();
+
+
+  if (update->receivedMask != 0 && 
+  (uint32_t )(now - update->lastActivity)
+   >= DV_REASSEMBLY_TIMEOUT) {
+
+      update->lastRetiredId = update->updateId;
+      update->hasRetired = TRUE;
+
+      update->receivedMask = 0;
+      update->totalPackets = 0;
+      update->lastPacketCount = 0;
+    }
+
+
+  if (update->receivedMask != 0 && 
+  update->updateId != __nesc_ntoh_uint16(incoming->seq.nxdata)) {
+
+      if (!DVExchangeP__isNewerUpdate(__nesc_ntoh_uint16(incoming->seq.nxdata), 
+      update->updateId)) {
+          return msg;
+        }
+
+      update->receivedMask = 0;
+      update->totalPackets = 0;
+      update->lastPacketCount = 0;
+    }
+
+
+  if (update->receivedMask == 0) {
+
+      if (update->hasRetired && 
+      !DVExchangeP__isNewerUpdate(__nesc_ntoh_uint16(incoming->seq.nxdata), 
+      update->lastRetiredId)) {
+          return msg;
+        }
+
+      update->updateId = __nesc_ntoh_uint16(incoming->seq.nxdata);
+      update->totalPackets = totalPackets;
+    }
+  else {
+    if (update->totalPackets != totalPackets) {
+
+
+        update->lastRetiredId = update->updateId;
+        update->hasRetired = TRUE;
+
+        update->receivedMask = 0;
+        update->totalPackets = 0;
+
+        return msg;
+      }
+    }
+
+  packetBit = (uint8_t )(1 << packetIndex);
+
+  offset = packetIndex * DV_MAX_ENTRIES;
+
+  if (update->receivedMask & packetBit) {
+
+      if (update->packetCounts[packetIndex] != count) {
+
+          update->lastRetiredId = update->updateId;
+          update->hasRetired = TRUE;
+
+          update->receivedMask = 0;
+          update->totalPackets = 0;
+
+          return msg;
+        }
+
+      for (i = 0; i < count; i++) {
+
+
+          if (
+#line 578
+          update->destinations[offset + i] != __nesc_ntoh_uint8(
+          incoming->payload[3 + i * 2].nxdata) || 
+          update->costs[offset + i] != __nesc_ntoh_uint8(
+          incoming->payload[4 + i * 2].nxdata)) {
+
+              update->lastRetiredId = update->updateId;
+              update->hasRetired = TRUE;
+
+              update->receivedMask = 0;
+              update->totalPackets = 0;
+
+              return msg;
+            }
+        }
+
+      return msg;
+    }
+
+
   for (i = 0; i < count; i++) {
 
-      destination = __nesc_ntoh_uint8(incoming->payload[1 + i * 2].nxdata);
-      cost = __nesc_ntoh_uint8(incoming->payload[2 + i * 2].nxdata);
+      update->destinations[offset + i] = __nesc_ntoh_uint8(
+      incoming->payload[3 + i * 2].nxdata);
 
-      DVExchangeP__DV__acceptEntry(neighbor, destination, cost);
+      update->costs[offset + i] = __nesc_ntoh_uint8(
+      incoming->payload[4 + i * 2].nxdata);
+    }
 
-      sim_log_debug(206U, ROUTING_CHANNEL, "Node %d received from neighbor %d: Dest %d Advertised Cost %d\n", TOS_NODE_ID, neighbor, destination, cost);
+  update->packetCounts[packetIndex] = count;
+
+  if (packetIndex == totalPackets - 1) {
+      update->lastPacketCount = count;
+    }
+
+  update->lastActivity = now;
+
+
+  update->receivedMask |= packetBit;
+
+  completeMask = 
+  (uint8_t )((1 << totalPackets) - 1);
+
+
+  if (update->receivedMask != completeMask) {
+
+      sim_log_debug(210U, ROUTING_CHANNEL, "Node %d received packet %d/%d from Node %d; waiting for remaining packets\n", TOS_NODE_ID, packetIndex + 1, totalPackets, neighbor);
+
+
+
+
+
+
+      return msg;
+    }
+
+
+  totalEntries = (
+  totalPackets - 1) * DV_MAX_ENTRIES + 
+  update->lastPacketCount;
+
+  if (totalEntries == 0 || 
+  totalEntries > DV_MAX_ROUTES) {
+
+      update->lastRetiredId = update->updateId;
+      update->hasRetired = TRUE;
+      update->receivedMask = 0;
+      update->totalPackets = 0;
+
+      return msg;
+    }
+
+  sim_log_debug(211U, ROUTING_CHANNEL, "Node %d received complete DV update %d from Node %d with %d entries\n", TOS_NODE_ID, update->updateId, neighbor, totalEntries);
+
+
+
+
+
+
+
+  for (i = 0; i < totalEntries; i++) {
+
+      destination = update->destinations[i];
+      cost = update->costs[i];
+
+      DVExchangeP__DV__acceptEntry(
+      neighbor, 
+      destination, 
+      cost);
+
+
+      sim_log_debug(212U, ROUTING_CHANNEL, "Node %d received from neighbor %d: Dest %d Advertised Cost %d\n", TOS_NODE_ID, neighbor, destination, cost);
     }
 
 
 
-  sim_log_debug(207U, ROUTING_CHANNEL, "Node %d received a DV packet from Node %d\n", TOS_NODE_ID, neighbor);
 
 
+
+
+  update->lastRetiredId = update->updateId;
+  update->hasRetired = TRUE;
+
+  update->receivedMask = 0;
+  update->totalPackets = 0;
+  update->lastPacketCount = 0;
 
   return msg;
 }
@@ -8494,7 +8952,7 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
     }
 
   if (__nesc_ntoh_uint8(incoming->TTL.nxdata) == 0) {
-      sim_log_debug(235U, ROUTING_CHANNEL, "Node %d dropped packet because TTL expired - src: %d, dest: %d, seq: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata), __nesc_ntoh_uint8(incoming->TTL.nxdata));
+      sim_log_debug(240U, ROUTING_CHANNEL, "Node %d dropped packet because TTL expired - src: %d, dest: %d, seq: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata), __nesc_ntoh_uint8(incoming->TTL.nxdata));
 
 
 
@@ -8510,17 +8968,17 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
           uint16_t nextHop;
           uint8_t cost;
 
-          sim_log_debug(236U, ROUTING_CHANNEL, "Node %d received PING from Node %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
+          sim_log_debug(241U, ROUTING_CHANNEL, "Node %d received PING from Node %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
 
 
 
           if (!IPRoutingP__DV__lookup(__nesc_ntoh_uint16(incoming->src.nxdata), &nextHop, &cost)) {
-              sim_log_debug(237U, ROUTING_CHANNEL, "No route back to %d\n", __nesc_ntoh_uint16(incoming->src.nxdata));
+              sim_log_debug(242U, ROUTING_CHANNEL, "No route back to %d\n", __nesc_ntoh_uint16(incoming->src.nxdata));
               return msg;
             }
 
           if (cost >= DV_INFINITY || !IPRoutingP__ND__isNeighbor(nextHop)) {
-              sim_log_debug(238U, ROUTING_CHANNEL, "Cannot send reply to %d\n", __nesc_ntoh_uint16(incoming->src.nxdata));
+              sim_log_debug(243U, ROUTING_CHANNEL, "Cannot send reply to %d\n", __nesc_ntoh_uint16(incoming->src.nxdata));
               return msg;
             }
 
@@ -8532,18 +8990,18 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
           __nesc_hton_uint8(reply.TTL.nxdata, MAX_TTL);
 
           if (IPRoutingP__Sender__send(reply, nextHop) != SUCCESS) {
-              sim_log_debug(239U, ROUTING_CHANNEL, "Failed to queue PINGREPLY\n");
+              sim_log_debug(244U, ROUTING_CHANNEL, "Failed to queue PINGREPLY\n");
               return msg;
             }
 
-          sim_log_debug(240U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(reply.src.nxdata), __nesc_ntoh_uint16(reply.dest.nxdata), __nesc_ntoh_uint16(reply.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(reply.TTL.nxdata));
+          sim_log_debug(245U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(reply.src.nxdata), __nesc_ntoh_uint16(reply.dest.nxdata), __nesc_ntoh_uint16(reply.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(reply.TTL.nxdata));
         }
       else 
 
 
         {
 
-          sim_log_debug(241U, ROUTING_CHANNEL, "Node %d received PING REPLY from Node %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
+          sim_log_debug(246U, ROUTING_CHANNEL, "Node %d received PING REPLY from Node %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
         }
     }
   else 
@@ -8554,7 +9012,7 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
       uint8_t cost;
 
       if (__nesc_ntoh_uint8(incoming->TTL.nxdata) <= 1) {
-          sim_log_debug(242U, ROUTING_CHANNEL, "Node %d dropped packet because TTL expired - src: %d, dest: %d, seq: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata), __nesc_ntoh_uint8(incoming->TTL.nxdata));
+          sim_log_debug(247U, ROUTING_CHANNEL, "Node %d dropped packet because TTL expired - src: %d, dest: %d, seq: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata), __nesc_ntoh_uint8(incoming->TTL.nxdata));
 
 
 
@@ -8562,14 +9020,14 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
         }
 
       if (!IPRoutingP__DV__lookup(__nesc_ntoh_uint16(incoming->dest.nxdata), &nextHop, &cost)) {
-          sim_log_debug(243U, ROUTING_CHANNEL, "Node %d has no route to %d - src: %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
+          sim_log_debug(248U, ROUTING_CHANNEL, "Node %d has no route to %d - src: %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
 
 
           return msg;
         }
 
       if (cost >= DV_INFINITY || !IPRoutingP__ND__isNeighbor(nextHop)) {
-          sim_log_debug(244U, ROUTING_CHANNEL, "Node %d cannot forward to %d - src: %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
+          sim_log_debug(249U, ROUTING_CHANNEL, "Node %d cannot forward to %d - src: %d, seq: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(incoming->dest.nxdata), __nesc_ntoh_uint16(incoming->src.nxdata), __nesc_ntoh_uint16(incoming->seq.nxdata));
 
 
           return msg;
@@ -8580,13 +9038,13 @@ static inline message_t *IPRoutingP__Receive__receive(message_t *msg, void *payl
       __nesc_hton_uint8(forwarded.TTL.nxdata, __nesc_ntoh_uint8(incoming->TTL.nxdata) - 1);
 
       if (IPRoutingP__Sender__send(forwarded, nextHop) != SUCCESS) {
-          sim_log_debug(245U, ROUTING_CHANNEL, "Node %d failed to queue forwarded packet\n", TOS_NODE_ID);
+          sim_log_debug(250U, ROUTING_CHANNEL, "Node %d failed to queue forwarded packet\n", TOS_NODE_ID);
 
 
           return msg;
         }
 
-      sim_log_debug(246U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(forwarded.src.nxdata), __nesc_ntoh_uint16(forwarded.dest.nxdata), __nesc_ntoh_uint16(forwarded.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(forwarded.TTL.nxdata));
+      sim_log_debug(251U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(forwarded.src.nxdata), __nesc_ntoh_uint16(forwarded.dest.nxdata), __nesc_ntoh_uint16(forwarded.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(forwarded.TTL.nxdata));
     }
 
 
@@ -8604,13 +9062,13 @@ static inline message_t *TossimActiveMessageC__Receive__default__receive(am_id_t
 }
 
 # 78 "/opt/tinyos-main/tos/interfaces/Receive.nc"
-inline static message_t * TossimActiveMessageC__Receive__receive(am_id_t arg_0x71c0ca350e30, message_t * msg, void * payload, uint8_t len){
+inline static message_t * TossimActiveMessageC__Receive__receive(am_id_t arg_0x7ffffabe9e30, message_t * msg, void * payload, uint8_t len){
 #line 78
   nx_struct message_t *__nesc_result;
 #line 78
 
 #line 78
-  switch (arg_0x71c0ca350e30) {
+  switch (arg_0x7ffffabe9e30) {
 #line 78
     case 6:
 #line 78
@@ -8644,7 +9102,7 @@ inline static message_t * TossimActiveMessageC__Receive__receive(am_id_t arg_0x7
 #line 78
     default:
 #line 78
-      __nesc_result = TossimActiveMessageC__Receive__default__receive(arg_0x71c0ca350e30, msg, payload, len);
+      __nesc_result = TossimActiveMessageC__Receive__default__receive(arg_0x7ffffabe9e30, msg, payload, len);
 #line 78
       break;
 #line 78
@@ -8660,7 +9118,7 @@ inline static message_t * TossimActiveMessageC__Receive__receive(am_id_t arg_0x7
 static inline bool /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__Pool__empty(void )
 #line 75
 {
-  sim_log_debug(250U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
+  sim_log_debug(255U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
   return /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()] == 0;
 }
 
@@ -8693,7 +9151,7 @@ static inline /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__pool_t */*IPRoutingC.Se
       if (/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__index[sim_node()] == 20) {
           /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__index[sim_node()] = 0;
         }
-      sim_log_debug(252U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
+      sim_log_debug(257U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
       return rval;
     }
   return (void *)0;
@@ -8733,7 +9191,7 @@ static inline error_t /*IPRoutingC.Sender.QueueC*/QueueC__4__Queue__enqueue(/*IP
 #line 101
 {
   if (/*IPRoutingC.Sender.QueueC*/QueueC__4__Queue__size() < /*IPRoutingC.Sender.QueueC*/QueueC__4__Queue__maxSize()) {
-      sim_log_debug(260U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*IPRoutingC.Sender.QueueC*/QueueC__4__size[sim_node()]);
+      sim_log_debug(265U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*IPRoutingC.Sender.QueueC*/QueueC__4__size[sim_node()]);
       /*IPRoutingC.Sender.QueueC*/QueueC__4__queue[sim_node()][/*IPRoutingC.Sender.QueueC*/QueueC__4__tail[sim_node()]] = newVal;
       /*IPRoutingC.Sender.QueueC*/QueueC__4__tail[sim_node()]++;
       if (/*IPRoutingC.Sender.QueueC*/QueueC__4__tail[sim_node()] == 20) {
@@ -8876,7 +9334,7 @@ static inline sim_time_t HplAtm128Timer0AsyncP__sim_to_clock(sim_time_t t)
 # 53 "/opt/tinyos-main/tos/chips/atm128/timer/HplAtm128TimerCtrl8.nc"
 inline static Atm128_TIFR_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP__0__TimerCtrl__getInterruptFlag(void ){
 #line 53
-  union __nesc_unnamed4322 __nesc_result;
+  union __nesc_unnamed4325 __nesc_result;
 #line 53
 
 #line 53
@@ -9210,13 +9668,13 @@ static inline message_t *TossimActiveMessageC__Snoop__default__receive(am_id_t i
 }
 
 # 78 "/opt/tinyos-main/tos/interfaces/Receive.nc"
-inline static message_t * TossimActiveMessageC__Snoop__receive(am_id_t arg_0x71c0ca34fa50, message_t * msg, void * payload, uint8_t len){
+inline static message_t * TossimActiveMessageC__Snoop__receive(am_id_t arg_0x7ffffabe8a50, message_t * msg, void * payload, uint8_t len){
 #line 78
   nx_struct message_t *__nesc_result;
 #line 78
 
 #line 78
-    __nesc_result = TossimActiveMessageC__Snoop__default__receive(arg_0x71c0ca34fa50, msg, payload, len);
+    __nesc_result = TossimActiveMessageC__Snoop__default__receive(arg_0x7ffffabe8a50, msg, payload, len);
 #line 78
 
 #line 78
@@ -9361,9 +9819,9 @@ inline static uint16_t DVExchangeP__Random__rand16(void ){
 #line 52
 }
 #line 52
-# 32 "lib/modules/DVExchangeP.nc"
+# 66 "lib/modules/DVExchangeP.nc"
 static inline void DVExchangeP__DVExchange__start(void )
-#line 32
+#line 66
 {
 
   uint16_t delay;
@@ -9469,7 +9927,7 @@ static inline void DistanceVectorP__DistanceVector__start(void )
       if (DistanceVectorP__ND__getNeighborAt(i, &neighborId)) 
         {
           DistanceVectorP__addDirectNeighbor(neighborId);
-          sim_log_debug(222U, ROUTING_CHANNEL, "Node %d found neighbor %d\n", TOS_NODE_ID, neighborId);
+          sim_log_debug(227U, ROUTING_CHANNEL, "Node %d found neighbor %d\n", TOS_NODE_ID, neighborId);
         }
     }
 
@@ -9531,9 +9989,9 @@ inline static void Node__NeighborDiscovery__start(void ){
 #line 2
 }
 #line 2
-# 21 "Node.nc"
+# 24 "Node.nc"
 static inline void Node__AMControl__startDone(error_t err)
-#line 21
+#line 24
 {
   if (err == SUCCESS) {
       sim_log_debug(109U, GENERAL_CHANNEL, "Radio On\n");
@@ -9542,7 +10000,7 @@ static inline void Node__AMControl__startDone(error_t err)
       Node__DVExchange__start();
     }
   else 
-#line 27
+#line 30
     {
 
       Node__AMControl__start();
@@ -9564,9 +10022,9 @@ static inline void TossimPacketModelC__startDoneTask__runTask(void )
   TossimPacketModelC__Control__startDone(SUCCESS);
 }
 
-# 33 "Node.nc"
+# 36 "Node.nc"
 static inline void Node__AMControl__stopDone(error_t err)
-#line 33
+#line 36
 {
 }
 
@@ -9596,9 +10054,9 @@ static __inline  int8_t __nesc_hton_int8(void * target, int8_t value)
 }
 
 # 110 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
-inline static void TossimActiveMessageC__AMSend__sendDone(am_id_t arg_0x71c0ca36ac70, message_t * msg, error_t error){
+inline static void TossimActiveMessageC__AMSend__sendDone(am_id_t arg_0x7ffffac03c70, message_t * msg, error_t error){
 #line 110
-  /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__sendDone(arg_0x71c0ca36ac70, msg, error);
+  /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__sendDone(arg_0x7ffffac03c70, msg, error);
 #line 110
 }
 #line 110
@@ -9701,9 +10159,9 @@ inline static error_t CommandHandlerP__Pool__put(CommandHandlerP__Pool__t * newV
 #line 89
 }
 #line 89
-# 51 "Node.nc"
+# 54 "Node.nc"
 static inline void Node__CommandHandler__setTestServer(void )
-#line 51
+#line 54
 {
 }
 
@@ -9714,9 +10172,9 @@ inline static void CommandHandlerP__CommandHandler__setTestServer(void ){
 #line 8
 }
 #line 8
-# 53 "Node.nc"
+# 56 "Node.nc"
 static inline void Node__CommandHandler__setTestClient(void )
-#line 53
+#line 56
 {
 }
 
@@ -9732,10 +10190,10 @@ static inline void DistanceVectorP__DistanceVector__printTable(void )
 {
   uint8_t i;
 
-  sim_log_debug(225U, ROUTING_CHANNEL, "Node %d Routing Table\n", TOS_NODE_ID);
+  sim_log_debug(230U, ROUTING_CHANNEL, "Node %d Routing Table\n", TOS_NODE_ID);
 
 
-  sim_log_debug(226U, ROUTING_CHANNEL, "Dest NextHop Cost State\n");
+  sim_log_debug(231U, ROUTING_CHANNEL, "Dest NextHop Cost State\n");
 
 
   for (i = 0; i < DistanceVectorP__routeCount[sim_node()]; i++) 
@@ -9745,7 +10203,7 @@ static inline void DistanceVectorP__DistanceVector__printTable(void )
       if (route->state == DV_ROUTE_VALID && 
       route->cost < DV_INFINITY) 
         {
-          sim_log_debug(227U, ROUTING_CHANNEL, "%d %d %d VALID\n", route->destination, route->nextHop, route->cost);
+          sim_log_debug(232U, ROUTING_CHANNEL, "%d %d %d VALID\n", route->destination, route->nextHop, route->cost);
         }
       else {
 
@@ -9754,7 +10212,7 @@ static inline void DistanceVectorP__DistanceVector__printTable(void )
         if (route->state == DV_ROUTE_WITHDRAWN) 
           {
 
-            sim_log_debug(228U, ROUTING_CHANNEL, "%d NONE INF WITHDRAWN\n", route->destination);
+            sim_log_debug(233U, ROUTING_CHANNEL, "%d NONE INF WITHDRAWN\n", route->destination);
           }
         }
     }
@@ -9767,9 +10225,9 @@ inline static void Node__DV__printTable(void ){
 #line 28
 }
 #line 28
-# 43 "Node.nc"
+# 46 "Node.nc"
 static inline void Node__CommandHandler__printRouteTable(void )
-#line 43
+#line 46
 {
   Node__DV__printTable();
 }
@@ -9781,9 +10239,9 @@ inline static void CommandHandlerP__CommandHandler__printRouteTable(void ){
 #line 5
 }
 #line 5
-# 47 "Node.nc"
+# 50 "Node.nc"
 static inline void Node__CommandHandler__printLinkState(void )
-#line 47
+#line 50
 {
 }
 
@@ -9813,9 +10271,9 @@ inline static void Node__NeighborDiscovery__printNeighbors(void ){
 #line 3
 }
 #line 3
-# 39 "Node.nc"
+# 42 "Node.nc"
 static inline void Node__CommandHandler__printNeighbors(void )
-#line 39
+#line 42
 {
   Node__NeighborDiscovery__printNeighbors();
 }
@@ -9837,17 +10295,17 @@ static inline void IPRoutingP__IPRouting__ping(uint16_t destination, uint8_t *pa
   uint8_t cost;
 
   if (destination == TOS_NODE_ID) {
-      sim_log_debug(230U, ROUTING_CHANNEL, "Node %d is already the destination\n", TOS_NODE_ID);
+      sim_log_debug(235U, ROUTING_CHANNEL, "Node %d is already the destination\n", TOS_NODE_ID);
       return;
     }
 
   if (!IPRoutingP__DV__lookup(destination, &nextHop, &cost)) {
-      sim_log_debug(231U, ROUTING_CHANNEL, "Node %d has no route to %d\n", TOS_NODE_ID, destination);
+      sim_log_debug(236U, ROUTING_CHANNEL, "Node %d has no route to %d\n", TOS_NODE_ID, destination);
       return;
     }
 
   if (cost >= DV_INFINITY || !IPRoutingP__ND__isNeighbor(nextHop)) {
-      sim_log_debug(232U, ROUTING_CHANNEL, "Node %d cannot reach %d\n", TOS_NODE_ID, destination);
+      sim_log_debug(237U, ROUTING_CHANNEL, "Node %d cannot reach %d\n", TOS_NODE_ID, destination);
       return;
     }
 
@@ -9864,11 +10322,11 @@ static inline void IPRoutingP__IPRouting__ping(uint16_t destination, uint8_t *pa
     }
 
   if (IPRoutingP__Sender__send(outgoing, nextHop) != SUCCESS) {
-      sim_log_debug(233U, ROUTING_CHANNEL, "Node %d failed to queue ping\n", TOS_NODE_ID);
+      sim_log_debug(238U, ROUTING_CHANNEL, "Node %d failed to queue ping\n", TOS_NODE_ID);
       return;
     }
 
-  sim_log_debug(234U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(outgoing.src.nxdata), __nesc_ntoh_uint16(outgoing.dest.nxdata), __nesc_ntoh_uint16(outgoing.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(outgoing.TTL.nxdata));
+  sim_log_debug(239U, ROUTING_CHANNEL, "Node %d Routing Packet - src: %d, dest: %d, seq: %d, next hop: %d, cost: %d, TTL: %d\n", TOS_NODE_ID, __nesc_ntoh_uint16(outgoing.src.nxdata), __nesc_ntoh_uint16(outgoing.dest.nxdata), __nesc_ntoh_uint16(outgoing.seq.nxdata), nextHop, cost, __nesc_ntoh_uint8(outgoing.TTL.nxdata));
 }
 
 # 3 "lib/interfaces/IPRouting.nc"
@@ -9878,9 +10336,9 @@ inline static void Node__IPRouting__ping(uint16_t destination, uint8_t *payload)
 #line 3
 }
 #line 3
-# 35 "Node.nc"
+# 38 "Node.nc"
 static inline void Node__CommandHandler__ping(uint16_t destination, uint8_t *payload)
-#line 35
+#line 38
 {
   Node__IPRouting__ping(destination, payload);
 }
@@ -9896,7 +10354,7 @@ inline static void CommandHandlerP__CommandHandler__ping(uint16_t destination, u
 static inline void *TossimActiveMessageC__Packet__getPayload(message_t *msg, uint8_t len)
 #line 189
 {
-  if (len <= 28) {
+  if (len <= 29) {
       return msg->data;
     }
   else {
@@ -10815,7 +11273,7 @@ static inline error_t /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__Pool__put(/*DV
         }
       /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__queue[sim_node()][emptyIndex] = newVal;
       /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]++;
-      sim_log_debug(214U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
+      sim_log_debug(219U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
       return SUCCESS;
     }
 }
@@ -10849,7 +11307,7 @@ static inline /*DVExchangeC.Sender.QueueC*/QueueC__3__queue_t /*DVExchangeC.Send
   /*DVExchangeC.Sender.QueueC*/QueueC__3__queue_t t = /*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__head();
 
 #line 91
-  sim_log_debug(220U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*DVExchangeC.Sender.QueueC*/QueueC__3__size[sim_node()]);
+  sim_log_debug(225U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*DVExchangeC.Sender.QueueC*/QueueC__3__size[sim_node()]);
   if (!/*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__empty()) {
       /*DVExchangeC.Sender.QueueC*/QueueC__3__head[sim_node()]++;
       if (/*DVExchangeC.Sender.QueueC*/QueueC__3__head[sim_node()] == 20) {
@@ -10971,19 +11429,19 @@ static inline error_t /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2__send(uin
 #line 133
         {
 
-          sim_log_debug(208U, GENERAL_CHANNEL, "The radio is busy, or something\n");
+          sim_log_debug(213U, GENERAL_CHANNEL, "The radio is busy, or something\n");
           return FAIL;
         }
     }
   else 
 #line 138
     {
-      sim_log_debug(209U, GENERAL_CHANNEL, "The radio is busy");
+      sim_log_debug(214U, GENERAL_CHANNEL, "The radio is busy");
       return EBUSY;
     }
 
 
-  sim_log_debug(210U, GENERAL_CHANNEL, "FAILED!?");
+  sim_log_debug(215U, GENERAL_CHANNEL, "FAILED!?");
   return FAIL;
 }
 
@@ -11070,7 +11528,7 @@ static inline error_t /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__Pool__put(/*IPR
         }
       /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__queue[sim_node()][emptyIndex] = newVal;
       /*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]++;
-      sim_log_debug(253U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
+      sim_log_debug(258U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*IPRoutingC.Sender.PoolC.PoolP*/PoolP__4__free[sim_node()]);
       return SUCCESS;
     }
 }
@@ -11104,7 +11562,7 @@ static inline /*IPRoutingC.Sender.QueueC*/QueueC__4__queue_t /*IPRoutingC.Sender
   /*IPRoutingC.Sender.QueueC*/QueueC__4__queue_t t = /*IPRoutingC.Sender.QueueC*/QueueC__4__Queue__head();
 
 #line 91
-  sim_log_debug(259U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*IPRoutingC.Sender.QueueC*/QueueC__4__size[sim_node()]);
+  sim_log_debug(264U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*IPRoutingC.Sender.QueueC*/QueueC__4__size[sim_node()]);
   if (!/*IPRoutingC.Sender.QueueC*/QueueC__4__Queue__empty()) {
       /*IPRoutingC.Sender.QueueC*/QueueC__4__head[sim_node()]++;
       if (/*IPRoutingC.Sender.QueueC*/QueueC__4__head[sim_node()] == 20) {
@@ -11226,19 +11684,19 @@ static inline error_t /*IPRoutingC.Sender.SimpleSendP*/SimpleSendP__3__send(uint
 #line 133
         {
 
-          sim_log_debug(247U, GENERAL_CHANNEL, "The radio is busy, or something\n");
+          sim_log_debug(252U, GENERAL_CHANNEL, "The radio is busy, or something\n");
           return FAIL;
         }
     }
   else 
 #line 138
     {
-      sim_log_debug(248U, GENERAL_CHANNEL, "The radio is busy");
+      sim_log_debug(253U, GENERAL_CHANNEL, "The radio is busy");
       return EBUSY;
     }
 
 
-  sim_log_debug(249U, GENERAL_CHANNEL, "FAILED!?");
+  sim_log_debug(254U, GENERAL_CHANNEL, "FAILED!?");
   return FAIL;
 }
 
@@ -11293,9 +11751,9 @@ static inline void SimSchedulerBasicP__TaskBasic__default__runTask(uint8_t id)
 }
 
 # 75 "/opt/tinyos-main/tos/interfaces/TaskBasic.nc"
-inline static void SimSchedulerBasicP__TaskBasic__runTask(uint8_t arg_0x71c0ca51f020){
+inline static void SimSchedulerBasicP__TaskBasic__runTask(uint8_t arg_0x7ffffadb8020){
 #line 75
-  switch (arg_0x71c0ca51f020) {
+  switch (arg_0x7ffffadb8020) {
 #line 75
     case TossimPacketModelC__startDoneTask:
 #line 75
@@ -11377,7 +11835,7 @@ inline static void SimSchedulerBasicP__TaskBasic__runTask(uint8_t arg_0x71c0ca51
 #line 75
     default:
 #line 75
-      SimSchedulerBasicP__TaskBasic__default__runTask(arg_0x71c0ca51f020);
+      SimSchedulerBasicP__TaskBasic__default__runTask(arg_0x7ffffadb8020);
 #line 75
       break;
 #line 75
@@ -11430,13 +11888,13 @@ inline static am_addr_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMPacket__dest
 }
 #line 78
 # 80 "/opt/tinyos-main/tos/interfaces/AMSend.nc"
-inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__send(am_id_t arg_0x71c0c9c234d0, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__AMSend__send(am_id_t arg_0x7ffffa49b4d0, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = TossimActiveMessageC__AMSend__send(arg_0x71c0c9c234d0, addr, msg, len);
+  __nesc_result = TossimActiveMessageC__AMSend__send(arg_0x7ffffa49b4d0, addr, msg, len);
 #line 80
 
 #line 80
@@ -12460,14 +12918,123 @@ static inline void /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1__sendTimer__fi
   /*FloodingC.Sender.SimpleSendP*/SimpleSendP__1__sendBufferTask__postTask();
 }
 
-# 186 "lib/modules/DVExchangeP.nc"
-static inline void DVExchangeP__DVExchange__sendUpdate(void )
-#line 186
+# 198 "lib/modules/DistanceVectorP.nc"
+static inline bool DistanceVectorP__DistanceVector__entryAt(
+uint8_t index, 
+uint16_t *destination, 
+uint8_t *cost, 
+uint16_t *nextHop)
+
 {
+
+
+  if (((
+#line 205
+  index >= DistanceVectorP__routeCount[sim_node()] || 
+  destination == (void *)0) || 
+  cost == (void *)0) || 
+  nextHop == (void *)0) 
+    {
+      return FALSE;
+    }
+
+  *destination = DistanceVectorP__routingTable[sim_node()][index].destination;
+  *cost = DistanceVectorP__routingTable[sim_node()][index].cost;
+  *nextHop = DistanceVectorP__routingTable[sim_node()][index].nextHop;
+
+  return TRUE;
+}
+
+# 9 "lib/interfaces/DistanceVector.nc"
+inline static bool DVExchangeP__DV__entryAt(uint8_t index, uint16_t *destination, uint8_t *cost, uint16_t *nextHop){
+#line 9
+  unsigned char __nesc_result;
+#line 9
+
+#line 9
+  __nesc_result = DistanceVectorP__DistanceVector__entryAt(index, destination, cost, nextHop);
+#line 9
+
+#line 9
+  return __nesc_result;
+#line 9
+}
+#line 9
+# 35 "lib/modules/DistanceVectorP.nc"
+static inline uint8_t DistanceVectorP__DistanceVector__count(void )
+{
+  return DistanceVectorP__routeCount[sim_node()];
+}
+
+# 7 "lib/interfaces/DistanceVector.nc"
+inline static uint8_t DVExchangeP__DV__count(void ){
+#line 7
+  unsigned char __nesc_result;
+#line 7
+
+#line 7
+  __nesc_result = DistanceVectorP__DistanceVector__count();
+#line 7
+
+#line 7
+  return __nesc_result;
+#line 7
+}
+#line 7
+# 319 "lib/modules/DVExchangeP.nc"
+static inline void DVExchangeP__DVExchange__sendUpdate(void )
+{
+  uint16_t i;
+  uint16_t destination;
+  uint16_t nextHop;
+  uint8_t cost;
+  uint8_t routeCount;
 
   if (DVExchangeP__sending[sim_node()]) {
       return;
     }
+
+  routeCount = DVExchangeP__DV__count();
+
+  DVExchangeP__snapshotCount[sim_node()] = 0;
+
+  for (i = 0; i < routeCount; i++) {
+
+      if (DVExchangeP__DV__entryAt(i, &destination, &cost, &nextHop)) {
+
+
+          if (destination > 255) {
+              continue;
+            }
+
+          if (cost > DV_INFINITY) {
+              cost = DV_INFINITY;
+            }
+
+          if (destination == TOS_NODE_ID) {
+              cost = 0;
+            }
+
+          DVExchangeP__snapshotDestinations[sim_node()][DVExchangeP__snapshotCount[sim_node()]] = 
+          (uint8_t )destination;
+
+          DVExchangeP__snapshotCosts[sim_node()][DVExchangeP__snapshotCount[sim_node()]] = cost;
+
+          DVExchangeP__snapshotNextHops[sim_node()][DVExchangeP__snapshotCount[sim_node()]] = nextHop;
+
+          DVExchangeP__snapshotCount[sim_node()]++;
+        }
+    }
+
+  if (DVExchangeP__snapshotCount[sim_node()] == 0) {
+      return;
+    }
+
+  DVExchangeP__updateSequence[sim_node()]++;
+  DVExchangeP__currentUpdateId[sim_node()] = DVExchangeP__updateSequence[sim_node()];
+
+  DVExchangeP__totalPackets[sim_node()] = (
+  DVExchangeP__snapshotCount[sim_node()] + DV_MAX_ENTRIES - 1) / DV_MAX_ENTRIES;
 
   DVExchangeP__sending[sim_node()] = TRUE;
 
@@ -12475,19 +13042,59 @@ static inline void DVExchangeP__DVExchange__sendUpdate(void )
   DVExchangeP__currentNeighbor[sim_node()] = AM_BROADCAST_ADDR;
   DVExchangeP__routeIndex[sim_node()] = 0;
 
-  sim_log_debug(202U, ROUTING_CHANNEL, "Node %d starting DV update\n", TOS_NODE_ID);
+  sim_log_debug(203U, ROUTING_CHANNEL, "Node %d starting DV update ID %d with %d routes in %d packets\n", TOS_NODE_ID, DVExchangeP__currentUpdateId[sim_node()], DVExchangeP__snapshotCount[sim_node()], DVExchangeP__totalPackets[sim_node()]);
+
+
+
 
 
 
   DVExchangeP__sendNextPacket();
 }
 
-#line 47
+#line 142
+static inline void DVExchangeP__expireIncompleteUpdates(void )
+{
+  uint8_t i;
+  uint32_t now;
+
+  now = DVExchangeP__Timer__getNow();
+
+  for (i = 0; i < DV_MAX_NEIGHBORS; i++) 
+    {
+
+      if (
+#line 151
+      DVExchangeP__incomingUpdates[sim_node()][i].active && 
+      DVExchangeP__incomingUpdates[sim_node()][i].receivedMask != 0 && 
+      (uint32_t )(now - DVExchangeP__incomingUpdates[sim_node()][i].lastActivity)
+       >= DV_REASSEMBLY_TIMEOUT) 
+        {
+          sim_log_debug(197U, ROUTING_CHANNEL, "Node %d discarded incomplete update %d from Node %d\n", TOS_NODE_ID, DVExchangeP__incomingUpdates[sim_node()][i].updateId, DVExchangeP__incomingUpdates[sim_node()][i].neighbor);
+
+
+
+
+
+          DVExchangeP__incomingUpdates[sim_node()][i].lastRetiredId = 
+          DVExchangeP__incomingUpdates[sim_node()][i].updateId;
+
+          DVExchangeP__incomingUpdates[sim_node()][i].hasRetired = TRUE;
+          DVExchangeP__incomingUpdates[sim_node()][i].receivedMask = 0;
+          DVExchangeP__incomingUpdates[sim_node()][i].totalPackets = 0;
+          DVExchangeP__incomingUpdates[sim_node()][i].lastPacketCount = 0;
+        }
+    }
+}
+
+#line 83
 static inline void DVExchangeP__Timer__fired(void )
-#line 47
+#line 83
 {
 
   uint16_t delay;
+
+  DVExchangeP__expireIncompleteUpdates();
 
   sim_log_debug(196U, ROUTING_CHANNEL, "Node %d timer fired\n", TOS_NODE_ID);
 
@@ -12498,9 +13105,9 @@ static inline void DVExchangeP__Timer__fired(void )
   DVExchangeP__Timer__startOneShot(delay);
 }
 
-#line 205
+#line 389
 static inline void DVExchangeP__SendTimer__fired(void )
-#line 205
+#line 389
 {
 
   DVExchangeP__sendNextPacket();
@@ -12557,7 +13164,7 @@ static inline void DistanceVectorP__MaintenanceTimer__fired(void )
       !DistanceVectorP__ND__isNeighbor(DistanceVectorP__routingTable[sim_node()][i].nextHop)) 
         {
 
-          sim_log_debug(223U, ROUTING_CHANNEL, "Node %d lost route to %d via %d\n", TOS_NODE_ID, DistanceVectorP__routingTable[sim_node()][i].destination, DistanceVectorP__routingTable[sim_node()][i].nextHop);
+          sim_log_debug(228U, ROUTING_CHANNEL, "Node %d lost route to %d via %d\n", TOS_NODE_ID, DistanceVectorP__routingTable[sim_node()][i].destination, DistanceVectorP__routingTable[sim_node()][i].nextHop);
 
 
 
@@ -12592,7 +13199,7 @@ static inline void DistanceVectorP__MaintenanceTimer__fired(void )
       DistanceVectorP__routingTable[sim_node()][i].lastUpdated) >= DV_ROUTE_TIMEOUT) 
         {
 
-          sim_log_debug(224U, ROUTING_CHANNEL, "Node %d route to %d expired\n", TOS_NODE_ID, DistanceVectorP__routingTable[sim_node()][i].destination);
+          sim_log_debug(229U, ROUTING_CHANNEL, "Node %d route to %d expired\n", TOS_NODE_ID, DistanceVectorP__routingTable[sim_node()][i].destination);
 
 
 
@@ -12653,9 +13260,9 @@ static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer
 }
 
 # 83 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
-inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__fired(uint8_t arg_0x71c0c9d30950){
+inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__fired(uint8_t arg_0x7ffffa5a8950){
 #line 83
-  switch (arg_0x71c0c9d30950) {
+  switch (arg_0x7ffffa5a8950) {
 #line 83
     case 0U:
 #line 83
@@ -12707,7 +13314,7 @@ inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer
 #line 83
     default:
 #line 83
-      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__default__fired(arg_0x71c0c9d30950);
+      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__default__fired(arg_0x7ffffa5a8950);
 #line 83
       break;
 #line 83
@@ -12715,27 +13322,6 @@ inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer
 #line 83
 }
 #line 83
-# 35 "lib/modules/DistanceVectorP.nc"
-static inline uint8_t DistanceVectorP__DistanceVector__count(void )
-{
-  return DistanceVectorP__routeCount[sim_node()];
-}
-
-# 7 "lib/interfaces/DistanceVector.nc"
-inline static uint8_t DVExchangeP__DV__count(void ){
-#line 7
-  unsigned char __nesc_result;
-#line 7
-
-#line 7
-  __nesc_result = DistanceVectorP__DistanceVector__count();
-#line 7
-
-#line 7
-  return __nesc_result;
-#line 7
-}
-#line 7
 # 5 "lib/interfaces/NeighborDiscovery.nc"
 inline static uint8_t DVExchangeP__ND__getNeighborCount(void ){
 #line 5
@@ -12766,48 +13352,6 @@ inline static bool DVExchangeP__ND__getNeighborAt(uint8_t index, uint16_t *nodeI
 #line 6
 }
 #line 6
-# 198 "lib/modules/DistanceVectorP.nc"
-static inline bool DistanceVectorP__DistanceVector__entryAt(
-uint8_t index, 
-uint16_t *destination, 
-uint8_t *cost, 
-uint16_t *nextHop)
-
-{
-
-
-  if (((
-#line 205
-  index >= DistanceVectorP__routeCount[sim_node()] || 
-  destination == (void *)0) || 
-  cost == (void *)0) || 
-  nextHop == (void *)0) 
-    {
-      return FALSE;
-    }
-
-  *destination = DistanceVectorP__routingTable[sim_node()][index].destination;
-  *cost = DistanceVectorP__routingTable[sim_node()][index].cost;
-  *nextHop = DistanceVectorP__routingTable[sim_node()][index].nextHop;
-
-  return TRUE;
-}
-
-# 9 "lib/interfaces/DistanceVector.nc"
-inline static bool DVExchangeP__DV__entryAt(uint8_t index, uint16_t *destination, uint8_t *cost, uint16_t *nextHop){
-#line 9
-  unsigned char __nesc_result;
-#line 9
-
-#line 9
-  __nesc_result = DistanceVectorP__DistanceVector__entryAt(index, destination, cost, nextHop);
-#line 9
-
-#line 9
-  return __nesc_result;
-#line 9
-}
-#line 9
 # 65 "/opt/tinyos-main/tos/system/QueueC.nc"
 static inline uint8_t /*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__maxSize(void )
 #line 65
@@ -12827,7 +13371,7 @@ static inline error_t /*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__enqueue(/*D
 #line 101
 {
   if (/*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__size() < /*DVExchangeC.Sender.QueueC*/QueueC__3__Queue__maxSize()) {
-      sim_log_debug(221U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*DVExchangeC.Sender.QueueC*/QueueC__3__size[sim_node()]);
+      sim_log_debug(226U, "QueueC", "%s: size is %hhu\n", __FUNCTION__, /*DVExchangeC.Sender.QueueC*/QueueC__3__size[sim_node()]);
       /*DVExchangeC.Sender.QueueC*/QueueC__3__queue[sim_node()][/*DVExchangeC.Sender.QueueC*/QueueC__3__tail[sim_node()]] = newVal;
       /*DVExchangeC.Sender.QueueC*/QueueC__3__tail[sim_node()]++;
       if (/*DVExchangeC.Sender.QueueC*/QueueC__3__tail[sim_node()] == 20) {
@@ -12873,7 +13417,7 @@ static inline /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__pool_t */*DVExchangeC.
       if (/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__index[sim_node()] == 20) {
           /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__index[sim_node()] = 0;
         }
-      sim_log_debug(213U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
+      sim_log_debug(218U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
       return rval;
     }
   return (void *)0;
@@ -12898,7 +13442,7 @@ inline static /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2__Pool__t * /*DVEx
 static inline bool /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__Pool__empty(void )
 #line 75
 {
-  sim_log_debug(211U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
+  sim_log_debug(216U, "PoolP", "%s size is %i\n", __FUNCTION__, (int )/*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()]);
   return /*DVExchangeC.Sender.PoolC.PoolP*/PoolP__3__free[sim_node()] == 0;
 }
 
@@ -13554,9 +14098,9 @@ inline static error_t SimMainP__SoftwareInit__init(void ){
 #line 62
 }
 #line 62
-# 16 "Node.nc"
+# 19 "Node.nc"
 static inline void Node__Boot__booted(void )
-#line 16
+#line 19
 {
   Node__AMControl__start();
   sim_log_debug(108U, GENERAL_CHANNEL, "Booted\n");
@@ -15235,18 +15779,18 @@ static void /*IPRoutingC.Sender.QueueC*/QueueC__4__printQueue(void )
   int j;
 
 #line 76
-  sim_log_debug(254U, "QueueC", "head <-");
+  sim_log_debug(259U, "QueueC", "head <-");
   for (i = /*IPRoutingC.Sender.QueueC*/QueueC__4__head[sim_node()]; i < /*IPRoutingC.Sender.QueueC*/QueueC__4__head[sim_node()] + /*IPRoutingC.Sender.QueueC*/QueueC__4__size[sim_node()]; i++) {
-      sim_log_debug_clear(255U, "QueueC", "[");
+      sim_log_debug_clear(260U, "QueueC", "[");
       for (j = 0; j < sizeof(/*IPRoutingC.Sender.QueueC*/QueueC__4__queue_t ); j++) {
           uint8_t v = ((uint8_t *)&/*IPRoutingC.Sender.QueueC*/QueueC__4__queue[sim_node()][i % 20])[j];
 
 #line 81
-          sim_log_debug_clear(256U, "QueueC", "%0.2hhx", v);
+          sim_log_debug_clear(261U, "QueueC", "%0.2hhx", v);
         }
-      sim_log_debug_clear(257U, "QueueC", "] ");
+      sim_log_debug_clear(262U, "QueueC", "] ");
     }
-  sim_log_debug_clear(258U, "QueueC", "<- tail\n");
+  sim_log_debug_clear(263U, "QueueC", "<- tail\n");
 }
 
 # 38 "lib/modules/SimpleSendP.nc"
@@ -15460,6 +16004,21 @@ static uint32_t RandomMlcgC__Random__rand32(void )
   return mlcg;
 }
 
+# 136 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
+static uint32_t DistanceVectorP__MaintenanceTimer__getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC__0__Timer__getNow(6U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
 # 96 "lib/modules/DistanceVectorP.nc"
 static void DistanceVectorP__withdrawRoute(uint8_t i)
 {
@@ -15655,7 +16214,7 @@ static void /*CommandHandlerC.QueueC*/QueueC__0__printQueue(void )
   uint8_t sim_packet_max_length(sim_packet_t *msg)
 #line 110
 {
-  return 28;
+  return 29;
 }
 
   sim_packet_t *sim_packet_allocate()
@@ -15961,9 +16520,9 @@ static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__default__sendDone(ui
 }
 
 # 100 "/opt/tinyos-main/tos/interfaces/Send.nc"
-static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__sendDone(uint8_t arg_0x71c0c9c252a0, message_t * msg, error_t error){
+static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__sendDone(uint8_t arg_0x7ffffa49c2a0, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x71c0c9c252a0) {
+  switch (arg_0x7ffffa49c2a0) {
 #line 100
     case 0U:
 #line 100
@@ -15991,7 +16550,7 @@ static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__sendDone(uint8_t arg
 #line 100
     default:
 #line 100
-      /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__default__sendDone(arg_0x71c0c9c252a0, msg, error);
+      /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Send__default__sendDone(arg_0x7ffffa49c2a0, msg, error);
 #line 100
       break;
 #line 100
@@ -16122,18 +16681,18 @@ static void /*DVExchangeC.Sender.QueueC*/QueueC__3__printQueue(void )
   int j;
 
 #line 76
-  sim_log_debug(215U, "QueueC", "head <-");
+  sim_log_debug(220U, "QueueC", "head <-");
   for (i = /*DVExchangeC.Sender.QueueC*/QueueC__3__head[sim_node()]; i < /*DVExchangeC.Sender.QueueC*/QueueC__3__head[sim_node()] + /*DVExchangeC.Sender.QueueC*/QueueC__3__size[sim_node()]; i++) {
-      sim_log_debug_clear(216U, "QueueC", "[");
+      sim_log_debug_clear(221U, "QueueC", "[");
       for (j = 0; j < sizeof(/*DVExchangeC.Sender.QueueC*/QueueC__3__queue_t ); j++) {
           uint8_t v = ((uint8_t *)&/*DVExchangeC.Sender.QueueC*/QueueC__3__queue[sim_node()][i % 20])[j];
 
 #line 81
-          sim_log_debug_clear(217U, "QueueC", "%0.2hhx", v);
+          sim_log_debug_clear(222U, "QueueC", "%0.2hhx", v);
         }
-      sim_log_debug_clear(218U, "QueueC", "] ");
+      sim_log_debug_clear(223U, "QueueC", "] ");
     }
-  sim_log_debug_clear(219U, "QueueC", "<- tail\n");
+  sim_log_debug_clear(224U, "QueueC", "<- tail\n");
 }
 
 # 73 "/opt/tinyos-main/tos/lib/timer/VirtualizeTimerC.nc"
@@ -16208,31 +16767,23 @@ static void DistanceVectorP__addDirectNeighbor(uint16_t neighborId)
   DistanceVectorP__routeCount[sim_node()]++;
 }
 
-# 60 "lib/modules/DVExchangeP.nc"
+# 173 "lib/modules/DVExchangeP.nc"
 static void DVExchangeP__sendNextPacket(void )
-#line 60
 {
-
-  uint8_t routeCount;
-
   uint16_t i;
-  uint16_t destination;
-  uint8_t cost;
-  uint16_t nextHop;
-
-  uint8_t neighborCount;
   uint16_t neighbor;
 
+  uint8_t neighborCount;
+  uint8_t entryCount;
+  uint8_t packetIndex;
   uint8_t sendCost;
 
   pack outgoing;
-  uint8_t entryCount;
 
   if (!DVExchangeP__sending[sim_node()]) {
       return;
     }
 
-  routeCount = DVExchangeP__DV__count();
   neighborCount = DVExchangeP__ND__getNeighborCount();
 
   while (DVExchangeP__neighborIndex[sim_node()] < neighborCount) {
@@ -16248,7 +16799,7 @@ static void DVExchangeP__sendNextPacket(void )
           DVExchangeP__routeIndex[sim_node()] = 0;
         }
 
-      if (DVExchangeP__routeIndex[sim_node()] >= routeCount) {
+      if (DVExchangeP__routeIndex[sim_node()] >= DVExchangeP__snapshotCount[sim_node()]) {
           DVExchangeP__neighborIndex[sim_node()]++;
           DVExchangeP__routeIndex[sim_node()] = 0;
           continue;
@@ -16260,51 +16811,48 @@ static void DVExchangeP__sendNextPacket(void )
       __nesc_hton_uint16(outgoing.dest.nxdata, neighbor);
       __nesc_hton_uint8(outgoing.TTL.nxdata, 1);
       __nesc_hton_uint8(outgoing.protocol.nxdata, PROTOCOL_DV);
-      __nesc_hton_uint16(outgoing.seq.nxdata, 0);
+
+      __nesc_hton_uint16(outgoing.seq.nxdata, DVExchangeP__currentUpdateId[sim_node()]);
+
+      packetIndex = DVExchangeP__routeIndex[sim_node()] / DV_MAX_ENTRIES;
+
+      __nesc_hton_uint8(outgoing.payload[1].nxdata, packetIndex);
+      __nesc_hton_uint8(outgoing.payload[2].nxdata, DVExchangeP__totalPackets[sim_node()]);
 
       entryCount = 0;
-      __nesc_hton_uint8(outgoing.payload[0].nxdata, 0);
 
-      for (i = DVExchangeP__routeIndex[sim_node()]; i < routeCount && entryCount < DV_MAX_ENTRIES; i++) {
+      for (i = DVExchangeP__routeIndex[sim_node()]; 
+      i < DVExchangeP__snapshotCount[sim_node()] && 
+      entryCount < DV_MAX_ENTRIES; 
+      i++) {
 
-          if (DVExchangeP__DV__entryAt(i, &destination, &cost, &nextHop)) {
+          sendCost = DVExchangeP__snapshotCosts[sim_node()][i];
 
-              if (destination > 255) {
-                  sim_log_debug(197U, ROUTING_CHANNEL, "Node %d cannot encode destination %d\n", TOS_NODE_ID, destination);
-
-
-                  continue;
-                }
-
-              sendCost = cost;
-
-              if (sendCost > DV_INFINITY) {
-                  sendCost = DV_INFINITY;
-                }
-
-              if (destination == TOS_NODE_ID) {
-                  sendCost = 0;
-                }
-              else {
-#line 133
-                if (nextHop == neighbor) {
-                    sendCost = DV_INFINITY;
-                  }
-                }
-              __nesc_hton_uint8(outgoing.payload[1 + entryCount * 2].nxdata, (uint8_t )destination);
-              __nesc_hton_uint8(outgoing.payload[2 + entryCount * 2].nxdata, sendCost);
-
-              entryCount++;
-              __nesc_hton_uint8(outgoing.payload[0].nxdata, entryCount);
+          if (DVExchangeP__snapshotDestinations[sim_node()][i] == TOS_NODE_ID) {
+              sendCost = 0;
             }
-        }
+          else {
+#line 236
+            if (DVExchangeP__snapshotNextHops[sim_node()][i] == neighbor) {
+                sendCost = DV_INFINITY;
+              }
+            }
+          __nesc_hton_uint8(outgoing.payload[3 + entryCount * 2].nxdata, 
+          DVExchangeP__snapshotDestinations[sim_node()][i]);
 
+          __nesc_hton_uint8(outgoing.payload[4 + entryCount * 2].nxdata, 
+          sendCost);
+
+          entryCount++;
+        }
 
       if (entryCount == 0) {
           DVExchangeP__neighborIndex[sim_node()]++;
           DVExchangeP__routeIndex[sim_node()] = 0;
           continue;
         }
+
+      __nesc_hton_uint8(outgoing.payload[0].nxdata, entryCount);
 
       if (DVExchangeP__Sender__send(outgoing, neighbor) != SUCCESS) {
 
@@ -16320,14 +16868,43 @@ static void DVExchangeP__sendNextPacket(void )
 
 
 
-      DVExchangeP__routeIndex[sim_node()] = i;
 
-      for (i = 0; i < entryCount; i++) {
-          sim_log_debug(200U, ROUTING_CHANNEL, "Node %d to neighbor %d: Dest %d Advertised Cost %d\n", TOS_NODE_ID, neighbor, __nesc_ntoh_uint8(outgoing.payload[1 + i * 2].nxdata), __nesc_ntoh_uint8(outgoing.payload[2 + i * 2].nxdata));
+
+
+      for (i = DVExchangeP__routeIndex[sim_node()]; i < DVExchangeP__routeIndex[sim_node()] + entryCount; i++) 
+        {
+
+          sendCost = DVExchangeP__snapshotCosts[sim_node()][i];
+
+          if (DVExchangeP__snapshotDestinations[sim_node()][i] == TOS_NODE_ID) 
+            {
+              sendCost = 0;
+            }
+          else {
+#line 283
+            if (DVExchangeP__snapshotNextHops[sim_node()][i] == neighbor) 
+              {
+                sendCost = DV_INFINITY;
+              }
+            }
+          sim_log_debug(200U, ROUTING_CHANNEL, "Node %d to neighbor %d: Dest %d Advertised Cost %d\n", TOS_NODE_ID, neighbor, DVExchangeP__snapshotDestinations[sim_node()][i], sendCost);
         }
 
 
 
+
+
+
+      sim_log_debug(201U, ROUTING_CHANNEL, "Node %d queued DV update %d packet %d/%d with %d routes for neighbor %d\n", TOS_NODE_ID, DVExchangeP__currentUpdateId[sim_node()], packetIndex + 1, DVExchangeP__totalPackets[sim_node()], entryCount, neighbor);
+
+
+
+
+
+
+
+
+      DVExchangeP__routeIndex[sim_node()] += entryCount;
 
       DVExchangeP__SendTimer__startOneShot(150);
       return;
@@ -16335,7 +16912,7 @@ static void DVExchangeP__sendNextPacket(void )
 
   DVExchangeP__sending[sim_node()] = FALSE;
 
-  sim_log_debug(201U, ROUTING_CHANNEL, "Node %d finished sending DV updates\n", TOS_NODE_ID);
+  sim_log_debug(202U, ROUTING_CHANNEL, "Node %d finished sending DV update %d\n", TOS_NODE_ID, DVExchangeP__currentUpdateId[sim_node()]);
 }
 
 # 73 "/opt/tinyos-main/tos/lib/timer/Timer.nc"
@@ -17386,6 +17963,48 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(DVExchangeP__sending[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "DVExchangeP__updateSequence"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__updateSequence[__nesc_mote];
+    *size = sizeof(DVExchangeP__updateSequence[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__currentUpdateId"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__currentUpdateId[__nesc_mote];
+    *size = sizeof(DVExchangeP__currentUpdateId[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__totalPackets"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__totalPackets[__nesc_mote];
+    *size = sizeof(DVExchangeP__totalPackets[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__snapshotCount"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__snapshotCount[__nesc_mote];
+    *size = sizeof(DVExchangeP__snapshotCount[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__snapshotDestinations"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__snapshotDestinations[__nesc_mote];
+    *size = sizeof(DVExchangeP__snapshotDestinations[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__snapshotCosts"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__snapshotCosts[__nesc_mote];
+    *size = sizeof(DVExchangeP__snapshotCosts[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__snapshotNextHops"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__snapshotNextHops[__nesc_mote];
+    *size = sizeof(DVExchangeP__snapshotNextHops[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "DVExchangeP__neighborIndex"))
   {
     *addr = (uintptr_t)&DVExchangeP__neighborIndex[__nesc_mote];
@@ -17402,6 +18021,12 @@ static int __nesc_nido_resolve(int __nesc_mote,
   {
     *addr = (uintptr_t)&DVExchangeP__routeIndex[__nesc_mote];
     *size = sizeof(DVExchangeP__routeIndex[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "DVExchangeP__incomingUpdates"))
+  {
+    *addr = (uintptr_t)&DVExchangeP__incomingUpdates[__nesc_mote];
+    *size = sizeof(DVExchangeP__incomingUpdates[__nesc_mote]);
     return 0;
   }
 
@@ -17569,6 +18194,10 @@ static int __nesc_nido_resolve(int __nesc_mote,
     return 0;
   }
 
+  /* Module TransportControlP */
+
+  /* Module TransportStreamP */
+
   return -1;
 }
 /* Invoke static initialisers for mote '__nesc_mote' */
@@ -17723,9 +18352,17 @@ static void __nesc_nido_initialise(int __nesc_mote)
   /* Module DVExchangeP */
   DVExchangeP__started[__nesc_mote] = FALSE;
   DVExchangeP__sending[__nesc_mote] = FALSE;
+  DVExchangeP__updateSequence[__nesc_mote] = 0;
+  DVExchangeP__currentUpdateId[__nesc_mote] = 0;
+  DVExchangeP__totalPackets[__nesc_mote] = 0;
+  DVExchangeP__snapshotCount[__nesc_mote] = 0;
+  memset((void *)&DVExchangeP__snapshotDestinations[__nesc_mote], 0, sizeof DVExchangeP__snapshotDestinations[__nesc_mote]);
+  memset((void *)&DVExchangeP__snapshotCosts[__nesc_mote], 0, sizeof DVExchangeP__snapshotCosts[__nesc_mote]);
+  memset((void *)&DVExchangeP__snapshotNextHops[__nesc_mote], 0, sizeof DVExchangeP__snapshotNextHops[__nesc_mote]);
   DVExchangeP__neighborIndex[__nesc_mote] = 0;
   DVExchangeP__currentNeighbor[__nesc_mote] = AM_BROADCAST_ADDR;
   DVExchangeP__routeIndex[__nesc_mote] = 0;
+  memset((void *)&DVExchangeP__incomingUpdates[__nesc_mote], 0, sizeof DVExchangeP__incomingUpdates[__nesc_mote]);
 
   /* Module SimpleSendP__2 */
   /*DVExchangeC.Sender.SimpleSendP*/SimpleSendP__2__busy[__nesc_mote] = FALSE;
@@ -17770,5 +18407,9 @@ static void __nesc_nido_initialise(int __nesc_mote)
   /*IPRoutingC.Sender.QueueC*/QueueC__4__head[__nesc_mote] = 0;
   /*IPRoutingC.Sender.QueueC*/QueueC__4__tail[__nesc_mote] = 0;
   /*IPRoutingC.Sender.QueueC*/QueueC__4__size[__nesc_mote] = 0;
+
+  /* Module TransportControlP */
+
+  /* Module TransportStreamP */
 
 }

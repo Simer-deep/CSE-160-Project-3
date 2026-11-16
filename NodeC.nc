@@ -30,4 +30,12 @@ implementation {
    IPRoutingC.DV -> DistanceVectorC.DistanceVector;
    IPRoutingC.ND -> NeighborDiscoveryC.NeighborDiscovery;
    Node.DV -> DistanceVectorC.DistanceVector;
+
+   components TransportControlP;
+   components TransportStreamP;
+
+   Node.Transport -> TransportControlP.Transport;
+
+   TransportControlP.TransportStream ->
+   TransportStreamP.TransportStream;
 }
