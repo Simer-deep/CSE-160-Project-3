@@ -81,6 +81,7 @@ typedef struct socket_store_t {
 
     uint32_t dataDeadline;
     uint8_t dataRetries;
+    uint32_t windowDeadline;
 
 } socket_store_t;
 
