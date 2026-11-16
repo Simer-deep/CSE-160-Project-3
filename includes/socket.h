@@ -1,6 +1,8 @@
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
 
+#include <stdint.h>
+
 enum {
     MAX_NUM_OF_SOCKETS = 3,
     ROOT_SOCKET_ADDR = 255,
