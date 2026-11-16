@@ -12,7 +12,7 @@
 #include "../../includes/packet.h"
 #include <string.h>
 
-module CommandHandlerP{
+module CommandHandlerP {
    provides interface CommandHandler;
    uses interface Receive;
    uses interface Pool<message_t>;
@@ -20,9 +20,9 @@ module CommandHandlerP{
    uses interface Packet;
 }
 
-implementation{
-    task void processCommand(){
-        if(! call Queue.empty()){
+implementation {
+    task void processCommand() {
+        if(!call Queue.empty()) {
             CommandMsg *msg;
             uint8_t commandID;
             uint8_t* buff;
@@ -37,7 +37,7 @@ implementation{
             payload = call Packet.getPayload(raw_msg, sizeof(CommandMsg));
 
             // Check to see if the packet is valid.
-            if(!payload){
+            if(!payload) {
                 call Pool.put(raw_msg);
                 post processCommand();
                 return;
@@ -50,7 +50,7 @@ implementation{
             commandID = msg->id;
 
             //Find out which command was called and call related command
-            switch(commandID){
+            switch(commandID) {
             // A ping will have the destination of the packet as the first
             // value and the string in the remainder of the payload
             case CMD_PING:
@@ -101,7 +101,7 @@ implementation{
             call Pool.put(raw_msg);
         }
 
-        if(! call Queue.empty()){
+        if(!call Queue.empty()) {
             post processCommand();
         }
     }

@@ -12,7 +12,7 @@ implementation {
     }
 
     uint8_t receiveWindow(socket_store_t* socket) {
-        if (socket == NULL || !socket->inUse ||
+        if(socket == NULL || !socket->inUse ||
             socket->receiveUsed > SOCKET_BUFFER_SIZE) {
             return 0;
         }
@@ -27,7 +27,7 @@ implementation {
             socket->sendNext, socket->receiveNext, receiveWindow(socket),
             NULL, 0);
 
-        if (result != SUCCESS) {
+        if(result != SUCCESS) {
             socket->windowDeadline = 0;
         }
 
@@ -38,7 +38,7 @@ implementation {
         uint8_t data[TRANSPORT_MAX_DATA_SIZE];
         uint8_t i;
 
-        for (i = 0; i < length; i++) {
+        for(i = 0; i < length; i++) {
             data[i] = socket->sendBuffer[(socket->sendHead + offset + i) %
                 SOCKET_BUFFER_SIZE];
         }
@@ -50,7 +50,7 @@ implementation {
 
     command void TransportStream.initialize(socket_store_t* socket,
         uint16_t sendSequence, uint16_t receiveSequence, uint8_t peerWindow) {
-        if (socket == NULL) {
+        if(socket == NULL) {
             return;
         }
 
@@ -62,7 +62,7 @@ implementation {
         socket->sendWindow = TRANSPORT_SEND_WINDOW;
         socket->peerWindow = peerWindow;
 
-        if (socket->peerWindow > SOCKET_BUFFER_SIZE) {
+        if(socket->peerWindow > SOCKET_BUFFER_SIZE) {
             socket->peerWindow = SOCKET_BUFFER_SIZE;
         }
 
@@ -79,18 +79,18 @@ implementation {
         uint16_t count;
         uint16_t i;
 
-        if (!isConnected(socket) || buffer == NULL ||
+        if(!isConnected(socket) || buffer == NULL ||
             socket->state != ESTABLISHED || socket->closeRequested ||
             socket->finSent) {
             return 0;
         }
 
         count = SOCKET_BUFFER_SIZE - socket->sendUsed;
-        if (count > length) {
+        if(count > length) {
             count = length;
         }
 
-        for (i = 0; i < count; i++) {
+        for(i = 0; i < count; i++) {
             socket->sendBuffer[(socket->sendHead + socket->sendUsed + i) %
                 SOCKET_BUFFER_SIZE] = buffer[i];
         }
@@ -105,16 +105,16 @@ implementation {
         uint16_t count;
         uint16_t i;
 
-        if (socket == NULL || !socket->inUse || buffer == NULL) {
+        if(socket == NULL || !socket->inUse || buffer == NULL) {
             return 0;
         }
 
         count = socket->receiveUsed;
-        if (count > length) {
+        if(count > length) {
             count = length;
         }
 
-        for (i = 0; i < count; i++) {
+        for(i = 0; i < count; i++) {
             buffer[i] = socket->receiveBuffer[(socket->receiveHead + i) %
                 SOCKET_BUFFER_SIZE];
         }
@@ -122,7 +122,7 @@ implementation {
         socket->receiveHead = (socket->receiveHead + count) % SOCKET_BUFFER_SIZE;
         socket->receiveUsed -= count;
 
-        if (count > 0 && isConnected(socket)) {
+        if(count > 0 && isConnected(socket)) {
             sendAck(socket);
         }
 
@@ -134,22 +134,22 @@ implementation {
         uint8_t i;
         error_t result = FAIL;
 
-        if (socket == NULL || !socket->inUse || data == NULL || length == 0 ||
+        if(socket == NULL || !socket->inUse || data == NULL || length == 0 ||
             length > TRANSPORT_MAX_DATA_SIZE) {
             return FAIL;
         }
 
-        if (!isConnected(socket) && socket->state != LAST_ACK &&
+        if(!isConnected(socket) && socket->state != LAST_ACK &&
             socket->state != CLOSING && socket->state != TIME_WAIT) {
             return FAIL;
         }
 
-        if (!socket->finReceived &&
+        if(!socket->finReceived &&
             (socket->state == ESTABLISHED || socket->state == FIN_WAIT_1 ||
              socket->state == FIN_WAIT_2) &&
             sequence == socket->receiveNext &&
             length <= SOCKET_BUFFER_SIZE - socket->receiveUsed) {
-            for (i = 0; i < length; i++) {
+            for(i = 0; i < length; i++) {
                 socket->receiveBuffer[(socket->receiveHead + socket->receiveUsed + i) %
                     SOCKET_BUFFER_SIZE] = data[i];
             }
@@ -168,14 +168,14 @@ implementation {
         uint16_t acknowledged;
         uint16_t outstanding;
 
-        if (!isConnected(socket) || window > SOCKET_BUFFER_SIZE) {
+        if(!isConnected(socket) || window > SOCKET_BUFFER_SIZE) {
             return FAIL;
         }
 
         acknowledged = (uint16_t)(acknowledgement - socket->sendUnacked);
         outstanding = (uint16_t)(socket->sendNext - socket->sendUnacked);
 
-        if (acknowledged > outstanding || acknowledged > socket->sendUsed) {
+        if(acknowledged > outstanding || acknowledged > socket->sendUsed) {
             return FAIL;
         }
 
@@ -185,12 +185,12 @@ implementation {
         socket->sendUnacked = acknowledgement;
         socket->peerWindow = window;
 
-        if (acknowledged > 0) {
+        if(acknowledged > 0) {
             socket->dataRetries = 0;
             socket->dataDeadline = 0;
         }
 
-        if (socket->sendUnacked == socket->sendNext) {
+        if(socket->sendUnacked == socket->sendNext) {
             socket->dataDeadline = 0;
         }
 
@@ -215,101 +215,101 @@ implementation {
         uint16_t length;
         uint8_t sent;
 
-        if (socket == NULL || !socket->inUse) {
+        if(socket == NULL || !socket->inUse) {
             return FAIL;
         }
 
-        if (!isConnected(socket) && socket->state != LAST_ACK &&
+        if(!isConnected(socket) && socket->state != LAST_ACK &&
             socket->state != CLOSING && socket->state != TIME_WAIT) {
             return FAIL;
         }
 
-        if (socket->windowDeadline == 0 ||
+        if(socket->windowDeadline == 0 ||
             (int32_t)(now - socket->windowDeadline) >= 0) {
-            if (sendAck(socket) == SUCCESS) {
+            if(sendAck(socket) == SUCCESS) {
                 socket->windowDeadline = now + TRANSPORT_RTO_MS;
-                if (socket->windowDeadline == 0) {
+                if(socket->windowDeadline == 0) {
                     socket->windowDeadline = 1;
                 }
             }
         }
 
-        if (socket->sendUsed == 0) {
+        if(socket->sendUsed == 0) {
             socket->dataDeadline = 0;
             socket->dataRetries = 0;
             return SUCCESS;
         }
 
-        if (socket->finSent || (socket->state != ESTABLISHED &&
+        if(socket->finSent || (socket->state != ESTABLISHED &&
             socket->state != CLOSE_WAIT)) {
             return FAIL;
         }
 
         outstanding = (uint16_t)(socket->sendNext - socket->sendUnacked);
-        if (outstanding > socket->sendUsed ||
+        if(outstanding > socket->sendUsed ||
             socket->sendUsed > SOCKET_BUFFER_SIZE) {
             return FAIL;
         }
 
-        if (socket->peerWindow == 0) {
+        if(socket->peerWindow == 0) {
             socket->dataDeadline = 0;
             socket->dataRetries = 0;
             return SUCCESS;
         }
 
         limit = socket->sendWindow;
-        if (limit > SOCKET_BUFFER_SIZE) {
+        if(limit > SOCKET_BUFFER_SIZE) {
             limit = SOCKET_BUFFER_SIZE;
         }
-        if (limit > socket->peerWindow) {
+        if(limit > socket->peerWindow) {
             limit = socket->peerWindow;
         }
 
-        if (socket->dataDeadline == 0) {
+        if(socket->dataDeadline == 0) {
             socket->dataDeadline = now + TRANSPORT_RTO_MS;
-            if (socket->dataDeadline == 0) {
+            if(socket->dataDeadline == 0) {
                 socket->dataDeadline = 1;
             }
-        } else if ((int32_t)(now - socket->dataDeadline) >= 0) {
-            if (socket->dataRetries >= TRANSPORT_MAX_RETRIES) {
+        } else if((int32_t)(now - socket->dataDeadline) >= 0) {
+            if(socket->dataRetries >= TRANSPORT_MAX_RETRIES) {
                 return FAIL;
             }
 
             socket->dataRetries++;
             socket->dataDeadline = now + TRANSPORT_RTO_MS;
-            if (socket->dataDeadline == 0) {
+            if(socket->dataDeadline == 0) {
                 socket->dataDeadline = 1;
             }
 
-            for (offset = 0; offset < outstanding && offset < limit;
+            for(offset = 0; offset < outstanding && offset < limit;
                 offset += length) {
                 length = outstanding - offset;
-                if (length > limit - offset) {
+                if(length > limit - offset) {
                     length = limit - offset;
                 }
-                if (length > TRANSPORT_MAX_DATA_SIZE) {
+                if(length > TRANSPORT_MAX_DATA_SIZE) {
                     length = TRANSPORT_MAX_DATA_SIZE;
                 }
-                if (sendData(socket, offset, length) != SUCCESS) {
+                if(sendData(socket, offset, length) != SUCCESS) {
                     return SUCCESS;
                 }
             }
 
-            if (outstanding > 0) {
+            if(outstanding > 0) {
                 return SUCCESS;
             }
         }
 
-        for (sent = 0; sent < 2 && outstanding < limit &&
+        for(sent = 0; sent < 2 && outstanding < limit &&
             outstanding < socket->sendUsed; sent++) {
             length = socket->sendUsed - outstanding;
-            if (length > limit - outstanding) {
+            if(length > limit - outstanding) {
                 length = limit - outstanding;
             }
-            if (length > TRANSPORT_MAX_DATA_SIZE) {
+            if(length > TRANSPORT_MAX_DATA_SIZE) {
                 length = TRANSPORT_MAX_DATA_SIZE;
             }
-            if (sendData(socket, outstanding, length) != SUCCESS) {
+            if(sendData(socket, outstanding, length) != SUCCESS) {
                 return SUCCESS;
             }
 
