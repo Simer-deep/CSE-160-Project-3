@@ -255,15 +255,45 @@ implementation {
         uint8_t* buff,
         uint16_t bufflen
     ) {
-        return 0;
-    }
+        socket_store_t* conn = getSocket(fd);
 
+        if (conn == NULL || buff == NULL ||
+            conn->state != ESTABLISHED ||
+            bufflen == 0) {
+            return 0;
+        }
+
+        return call TransportStream.write(
+            conn,
+            buff,
+            bufflen
+        );
+    }
+    
     command uint16_t Transport.read(
         socket_t fd,
         uint8_t* buff,
         uint16_t bufflen
     ) {
-        return 0;
+        socket_store_t* conn = getSocket(fd);
+
+        if (conn == NULL || buff == NULL ||
+            bufflen == 0) {
+            return 0;
+        }
+
+        if (conn->state == CLOSED ||
+            conn->state == LISTEN ||
+            conn->state == SYN_SENT ||
+            conn->state == SYN_RCVD) {
+            return 0;
+        }
+
+        return call TransportStream.read(
+            conn,
+            buff,
+            bufflen
+        );
     }
 
     command error_t Transport.receive(pack* package) {
