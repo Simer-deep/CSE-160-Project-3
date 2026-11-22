@@ -7,6 +7,7 @@ module TransportControlP {
     provides interface Transport;
 
     uses interface TransportStream;
+    uses interface IPRouting;
 }
 
 implementation {
@@ -178,7 +179,7 @@ implementation {
         memset(conn, 0, sizeof(socket_store_t));
         return SUCCESS;
     }
-
+    
     event error_t TransportStream.sendSegment(
         socket_store_t* conn,
         uint8_t flags,
@@ -188,6 +189,55 @@ implementation {
         uint8_t* data,
         uint8_t length
     ) {
-        return FAIL;
+        uint8_t payload[PACKET_MAX_PAYLOAD_SIZE];
+        uint8_t i;
+
+        if (conn == NULL || !conn->inUse) {
+            return FAIL;
+        }
+
+        if (length > TRANSPORT_MAX_DATA_SIZE) {
+            return FAIL;
+        }
+
+        if (length > 0 && data == NULL) {
+            return FAIL;
+        }
+
+        if (conn->remoteAddr == 0 ||
+            conn->remotePort == 0 ||
+            conn->localPort == 0) {
+            return FAIL;
+        }
+
+        memset(payload, 0, sizeof(payload));
+
+        payload[0] = conn->localPort;
+        payload[1] = conn->remotePort;
+        payload[2] = flags;
+
+        payload[3] = (uint8_t)(seq >> 8);
+        payload[4] = (uint8_t)(seq & 0xFF);
+
+        payload[5] = (uint8_t)(ack >> 8);
+        payload[6] = (uint8_t)(ack & 0xFF);
+
+        payload[7] = window;
+        payload[8] = length;
+
+        for (i = 0; i < length; i++) {
+            payload[TRANSPORT_HEADER_SIZE + i] = data[i];
+        }
+
+        return call IPRouting.sendTransport(
+            conn->remoteAddr,
+            payload,
+            TRANSPORT_HEADER_SIZE + length
+        );
+    }
+
+    event void IPRouting.transportReceived(pack* packet) 
+    {
+
     }
 }

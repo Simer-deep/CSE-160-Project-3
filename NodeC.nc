@@ -37,5 +37,7 @@ implementation {
    Node.Transport -> TransportControlP.Transport;
 
    TransportControlP.TransportStream ->
-   TransportStreamP.TransportStream;
+      TransportStreamP.TransportStream;
+
+   TransportControlP.IPRouting -> IPRoutingC.IPRouting;
 }
