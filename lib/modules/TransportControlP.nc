@@ -413,17 +413,116 @@ implementation {
             "Node %d TCP receive: fd=%d flags=%d seq=%d ack=%d len=%d\n",
             TOS_NODE_ID, fd, flags, seq, ack, length);
 
-        if (flags & (TCP_FLAG_SYN | TCP_FLAG_FIN)) {
+        if (conn->state == SYN_SENT &&
+            flags == (TCP_FLAG_SYN | TCP_FLAG_ACK)) 
+            {
+                if (ack != (uint16_t)(
+                        conn->initialSendSequence + 1)) {
+                    return FAIL;
+                }
+
+            conn->initialReceiveSequence = seq;
+
+            if (sendControlPacket(
+                    conn,
+                    TCP_FLAG_ACK,
+                    (uint16_t)(conn->initialSendSequence + 1),
+                    (uint16_t)(seq + 1)
+                ) != SUCCESS) {
+                return FAIL;
+            }
+
+            call TransportStream.initialize(
+                conn,
+                (uint16_t)(conn->initialSendSequence + 1),
+                (uint16_t)(seq + 1),
+                window
+            );
+
+            conn->controlRetries = 0;
+            conn->controlDeadline = 0;
+            conn->state = ESTABLISHED;
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d: Client TCP ESTABLISHED fd=%d\n",
+                TOS_NODE_ID, fd);
+
+            signal Transport.connectDone(fd, SUCCESS);
+            return SUCCESS;
+        }
+
+        if (conn->state == SYN_RCVD &&
+            flags == TCP_FLAG_ACK) {
+
+            if (ack != (uint16_t)(
+                    conn->initialSendSequence + 1) ||
+                seq != (uint16_t)(
+                    conn->initialReceiveSequence + 1)) {
+                return FAIL;
+            }
+
+            call TransportStream.initialize(
+                conn,
+                (uint16_t)(conn->initialSendSequence + 1),
+                (uint16_t)(conn->initialReceiveSequence + 1),
+                window
+            );
+
+            conn->controlRetries = 0;
+            conn->controlDeadline = 0;
+            conn->state = ESTABLISHED;
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d: Server TCP ESTABLISHED fd=%d\n",
+                TOS_NODE_ID, fd);
+
+            {
+                socket_t listenFd = findListener(conn->localPort);
+
+                if (listenFd != 0) {
+                    signal Transport.acceptDone(listenFd, fd);
+                }
+            }
+
+            return SUCCESS;
+        }
+
+        if (conn->state == ESTABLISHED &&
+            flags == (TCP_FLAG_SYN | TCP_FLAG_ACK) &&
+            seq == conn->initialReceiveSequence &&
+            ack == (uint16_t)(
+                conn->initialSendSequence + 1)) {
+
+            return sendControlPacket(
+                conn,
+                TCP_FLAG_ACK,
+                conn->sendNext,
+                conn->receiveNext
+            );
+        }
+
+        if (flags & (TCP_FLAG_SYN | TCP_FLAG_FIN)) 
+        {
             return FAIL;
         }
 
-        if (flags & TCP_FLAG_ACK) {
+        if (conn->state != ESTABLISHED &&
+            conn->state != CLOSE_WAIT &&
+            conn->state != FIN_WAIT_1 &&
+            conn->state != FIN_WAIT_2) {
+            return FAIL;
+        }
+
+
+        if (flags & TCP_FLAG_ACK) 
+        {
             result = call TransportStream.onAck(
                 conn, ack, window
             );
         }
 
-        if (flags & TCP_FLAG_DATA) {
+        if (flags & TCP_FLAG_DATA) 
+        {
             result = call TransportStream.onData(
                 conn,
                 seq,
@@ -432,21 +531,25 @@ implementation {
             );
         }
 
-        if (!(flags & (TCP_FLAG_ACK | TCP_FLAG_DATA))) {
+        if (!(flags & (TCP_FLAG_ACK | TCP_FLAG_DATA))) 
+        {
             return FAIL;
         }
 
         return result;
     }
 
-    command error_t Transport.close(socket_t fd) {
+    command error_t Transport.close(socket_t fd) 
+    {
         return FAIL;
     }
 
-    command error_t Transport.release(socket_t fd) {
+    command error_t Transport.release(socket_t fd) 
+    {
         socket_store_t* conn = getSocket(fd);
 
-        if (conn == NULL || conn->state != CLOSED) {
+        if (conn == NULL || conn->state != CLOSED) 
+        {
             return FAIL;
         }
 

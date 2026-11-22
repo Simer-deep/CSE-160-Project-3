@@ -144,4 +144,11 @@ interface Transport{
     *   to listen else FAIL.
     */
    command error_t listen(socket_t fd);
+
+   event void connectDone(socket_t fd, error_t result);
+
+   event void acceptDone(socket_t listenFd, socket_t connectedFd);
+
+   event void closeDone(socket_t fd, error_t result);
+
 }

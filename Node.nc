@@ -73,5 +73,30 @@ implementation {
       call Transport.receive(packet);
    }
 
+   event void Transport.connectDone(
+      socket_t fd,
+      error_t result
+   ) {
+      dbg(TRANSPORT_CHANNEL,
+         "Node %d: TCP client connected fd=%d result=%d\n",
+         TOS_NODE_ID, fd, result);
+   }
 
+   event void Transport.acceptDone(
+      socket_t listenFd,
+      socket_t connectedFd
+   ) {
+      dbg(TRANSPORT_CHANNEL,
+         "Node %d: TCP server accepted connection fd=%d listener=%d\n",
+         TOS_NODE_ID, connectedFd, listenFd);
+   }
+
+   event void Transport.closeDone(
+      socket_t fd,
+      error_t result
+   ) {
+      dbg(TRANSPORT_CHANNEL,
+         "Node %d: TCP connection closed fd=%d result=%d\n",
+         TOS_NODE_ID, fd, result);
+   }
 }
