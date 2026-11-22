@@ -85,7 +85,8 @@ implementation {
         test_connection_t* connection;
 
         if(socket == NULL || socket->sendUsed != 0 || socket->closeRequested ||
-            socket->finSent) {
+            socket->finSent || socket->sendEnd > 65534U ||
+            totalBytes > 65534UL - socket->sendEnd) {
             return FAIL;
         }
 
@@ -281,6 +282,19 @@ implementation {
 
         if(complete || connection->stats.failed) {
             connection->resultSent = TRUE;
+
+            dbg("Project3TGen",
+                "Node %u conn=%u:%u->%u:%u accepted=%lu acknowledged=%lu "
+                "consumed=%lu mismatches=%lu result=%s\n",
+                TOS_NODE_ID,
+                socket->localAddr, socket->localPort,
+                socket->remoteAddr, socket->remotePort,
+                (unsigned long)connection->stats.accepted,
+                (unsigned long)connection->stats.acknowledged,
+                (unsigned long)connection->stats.consumed,
+                (unsigned long)connection->stats.mismatches,
+                connection->stats.failed ? "FAIL" : "PASS");
+
             signal TransportTest.finished(socket,
                 connection->stats.failed ? FAIL : SUCCESS);
         }

@@ -11,7 +11,8 @@ enum {
     TRANSPORT_SEND_WINDOW = 48,
     TRANSPORT_MAX_RETRIES = 8,
     TRANSPORT_RTO_MS = 2000,
-    TRANSPORT_TIME_WAIT_MS = 10000
+    TRANSPORT_TIME_WAIT_MS = 10000,
+    TRANSPORT_STALL_MS = 60000UL
 };
 
 enum socket_state {
@@ -84,6 +85,9 @@ typedef struct socket_store_t {
     uint32_t dataDeadline;
     uint8_t dataRetries;
     uint32_t windowDeadline;
+    bool retransmitting;
+    uint16_t retryOffset;
+    uint32_t stallDeadline;    
 
 } socket_store_t;
 

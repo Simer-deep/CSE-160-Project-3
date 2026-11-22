@@ -20,6 +20,20 @@ implementation {
         return SOCKET_BUFFER_SIZE - socket->receiveUsed;
     }
 
+    void logStream(socket_store_t* socket, char* eventName,
+    uint16_t sequence, uint16_t acknowledgement, uint16_t length) {
+
+    dbg("Project3TGen",
+        "Node %u conn=%u:%u->%u:%u %s seq=%u ack=%u len=%u "
+        "outstanding=%u wnd=%u peerWnd=%u\n",
+        TOS_NODE_ID,
+        socket->localAddr, socket->localPort,
+        socket->remoteAddr, socket->remotePort,
+        eventName, sequence, acknowledgement, length,
+        (uint16_t)(socket->sendNext - socket->sendUnacked),
+        receiveWindow(socket), socket->peerWindow);
+    }
+
     error_t sendAck(socket_store_t* socket) {
         error_t result;
 
@@ -29,6 +43,9 @@ implementation {
 
         if(result != SUCCESS) {
             socket->windowDeadline = 0;
+        } else {
+            logStream(socket, "ACK_TX", socket->sendNext,
+                socket->receiveNext, 0);
         }
 
         return result;
@@ -37,6 +54,13 @@ implementation {
     error_t sendData(socket_store_t* socket, uint16_t offset, uint8_t length) {
         uint8_t data[TRANSPORT_MAX_DATA_SIZE];
         uint8_t i;
+
+        if(socket == NULL || !socket->inUse || length == 0 ||
+            length > TRANSPORT_MAX_DATA_SIZE ||
+            offset > socket->sendUsed ||
+            length > socket->sendUsed - offset) {
+            return FAIL;
+        }
 
         for(i = 0; i < length; i++) {
             data[i] = socket->sendBuffer[(socket->sendHead + offset + i) %
@@ -72,6 +96,9 @@ implementation {
         socket->dataDeadline = 0;
         socket->dataRetries = 0;
         socket->windowDeadline = 0;
+        socket->retransmitting = FALSE;
+        socket->retryOffset = 0;
+        socket->stallDeadline = 0;
     }
 
     command uint16_t TransportStream.write(socket_store_t* socket,
@@ -85,9 +112,19 @@ implementation {
             return 0;
         }
 
+        if(socket->sendUsed > SOCKET_BUFFER_SIZE ||
+            socket->sendEnd >= 65534U) {
+            return 0;
+        }
+
         count = SOCKET_BUFFER_SIZE - socket->sendUsed;
+
         if(count > length) {
             count = length;
+        }
+
+        if(count > 65534UL - socket->sendEnd) {
+            count = 65534UL - socket->sendEnd;
         }
 
         for(i = 0; i < count; i++) {
@@ -97,6 +134,13 @@ implementation {
 
         socket->sendUsed += count;
         socket->sendEnd += count;
+
+        if(count > 0) {
+            logStream(socket, "Added data to send buffer",
+            (uint16_t)(socket->sendEnd - count),
+            socket->receiveNext, count);
+        }
+
         return count;
     }
 
@@ -105,7 +149,8 @@ implementation {
         uint16_t count;
         uint16_t i;
 
-        if(socket == NULL || !socket->inUse || buffer == NULL) {
+        if(socket == NULL || !socket->inUse || buffer == NULL ||
+            socket->receiveUsed > SOCKET_BUFFER_SIZE) {
             return 0;
         }
 
@@ -122,8 +167,13 @@ implementation {
         socket->receiveHead = (socket->receiveHead + count) % SOCKET_BUFFER_SIZE;
         socket->receiveUsed -= count;
 
-        if(count > 0 && isConnected(socket)) {
-            sendAck(socket);
+        if(count > 0) {
+            logStream(socket, "Read data from buffer",
+                socket->sendNext, socket->receiveNext, count);
+
+            if(isConnected(socket)) {
+                sendAck(socket);
+            }
         }
 
         return count;
@@ -144,11 +194,14 @@ implementation {
             return FAIL;
         }
 
-        if(!socket->finReceived &&
-            (socket->state == ESTABLISHED || socket->state == FIN_WAIT_1 ||
-             socket->state == FIN_WAIT_2) &&
-            sequence == socket->receiveNext &&
-            length <= SOCKET_BUFFER_SIZE - socket->receiveUsed) {
+            if(!socket->finReceived &&
+                (socket->state == ESTABLISHED || socket->state == FIN_WAIT_1 ||
+                socket->state == FIN_WAIT_2) &&
+                sequence == socket->receiveNext &&
+                sequence <= 65534U &&
+                length <= 65534UL - sequence &&
+                socket->receiveUsed <= SOCKET_BUFFER_SIZE &&
+                length <= SOCKET_BUFFER_SIZE - socket->receiveUsed) {
             for(i = 0; i < length; i++) {
                 socket->receiveBuffer[(socket->receiveHead + socket->receiveUsed + i) %
                     SOCKET_BUFFER_SIZE] = data[i];
@@ -157,6 +210,20 @@ implementation {
             socket->receiveUsed += length;
             socket->receiveNext += length;
             result = SUCCESS;
+        }
+
+        if(result == SUCCESS) {
+            logStream(socket, "Received data", sequence,
+                socket->receiveNext, length);
+        } else if(sequence != socket->receiveNext) {
+            logStream(socket, "Wrong sequence number", sequence,
+                socket->receiveNext, length);
+        } else if(length > receiveWindow(socket)) {
+            logStream(socket, "Not enough buffer space", sequence,
+                socket->receiveNext, length);
+        } else {
+            logStream(socket, "Dropped data", sequence,
+                socket->receiveNext, length);
         }
 
         sendAck(socket);
@@ -183,16 +250,31 @@ implementation {
             SOCKET_BUFFER_SIZE;
         socket->sendUsed -= acknowledged;
         socket->sendUnacked = acknowledgement;
-        socket->peerWindow = window;
+
+        if(acknowledged > 0 || window > socket->peerWindow) {
+            socket->peerWindow = window;
+            socket->stallDeadline = 0;
+        }
 
         if(acknowledged > 0) {
             socket->dataRetries = 0;
             socket->dataDeadline = 0;
+            socket->retransmitting = FALSE;
+            socket->retryOffset = 0;
+        }
+
+        if(socket->peerWindow == 0 && window == 0) {
+            socket->stallDeadline = 0;
         }
 
         if(socket->sendUnacked == socket->sendNext) {
             socket->dataDeadline = 0;
+            socket->retransmitting = FALSE;
+            socket->retryOffset = 0;
         }
+
+        logStream(socket, "Received ACK", socket->sendNext,
+        acknowledgement, acknowledged);
 
         return SUCCESS;
     }
@@ -211,7 +293,6 @@ implementation {
         uint32_t now) {
         uint16_t outstanding;
         uint16_t limit;
-        uint16_t offset;
         uint16_t length;
         uint8_t sent;
 
@@ -237,6 +318,9 @@ implementation {
         if(socket->sendUsed == 0) {
             socket->dataDeadline = 0;
             socket->dataRetries = 0;
+            socket->retransmitting = FALSE;
+            socket->retryOffset = 0;
+            socket->stallDeadline = 0;
             return SUCCESS;
         }
 
@@ -246,75 +330,127 @@ implementation {
         }
 
         outstanding = (uint16_t)(socket->sendNext - socket->sendUnacked);
+
         if(outstanding > socket->sendUsed ||
             socket->sendUsed > SOCKET_BUFFER_SIZE) {
             return FAIL;
         }
 
+        if(socket->stallDeadline == 0) {
+            socket->stallDeadline = now + TRANSPORT_STALL_MS;
+
+            if(socket->stallDeadline == 0) {
+                socket->stallDeadline = 1;
+            }
+        } else if((int32_t)(now - socket->stallDeadline) >= 0) {
+            logStream(socket, "Connection stopped making progress",
+            socket->sendUnacked, socket->receiveNext, outstanding);
+            return FAIL;
+        }
+
         if(socket->peerWindow == 0) {
-            socket->dataDeadline = 0;
-            socket->dataRetries = 0;
             return SUCCESS;
         }
 
         limit = socket->sendWindow;
+
         if(limit > SOCKET_BUFFER_SIZE) {
             limit = SOCKET_BUFFER_SIZE;
         }
+
         if(limit > socket->peerWindow) {
             limit = socket->peerWindow;
         }
 
-        if(socket->dataDeadline == 0) {
-            socket->dataDeadline = now + TRANSPORT_RTO_MS;
+        if(outstanding > 0 && !socket->retransmitting) {
             if(socket->dataDeadline == 0) {
-                socket->dataDeadline = 1;
-            }
-        } else if((int32_t)(now - socket->dataDeadline) >= 0) {
-            if(socket->dataRetries >= TRANSPORT_MAX_RETRIES) {
-                return FAIL;
-            }
+                socket->dataDeadline = now + TRANSPORT_RTO_MS;
 
-            socket->dataRetries++;
-            socket->dataDeadline = now + TRANSPORT_RTO_MS;
-            if(socket->dataDeadline == 0) {
-                socket->dataDeadline = 1;
-            }
-
-            for(offset = 0; offset < outstanding && offset < limit;
-                offset += length) {
-                length = outstanding - offset;
-                if(length > limit - offset) {
-                    length = limit - offset;
+                if(socket->dataDeadline == 0) {
+                    socket->dataDeadline = 1;
                 }
+            } else if((int32_t)(now - socket->dataDeadline) >= 0) {
+                if(socket->dataRetries >= TRANSPORT_MAX_RETRIES) {
+                    logStream(socket, "Too many retries",
+                        socket->sendUnacked, socket->receiveNext, outstanding);
+                    return FAIL;
+                }
+
+                socket->retransmitting = TRUE;
+                socket->retryOffset = 0;
+
+                logStream(socket, "Timed out waiting for ACK",
+                socket->sendUnacked, socket->receiveNext, outstanding);
+            }
+        }
+
+        if(socket->retransmitting) {
+            for(sent = 0; sent < 2 &&
+                socket->retryOffset < outstanding; sent++) {
+
+                length = outstanding - socket->retryOffset;
+
                 if(length > TRANSPORT_MAX_DATA_SIZE) {
                     length = TRANSPORT_MAX_DATA_SIZE;
                 }
-                if(sendData(socket, offset, length) != SUCCESS) {
+
+                if(sendData(socket, socket->retryOffset, length) != SUCCESS) {
                     return SUCCESS;
+                }
+
+                if(socket->retryOffset == 0) {
+                    socket->dataRetries++;
+                }
+
+                logStream(socket, "Resending data",
+                (uint16_t)(socket->sendUnacked + socket->retryOffset),
+                socket->receiveNext, length);
+
+                socket->retryOffset += length;
+            }
+
+            if(socket->retryOffset >= outstanding) {
+                socket->retransmitting = FALSE;
+                socket->retryOffset = 0;
+                socket->dataDeadline = now + TRANSPORT_RTO_MS;
+
+                if(socket->dataDeadline == 0) {
+                    socket->dataDeadline = 1;
                 }
             }
 
-            if(outstanding > 0) {
-                return SUCCESS;
-            }
+            return SUCCESS;
         }
 
         for(sent = 0; sent < 2 && outstanding < limit &&
             outstanding < socket->sendUsed; sent++) {
+
             length = socket->sendUsed - outstanding;
+
             if(length > limit - outstanding) {
                 length = limit - outstanding;
             }
+
             if(length > TRANSPORT_MAX_DATA_SIZE) {
                 length = TRANSPORT_MAX_DATA_SIZE;
             }
+
             if(sendData(socket, outstanding, length) != SUCCESS) {
                 return SUCCESS;
             }
 
             socket->sendNext += length;
             outstanding += length;
+
+            logStream(socket, "Sending data", (uint16_t)(socket->sendNext - length), socket->receiveNext, length);
+
+            if(socket->dataDeadline == 0) {
+                socket->dataDeadline = now + TRANSPORT_RTO_MS;
+
+                if(socket->dataDeadline == 0) {
+                    socket->dataDeadline = 1;
+                }
+            }
         }
 
         return SUCCESS;
