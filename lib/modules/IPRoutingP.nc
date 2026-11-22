@@ -3,6 +3,7 @@
 #include "../../includes/channels.h"
 #include "../../includes/dv.h"
 #include <string.h>
+#include "../../includes/transport.h"
 
 module IPRoutingP {
 
@@ -17,8 +18,62 @@ module IPRoutingP {
 
 implementation {
 
-
     uint16_t sequenceNum = 0;
+
+    command error_t IPRouting.sendTransport(
+        uint16_t destination,
+        uint8_t* payload,
+        uint8_t length
+    ) {
+        pack outgoing;
+        uint16_t nextHop;
+        uint8_t cost;
+
+        if (payload == NULL ||
+            length < TRANSPORT_HEADER_SIZE ||
+            length > PACKET_MAX_PAYLOAD_SIZE) {
+            return FAIL;
+        }
+
+        if (destination == TOS_NODE_ID) {
+            return FAIL;
+        }
+
+        if (!call DV.lookup(destination, &nextHop, &cost)) {
+            dbg(ROUTING_CHANNEL,
+                "Node %d: No TCP route to %d\n",
+                TOS_NODE_ID, destination);
+            return FAIL;
+        }
+
+        if (cost >= DV_INFINITY ||
+            !call ND.isNeighbor(nextHop)) {
+            return FAIL;
+        }
+
+        memset(&outgoing, 0, sizeof(pack));
+
+        outgoing.src = TOS_NODE_ID;
+        outgoing.dest = destination;
+        outgoing.seq = sequenceNum++;
+        outgoing.TTL = MAX_TTL;
+        outgoing.protocol = PROTOCOL_TCP;
+
+        memcpy(outgoing.payload, payload, length);
+
+        if (call Sender.send(outgoing, nextHop) != SUCCESS) {
+            dbg(ROUTING_CHANNEL,
+                "Node %d: TCP packet queue failed\n",
+                TOS_NODE_ID);
+            return FAIL;
+        }
+
+        dbg(ROUTING_CHANNEL,
+            "Node %d TCP packet sent to %d via %d\n",
+            TOS_NODE_ID, destination, nextHop);
+
+        return SUCCESS;
+    }
 
     command void IPRouting.ping(uint16_t destination, uint8_t* payload) {
 
@@ -76,7 +131,9 @@ implementation {
         incoming = (pack*)payload;
 
         if(incoming->protocol != PROTOCOL_PING &&
-        incoming->protocol != PROTOCOL_PINGREPLY) {
+        incoming->protocol != PROTOCOL_PINGREPLY &&
+        incoming->protocol != PROTOCOL_TCP) 
+        {
             return msg;
         }
 
@@ -88,11 +145,21 @@ implementation {
             return msg;
         }
 
-        if(incoming->dest == TOS_NODE_ID) {
+        
+    if(incoming->dest == TOS_NODE_ID) 
+    {
+        if(incoming->protocol == PROTOCOL_TCP) 
+        {
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d received TCP packet from Node %d, seq: %d\n",
+                TOS_NODE_ID, incoming->src, incoming->seq);
 
-            
-            if(incoming->protocol == PROTOCOL_PING) {
+            signal IPRouting.transportReceived(incoming);
 
+        } 
+        
+        else if(incoming->protocol == PROTOCOL_PING) 
+        {
                 pack reply;
                 uint16_t nextHop;
                 uint8_t cost;
@@ -128,12 +195,13 @@ implementation {
                     TOS_NODE_ID, reply.src, reply.dest, reply.seq,
                     nextHop, cost, reply.TTL);
                     
-            } else {
-
-                    dbg(ROUTING_CHANNEL,
-                        "Node %d received PING REPLY from Node %d, seq: %d\n",
-                        TOS_NODE_ID, incoming->src, incoming->seq);
-                }
+            } 
+            else 
+            {
+                dbg(ROUTING_CHANNEL,
+                    "Node %d received PING REPLY from Node %d, seq: %d\n",
+                    TOS_NODE_ID, incoming->src, incoming->seq);
+            }
 
         } else {
             pack forwarded;
