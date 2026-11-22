@@ -138,11 +138,101 @@ implementation {
         return 0;
     }
 
+    error_t sendControlPacket(
+        socket_store_t* conn,
+        uint8_t flags,
+        uint16_t seq,
+        uint16_t ack
+    ) {
+        uint8_t payload[TRANSPORT_HEADER_SIZE];
+        uint8_t window;
+
+        if (conn == NULL || !conn->inUse ||
+            conn->localPort == 0 ||
+            conn->remotePort == 0 ||
+            conn->remoteAddr == 0) {
+            return FAIL;
+        }
+
+        window = SOCKET_BUFFER_SIZE - conn->receiveUsed;
+
+        payload[0] = conn->localPort;
+        payload[1] = conn->remotePort;
+        payload[2] = flags;
+
+        payload[3] = (uint8_t)(seq >> 8);
+        payload[4] = (uint8_t)(seq & 0xFF);
+
+        payload[5] = (uint8_t)(ack >> 8);
+        payload[6] = (uint8_t)(ack & 0xFF);
+
+        payload[7] = window;
+        payload[8] = 0;
+
+        return call IPRouting.sendTransport(
+            conn->remoteAddr,
+            payload,
+            TRANSPORT_HEADER_SIZE
+        );
+    }
+
     command error_t Transport.connect(
         socket_t fd,
         socket_addr_t* addr
     ) {
-        return FAIL;
+        socket_store_t* conn = getSocket(fd);
+        uint16_t initialSeq;
+
+        if (conn == NULL || addr == NULL) {
+            return FAIL;
+        }
+
+        if (conn->state != CLOSED || conn->localPort == 0) {
+            return FAIL;
+        }
+
+        if (addr->addr == 0 || addr->port == 0 ||
+            addr->addr == TOS_NODE_ID) {
+            return FAIL;
+        }
+
+        conn->remoteAddr = addr->addr;
+        conn->remotePort = addr->port;
+
+        initialSeq = (uint16_t)(
+            TOS_NODE_ID * 100 + fd * 10
+        );
+
+        conn->initialSendSequence = initialSeq;
+        conn->initialReceiveSequence = 0;
+
+        conn->controlRetries = 0;
+        conn->controlDeadline = 0;
+
+        conn->state = SYN_SENT;
+
+        if (sendControlPacket(
+                conn,
+                TCP_FLAG_SYN,
+                initialSeq,
+                0
+            ) != SUCCESS) {
+
+            conn->state = CLOSED;
+            conn->remoteAddr = 0;
+            conn->remotePort = 0;
+
+            return FAIL;
+        }
+
+        dbg(TRANSPORT_CHANNEL,
+            "Node %d sent SYN to %d:%d seq=%d\n",
+            TOS_NODE_ID,
+            conn->remoteAddr,
+            conn->remotePort,
+            initialSeq);
+
+        return SUCCESS;
     }
 
     command uint16_t Transport.write(
