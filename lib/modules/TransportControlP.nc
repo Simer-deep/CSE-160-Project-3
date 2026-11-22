@@ -686,9 +686,26 @@ implementation {
             socket_store_t* conn = &sockets[i];
             uint8_t flags;
             uint16_t ack;
+            
+            if (!conn->inUse) {
+                continue;
+            }
 
-            if (!conn->inUse) 
-            {
+            if (conn->state == ESTABLISHED ||
+                conn->state == CLOSE_WAIT ||
+                conn->state == FIN_WAIT_1 ||
+                conn->state == FIN_WAIT_2) {
+
+                pending = TRUE;
+
+                if (call TransportStream.onTick(conn, now)
+                    != SUCCESS) {
+
+                    dbg(TRANSPORT_CHANNEL,
+                        "Node %d: Stream tick failed fd=%d\n",
+                        TOS_NODE_ID, i + 1);
+                }
+
                 continue;
             }
 
@@ -696,6 +713,7 @@ implementation {
                 conn->state != SYN_RCVD) {
                 continue;
             }
+
 
             if (conn->controlDeadline == 0) 
             {
