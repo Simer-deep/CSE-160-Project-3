@@ -162,7 +162,101 @@ implementation {
     }
 
     command error_t Transport.receive(pack* package) {
-        return FAIL;
+        uint8_t srcPort;
+        uint8_t destPort;
+        uint8_t flags;
+        uint16_t seq;
+        uint16_t ack;
+        uint8_t window;
+        uint8_t length;
+
+        socket_t fd;
+        socket_store_t* conn;
+        error_t result = SUCCESS;
+
+        if (package == NULL ||
+            package->protocol != PROTOCOL_TCP ||
+            package->dest != TOS_NODE_ID) {
+            return FAIL;
+        }
+
+        srcPort = package->payload[0];
+        destPort = package->payload[1];
+        flags = package->payload[2];
+
+        seq = ((uint16_t)package->payload[3] << 8) |
+              package->payload[4];
+
+        ack = ((uint16_t)package->payload[5] << 8) |
+              package->payload[6];
+
+        window = package->payload[7];
+        length = package->payload[8];
+
+        if (srcPort == 0 || destPort == 0 ||
+            length > TRANSPORT_MAX_DATA_SIZE ||
+            window > SOCKET_BUFFER_SIZE ||
+            (flags & ~(TCP_FLAG_SYN | TCP_FLAG_ACK |
+                       TCP_FLAG_FIN | TCP_FLAG_DATA)) != 0) {
+            return FAIL;
+        }
+
+        if (length > 0 && !(flags & TCP_FLAG_DATA)) {
+            return FAIL;
+        }
+
+        if ((flags & TCP_FLAG_DATA) && length == 0) {
+            return FAIL;
+        }
+
+        fd = findConnection(
+            TOS_NODE_ID,
+            destPort,
+            package->src,
+            srcPort
+        );
+
+        if (fd == 0) {
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d: No TCP connection for %d:%d\n",
+                TOS_NODE_ID, package->src, srcPort);
+            return FAIL;
+        }
+
+        conn = getSocket(fd);
+
+        if (conn == NULL) {
+            return FAIL;
+        }
+
+        dbg(TRANSPORT_CHANNEL,
+            "Node %d TCP receive: fd=%d flags=%d seq=%d ack=%d len=%d\n",
+            TOS_NODE_ID, fd, flags, seq, ack, length);
+
+        if (flags & (TCP_FLAG_SYN | TCP_FLAG_FIN)) {
+            return FAIL;
+        }
+
+        if (flags & TCP_FLAG_ACK) {
+            result = call TransportStream.onAck(
+                conn, ack, window
+            );
+        }
+
+        if (flags & TCP_FLAG_DATA) {
+            result = call TransportStream.onData(
+                conn,
+                seq,
+                (uint8_t*)&package->payload[TRANSPORT_HEADER_SIZE],
+                length
+            );
+        }
+
+        if (!(flags & (TCP_FLAG_ACK | TCP_FLAG_DATA))) {
+            return FAIL;
+        }
+
+        return result;
     }
 
     command error_t Transport.close(socket_t fd) {
