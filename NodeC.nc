@@ -34,10 +34,14 @@ implementation {
    components TransportControlP;
    components TransportStreamP;
 
+   components new TimerMilliC() as TransportControlTimer;
+
    Node.Transport -> TransportControlP.Transport;
 
    TransportControlP.TransportStream ->
       TransportStreamP.TransportStream;
 
    TransportControlP.IPRouting -> IPRoutingC.IPRouting;
+
+   TransportControlP.ControlTimer -> TransportControlTimer;
 }

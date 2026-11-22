@@ -2,12 +2,15 @@
 #include "../../includes/transport.h"
 #include "../../includes/packet.h"
 #include <string.h>
+#include <Timer.h>
 
 module TransportControlP {
     provides interface Transport;
 
     uses interface TransportStream;
     uses interface IPRouting;
+
+    uses interface Timer<TMilli> as ControlTimer;
 }
 
 implementation {
@@ -231,6 +234,18 @@ implementation {
             conn->remoteAddr,
             conn->remotePort,
             initialSeq);
+        
+        conn->controlDeadline = call ControlTimer.getNow() + TRANSPORT_RTO_MS;
+
+        if (conn->controlDeadline == 0) 
+        {
+            conn->controlDeadline = 1;
+        }
+
+        if (!call ControlTimer.isRunning()) 
+        {
+            call ControlTimer.startPeriodic(250);
+        }
 
         return SUCCESS;
     }
@@ -299,7 +314,8 @@ implementation {
             return FAIL;
         }
 
-        if (flags == TCP_FLAG_SYN) {
+        if (flags == TCP_FLAG_SYN) 
+        {
             socket_t listenFd;
             socket_t existingFd;
             socket_t newFd;
@@ -385,6 +401,18 @@ implementation {
                 TOS_NODE_ID,
                 package->src,
                 srcPort);
+
+            newConn->controlDeadline = call ControlTimer.getNow() + TRANSPORT_RTO_MS;
+
+            if (newConn->controlDeadline == 0) 
+            {
+                newConn->controlDeadline = 1;
+            }
+
+            if (!call ControlTimer.isRunning()) 
+            {
+                call ControlTimer.startPeriodic(250);
+            }
 
             return SUCCESS;
         }
@@ -617,4 +645,106 @@ implementation {
     {
 
     }
+
+    event void ControlTimer.fired() {
+        uint8_t i;
+        uint32_t now = call ControlTimer.getNow();
+        bool pending = FALSE;
+
+        for (i = 0; i < MAX_NUM_OF_SOCKETS; i++) 
+        {
+            socket_store_t* conn = &sockets[i];
+            uint8_t flags;
+            uint16_t ack;
+
+            if (!conn->inUse) 
+            {
+                continue;
+            }
+
+            if (conn->state != SYN_SENT &&
+                conn->state != SYN_RCVD) {
+                continue;
+            }
+
+            if (conn->controlDeadline == 0) 
+            {
+                continue;
+            }
+
+            if ((int32_t)(now - conn->controlDeadline) < 0) 
+            {
+                pending = TRUE;
+                continue;
+            }
+
+            if (conn->controlRetries >= TRANSPORT_MAX_RETRIES) 
+            {
+                socket_t fd = i + 1;
+
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %d: TCP handshake timeout fd=%d\n",
+                    TOS_NODE_ID, fd);
+
+                if (conn->state == SYN_SENT) 
+                {
+                    conn->state = CLOSED;
+                    conn->remoteAddr = 0;
+                    conn->remotePort = 0;
+                    conn->controlRetries = 0;
+                    conn->controlDeadline = 0;
+
+                    signal Transport.connectDone(fd, FAIL);
+                } else 
+                {
+                    memset(conn, 0, sizeof(socket_store_t));
+                }
+
+                continue;
+            }
+
+            if (conn->state == SYN_SENT) 
+            {
+                flags = TCP_FLAG_SYN;
+                ack = 0;
+            } 
+            else 
+            {
+                flags = TCP_FLAG_SYN | TCP_FLAG_ACK;
+                ack = (uint16_t)(
+                    conn->initialReceiveSequence + 1
+                );
+            }
+
+            if (sendControlPacket(
+                    conn,
+                    flags,
+                    conn->initialSendSequence,
+                    ack
+                ) == SUCCESS) {
+
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %d retransmitted TCP control flags=%d fd=%d\n",
+                    TOS_NODE_ID, flags, i + 1);
+            }
+
+            conn->controlRetries++;
+
+            conn->controlDeadline =
+                now + TRANSPORT_RTO_MS;
+
+            if (conn->controlDeadline == 0) 
+            {
+                conn->controlDeadline = 1;
+            }
+
+            pending = TRUE;
+        }
+
+        if (!pending) 
+        {
+            call ControlTimer.stop();
+        }
+    }
+
 }
