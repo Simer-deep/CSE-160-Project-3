@@ -299,6 +299,96 @@ implementation {
             return FAIL;
         }
 
+        if (flags == TCP_FLAG_SYN) {
+            socket_t listenFd;
+            socket_t existingFd;
+            socket_t newFd;
+            socket_store_t* newConn;
+            socket_store_t* existingConn;
+            uint16_t initialSeq;
+
+            existingFd = findConnection(
+                TOS_NODE_ID,
+                destPort,
+                package->src,
+                srcPort
+            );
+
+            if (existingFd != 0) {
+                existingConn = getSocket(existingFd);
+
+                if (existingConn != NULL &&
+                    existingConn->state == SYN_RCVD &&
+                    seq == existingConn->initialReceiveSequence) {
+
+                    return sendControlPacket(
+                        existingConn,
+                        TCP_FLAG_SYN | TCP_FLAG_ACK,
+                        existingConn->initialSendSequence,
+                        (uint16_t)(seq + 1)
+                    );
+                }
+
+                return FAIL;
+            }
+
+            listenFd = findListener(destPort);
+
+            if (listenFd == 0) {
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %d: No listener on port %d\n",
+                    TOS_NODE_ID, destPort);
+                return FAIL;
+            }
+
+            newFd = allocateSocket();
+
+            if (newFd == 0) {
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %d: No free TCP sockets\n",
+                    TOS_NODE_ID);
+                return FAIL;
+            }
+
+            newConn = getSocket(newFd);
+
+            newConn->localAddr = TOS_NODE_ID;
+            newConn->localPort = destPort;
+            newConn->remoteAddr = package->src;
+            newConn->remotePort = srcPort;
+
+            newConn->initialReceiveSequence = seq;
+
+            initialSeq = (uint16_t)(
+                TOS_NODE_ID * 100 + newFd * 10
+            );
+
+            newConn->initialSendSequence = initialSeq;
+            newConn->controlRetries = 0;
+            newConn->controlDeadline = 0;
+
+            newConn->state = SYN_RCVD;
+
+            if (sendControlPacket(
+                    newConn,
+                    TCP_FLAG_SYN | TCP_FLAG_ACK,
+                    initialSeq,
+                    (uint16_t)(seq + 1)
+                ) != SUCCESS) {
+
+                memset(newConn, 0, sizeof(socket_store_t));
+                return FAIL;
+            }
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d received SYN from %d:%d, sent SYN-ACK\n",
+                TOS_NODE_ID,
+                package->src,
+                srcPort);
+
+            return SUCCESS;
+        }
+
         fd = findConnection(
             TOS_NODE_ID,
             destPort,
