@@ -183,53 +183,56 @@ implementation
       call Transport.receive(packet);
    }
    
-   
    event void Transport.connectDone(
       socket_t fd,
       error_t result
    ) {
-      uint8_t message[48];
-      uint8_t i;
-      uint16_t written;
+      socket_store_t* socket;
 
       if (result != SUCCESS || fd != clientSocket) 
       {
          dbg(TRANSPORT_CHANNEL,
-               "Node %d: TCP connection failed\n",
-               TOS_NODE_ID);
+             "Node %d: TCP connection failed\n",
+             TOS_NODE_ID);
          return;
       }
 
-      for (i = 0; i < sizeof(message); i++) 
-      {
-         message[i] = 'A' + (i % 26);
+      socket = call Transport.getSocketState(fd);
+
+      if (call TransportTest.startProducer(
+             fd, socket, 1025
+          ) != SUCCESS) {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Test producer failed to start\n",
+             TOS_NODE_ID);
+         return;
       }
 
-      written = call Transport.write(
-         fd,
-         message,
-         sizeof(message)
-      );
-
       dbg(TRANSPORT_CHANNEL,
-         "Node %d: TCP wrote %d of 48 bytes\n",
-         TOS_NODE_ID, written);
+          "Node %d: Started 1025-byte TCP transfer\n",
+          TOS_NODE_ID);
    }
 
    event void Transport.acceptDone(
       socket_t listenFd,
       socket_t connectedFd
    ) {
-      acceptedSocket = connectedFd;
+      socket_store_t* socket;
 
-      testReceivedBytes = 0;
-      testDataFailed = FALSE;
+      acceptedSocket = connectedFd;
+      socket = call Transport.getSocketState(connectedFd);
 
       dbg(TRANSPORT_CHANNEL,
-          "Node %d: TCP server ESTABLISHED fd=%d\n",
+          "Node %d: Server accepted TCP fd=%d\n",
           TOS_NODE_ID, connectedFd);
 
-      call AppTestTimer.startPeriodic(250);
+      if (call TransportTest.startConsumer(
+             connectedFd, socket, 1025
+          ) != SUCCESS) {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Test consumer failed to start\n",
+             TOS_NODE_ID);
+      }
    }
 
    event void Transport.closeDone(
@@ -302,7 +305,11 @@ implementation
 
    event void TransportTest.bytesQueued(
       socket_store_t* socket
-   ) {}
+   ) {
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: All test bytes accepted by transport\n",
+          TOS_NODE_ID);
+   }
 
    event void TransportTest.finished(
       socket_store_t* socket,
