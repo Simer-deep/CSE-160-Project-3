@@ -45,6 +45,7 @@ class TransportCase:
         self.sim = TestSim(seed=1)
         self.sim.addChannel("transport_test", self.output)
         self.sim.addChannel("transport", self.output)
+        self.sim.addChannel("transport_test", self.output)
         self.sim.addChannel("routing", self.output)
 
         self.show("Loading tcp-line.topo and " + noise)
