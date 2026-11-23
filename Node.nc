@@ -15,6 +15,8 @@ module Node {
 
    uses interface Transport;
    uses interface Timer<TMilli> as AppTestTimer;
+
+   uses interface TransportTest;
 }
 implementation 
 {
@@ -297,4 +299,18 @@ implementation
          call AppTestTimer.stop();
       }
    }
+
+   event void TransportTest.bytesQueued(
+      socket_store_t* socket
+   ) {}
+
+   event void TransportTest.finished(
+      socket_store_t* socket,
+      error_t result
+   ) {
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: Transport test finished result=%d\n",
+          TOS_NODE_ID, result);
+   }
+
 }

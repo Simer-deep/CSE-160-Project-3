@@ -320,4 +320,19 @@ implementation {
             call TestTimer.stop();
         }
     }
+
+    event void Transport.connectDone(
+        socket_t fd,
+        error_t result
+    ) {}
+
+    event void Transport.acceptDone(
+        socket_t listenFd,
+        socket_t connectedFd
+    ) {}
+
+    event void Transport.closeDone(
+        socket_t fd,
+        error_t result
+    ) {}
 }

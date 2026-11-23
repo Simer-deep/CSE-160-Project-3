@@ -45,6 +45,7 @@ implementation {
    components new TimerMilliC() as TransportControlTimer;
 
    Node.Transport -> TransportControlP.Transport;
+   Node.TransportTest -> TransportTestP.TransportTest;
 
    TransportControlP.TransportStream ->
       TransportStreamP.TransportStream;
