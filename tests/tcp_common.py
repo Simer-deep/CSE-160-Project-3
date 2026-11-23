@@ -16,23 +16,6 @@ ACK = 2
 DATA = 8
 
 
-class TestLog:
-    def __init__(self, sim, output):
-        self.sim = sim
-        self.output = output
-        self.newLine = True
-
-    def write(self, message):
-        for part in message.splitlines(True):
-            if self.newLine:
-                self.output.write("t=%.3f " % self.sim.seconds())
-            self.output.write(part)
-            self.newLine = part.endswith("\n")
-
-    def flush(self):
-        self.output.flush()
-
-
 class TransportCase:
     def __init__(self, name, noise="no_noise.txt"):
         self.name = name
@@ -43,7 +26,8 @@ class TransportCase:
         self.path = os.path.join(logFolder, "tcp_%s.log" % name)
         self.output = open(self.path, "w")
         self.sim = TestSim(seed=1)
-                
+
+        self.sim.addChannel("Project3Generate", self.output)
         self.sim.addChannel("Project3TGen", self.output)
         self.sim.addChannel("transport", self.output)
         self.sim.addChannel("routing", self.output)
