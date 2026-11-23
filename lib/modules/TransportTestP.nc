@@ -1,4 +1,4 @@
-#include "../../includes/Project3Generate.h"
+#include "../../includes/transport_test.h"
 #include <Timer.h>
 #include <string.h>
 
@@ -18,7 +18,7 @@ implementation {
         bool resultSent;
         uint32_t totalBytes;
         uint32_t expectedBytes;
-        Project3Generate_stats_t stats;
+        transport_test_stats_t stats;
     } test_connection_t;
 
     test_connection_t connections[MAX_NUM_OF_SOCKETS];
@@ -143,7 +143,7 @@ implementation {
     }
 
     command error_t TransportTest.getStats(socket_store_t* socket,
-        Project3Generate_stats_t* stats) {
+        transport_test_stats_t* stats) {
         test_connection_t* connection;
 
         connection = findConnection(socket);

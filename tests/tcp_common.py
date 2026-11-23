@@ -43,11 +43,11 @@ class TransportCase:
         self.path = os.path.join(logFolder, "tcp_%s.log" % name)
         self.output = open(self.path, "w")
         self.sim = TestSim(seed=1)
-        self.sim.addChannel("Project3Generate", self.output)
-        self.sim.addChannel("transport", self.output)
-        self.sim.addChannel("Project3Generate", self.output)
-        self.sim.addChannel("routing", self.output)
-        self.sim.addChannel("command", self.output)
+
+        self.sim.addChannel("Project3Generate", log)
+        self.sim.addChannel("transport", log)
+        self.sim.addChannel("routing", log)
+        self.sim.addChannel("command", log)
 
         self.show("Loading tcp-line.topo and " + noise)
         self.sim.loadTopo("tcp-line.topo")
