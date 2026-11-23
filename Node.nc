@@ -15,6 +15,11 @@ module Node {
 }
 
 implementation {
+
+   socket_t serverSocket = 0;
+   socket_t clientSocket = 0;
+   socket_t acceptedSocket = 0;
+
     typedef struct test_request_t {
         bool inUse;
         bool paused;
@@ -286,11 +291,14 @@ implementation {
         }
     }
 
-    event void Transport.acceptDone(socket_t listenFd, socket_t connectedFd) {
+    event void Transport.acceptDone(socket_t listenFd, socket_t connectedFd) 
+    {
         socket_store_t* socket = call Transport.getSocketState(connectedFd);
         test_request_t* request;
+        acceptedSocket = connectedFd;
 
-        if(socket == NULL) {
+        if(socket == NULL) 
+        {
             return;
         }
 
@@ -358,38 +366,41 @@ implementation {
         }
     }
 
-    
+   
    event void TransportTest.finished(
       socket_store_t* socket,
       error_t result
    ) 
    {
-      dbg(TRANSPORT_CHANNEL,
-         "Node %d: Transport test finished result=%d\n",
-         TOS_NODE_ID, result);
+      socket_t fd;
 
-      if (acceptedSocket != 0 && socket == call Transport.getSocketState(acceptedSocket)) 
+      if (socket == NULL) 
       {
+         return;
+      }
 
-         if (result == SUCCESS) 
+      fd = findSocket(
+         socket->remoteAddr,
+         socket->localPort,
+         socket->remotePort
+      );
+
+      dbg("Project3TGen",
+         "Node %u: Transport test finished fd=%u result=%u\n",
+         TOS_NODE_ID, fd, result);
+
+      if (fd == 0) 
+      {
+         return;
+      }
+
+      if (result == SUCCESS && socket->finReceived) 
+      {
+         if (call Transport.close(fd) == SUCCESS) 
          {
-
-            if (call Transport.close(acceptedSocket) == SUCCESS) {
-               dbg(TRANSPORT_CHANNEL,
-                  "Node %d: Server requested graceful close\n",
-                  TOS_NODE_ID);
-            } else {
-               dbg(TRANSPORT_CHANNEL,
-                  "Node %d: Server close request FAILED\n",
-                  TOS_NODE_ID);
-            }
-
-         } 
-         else 
-         {
-            dbg(TRANSPORT_CHANNEL,
-               "Node %d: Server data verification FAILED\n",
-               TOS_NODE_ID);
+               dbg("Project3TGen",
+                  "Node %u: Server requested graceful close fd=%u\n",
+                  TOS_NODE_ID, fd);
          }
       }
    }
