@@ -15,7 +15,11 @@ module Node {
 
    uses interface Transport;
 }
-implementation {
+implementation 
+{
+   socket_t serverSocket = 0;
+   socket_t clientSocket = 0;
+
    event void Boot.booted() {
       call AMControl.start();
       dbg(GENERAL_CHANNEL, "Booted\n");
@@ -51,9 +55,109 @@ implementation {
 
    event void CommandHandler.printDistanceVector(){}
 
-   event void CommandHandler.setTestServer(){}
+   event void CommandHandler.setTestServer() 
+   {
+      socket_addr_t address;
 
-   event void CommandHandler.setTestClient(){}
+      if (serverSocket != 0) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Server already started\n",
+             TOS_NODE_ID);
+         return;
+      }
+
+      serverSocket = call Transport.socket();
+
+      if (serverSocket == 0) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Server socket allocation failed\n",
+             TOS_NODE_ID);
+         return;
+      }
+
+      address.addr = TOS_NODE_ID;
+      address.port = 20;
+
+      if (call Transport.bind(serverSocket, &address)
+          != SUCCESS) {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Server bind failed\n",
+             TOS_NODE_ID);
+         call Transport.release(serverSocket);
+         serverSocket = 0;
+         return;
+      }
+
+      if (call Transport.listen(serverSocket) != SUCCESS) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Server listen failed\n",
+             TOS_NODE_ID);
+         call Transport.release(serverSocket);
+         serverSocket = 0;
+         return;
+      }
+
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: TCP server LISTENING on port 20\n",
+          TOS_NODE_ID);
+   }
+
+   event void CommandHandler.setTestClient() 
+   {
+      socket_addr_t localAddress;
+      socket_addr_t serverAddress;
+
+      if (clientSocket != 0) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Client already started\n",
+             TOS_NODE_ID);
+         return;
+      }
+
+      clientSocket = call Transport.socket();
+
+      if (clientSocket == 0) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Client socket allocation failed\n",
+             TOS_NODE_ID);
+         return;
+      }
+
+      localAddress.addr = TOS_NODE_ID;
+      localAddress.port = 10;
+
+      if (call Transport.bind(clientSocket, &localAddress)
+          != SUCCESS) {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Client bind failed\n",
+             TOS_NODE_ID);
+         call Transport.release(clientSocket);
+         clientSocket = 0;
+         return;
+      }
+
+      serverAddress.addr = 1;
+      serverAddress.port = 20;
+
+      if (call Transport.connect(clientSocket, &serverAddress)
+          != SUCCESS) {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: Client connect request failed\n",
+             TOS_NODE_ID);
+         call Transport.release(clientSocket);
+         clientSocket = 0;
+         return;
+      }
+
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: TCP client connecting to Node 1 port 20\n",
+          TOS_NODE_ID);
+   }
 
    event void CommandHandler.setAppServer(){}
 
