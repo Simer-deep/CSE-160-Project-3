@@ -5,7 +5,7 @@ def run():
     test.show("Checking recovery after the last handshake ACK is lost")
     test.startServer()
     test.drop(3, CLIENT, SERVER, SOURCE_PORT, SERVER_PORT, ACK,
-              acknowledgement=121)
+              acknowledgement=121, count=5)
     test.startClient()
     test.wait(360)
     test.checkDrop()
@@ -17,9 +17,14 @@ def run():
                "Server did not finish the handshake after the lost ACK")
 
     recovery = log[droppedAt:establishedAt]
-    replacementAck = any("Node 1 TCP receive:" in line and
-                         "flags=2 seq=411 ack=121 len=0" in line
-                         for line in recovery.splitlines())
+    
+    replacementAck = any(
+        "Node 1 TCP receive:" in line and
+        "flags=2" in line and
+        "ack=121 len=0" in line and
+        int(line.split("seq=")[1].split()[0]) >= 411
+        for line in recovery.splitlines()
+    )
     test.check(replacementAck,
                "Server did not receive a replacement handshake ACK")
     test.show("Confirmed handshake recovered after the lost ACK")

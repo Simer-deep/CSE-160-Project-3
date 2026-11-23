@@ -542,7 +542,7 @@ implementation
 
             if (ack != (uint16_t)(
                     conn->initialSendSequence + 1) ||
-                seq != (uint16_t)(
+                seq < (uint16_t)(
                     conn->initialReceiveSequence + 1)) {
                 return FAIL;
             }

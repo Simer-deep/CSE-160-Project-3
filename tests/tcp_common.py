@@ -56,10 +56,10 @@ class TransportCase:
                                SERVER_PORT, TRANSFER_BYTES)
 
     def drop(self, relay, source, destination, srcPort, destPort, flags,
-             sequence=65535, acknowledgement=65535, windowMode=0):
+             sequence=65535, acknowledgement=65535, windowMode=0, count=1):
         self.show("Dropping one matching packet at node %d" % relay)
         self.sim.cmdTestDrop(relay, source, destination, srcPort, destPort,
-                             flags, sequence, acknowledgement, windowMode)
+                             flags, sequence, acknowledgement, windowMode, count)
         self.sim.runTime(2)
 
     def pause(self):

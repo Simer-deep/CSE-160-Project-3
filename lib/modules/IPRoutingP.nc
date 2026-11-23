@@ -78,11 +78,12 @@ implementation {
         }
 
         dropCount--;
-        if(dropCount > 0) {
-            return FALSE;
+
+        if(dropCount == 0) 
+        {
+            dropActive = FALSE;
         }
 
-        dropActive = FALSE;
         dbg("Project3TGen",
             "Node %u dropped transport packet from %u to %u flags=%u seq=%u ack=%u wnd=%u\n",
             TOS_NODE_ID, packet->src, packet->dest, packet->payload[2],
