@@ -36,6 +36,12 @@ implementation {
    components new TimerMilliC() as AppTestTimerC;
    Node.AppTestTimer -> AppTestTimerC;
 
+   components TransportTestP;
+   components new TimerMilliC() as TransportTestTimer;
+
+   TransportTestP.Transport -> TransportControlP.Transport;
+   TransportTestP.TestTimer -> TransportTestTimer;
+
    components new TimerMilliC() as TransportControlTimer;
 
    Node.Transport -> TransportControlP.Transport;
