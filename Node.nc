@@ -16,6 +16,9 @@ module Node {
 
 implementation {
 
+   socket_t serverSocket = 0;
+   socket_t clientSocket = 0;
+   socket_t acceptedSocket = 0;
 
     typedef struct test_request_t {
         bool inUse;
