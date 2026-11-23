@@ -568,41 +568,12 @@ implementation {
                 );
             }
 
-        if (flags == TCP_FLAG_FIN) 
-        {
-
-            if (conn->state != ESTABLISHED) {
-                return FAIL;
-            }
-
-            if (seq != conn->receiveNext) {
-                return sendControlPacket(
-                    conn,
-                    TCP_FLAG_ACK,
-                    conn->sendNext,
-                    conn->receiveNext
-                );
-            }
-
-            conn->receiveNext++;
-            conn->finReceived = TRUE;
-            conn->state = CLOSE_WAIT;
-
-            dbg(TRANSPORT_CHANNEL,
-                "Node %d: TCP FIN received fd=%d seq=%d\n",
-                TOS_NODE_ID, fd, seq);
-
-            return sendControlPacket(
-                conn,
-                TCP_FLAG_ACK,
-                conn->sendNext,
-                conn->receiveNext
-            );
-        }
-
         if (flags == TCP_FLAG_FIN) {
             if(seq == (uint16_t)(conn->receiveNext - 1) &&
                 conn->finReceived) {
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %u answered duplicate FIN fd=%u\n",
+                    TOS_NODE_ID, fd);
                 return sendControlPacket(conn, TCP_FLAG_ACK,
                     conn->finSent ? (uint16_t)(conn->finSequence + 1) :
                     conn->sendNext, conn->receiveNext);
@@ -656,8 +627,12 @@ implementation {
                 TOS_NODE_ID, fd, ack);
 
             if(conn->state == LAST_ACK) {
-                conn->state = CLOSED;
-                signal Transport.closeDone(fd, SUCCESS);
+                conn->state = TIME_WAIT;
+                conn->timeWaitDeadline = call ControlTimer.getNow() +
+                    TRANSPORT_TIME_WAIT_MS;
+                dbg(TRANSPORT_CHANNEL,
+                    "Node %u waiting for duplicate FINs fd=%u\n",
+                    TOS_NODE_ID, fd);
             } else if(conn->state == FIN_WAIT_1) {
                 if(conn->finReceived) {
                     conn->state = TIME_WAIT;
@@ -690,22 +665,6 @@ implementation {
             conn->state != FIN_WAIT_1 &&
             conn->state != FIN_WAIT_2) {
             return FAIL;
-        }
-
-        if (conn->state == FIN_WAIT_1 &&
-            flags == TCP_FLAG_ACK &&
-            ack == (uint16_t)(conn->finSequence + 1)) {
-
-            conn->finAcked = TRUE;
-            conn->controlRetries = 0;
-            conn->controlDeadline = 0;
-            conn->state = FIN_WAIT_2;
-
-            dbg(TRANSPORT_CHANNEL,
-                "Node %d: TCP FIN acknowledged fd=%d ack=%d\n",
-                TOS_NODE_ID, fd, ack);
-
-            return SUCCESS;
         }
 
         if (flags & TCP_FLAG_ACK) 
@@ -903,7 +862,8 @@ implementation {
                             conn->controlDeadline = 1;
                         }
 
-                        conn->state = FIN_WAIT_1;
+                        conn->state = conn->finReceived ?
+                            LAST_ACK : FIN_WAIT_1;
 
                         dbg(TRANSPORT_CHANNEL,
                             "Node %d: TCP FIN sent fd=%d seq=%d\n",
