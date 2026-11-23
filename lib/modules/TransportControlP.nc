@@ -600,6 +600,86 @@ implementation {
             );
         }
 
+        if (flags == TCP_FLAG_FIN) {
+            if(seq == (uint16_t)(conn->receiveNext - 1) &&
+                conn->finReceived) {
+                return sendControlPacket(conn, TCP_FLAG_ACK,
+                    conn->finSent ? (uint16_t)(conn->finSequence + 1) :
+                    conn->sendNext, conn->receiveNext);
+            }
+
+            if(seq != conn->receiveNext) {
+                sendControlPacket(conn, TCP_FLAG_ACK, conn->sendNext,
+                    conn->receiveNext);
+                return FAIL;
+            }
+
+            if(conn->state != ESTABLISHED &&
+                conn->state != FIN_WAIT_1 &&
+                conn->state != FIN_WAIT_2) {
+                return FAIL;
+            }
+
+            conn->finReceived = TRUE;
+            conn->receiveNext++;
+            dbg(TRANSPORT_CHANNEL,
+                "Node %u received FIN fd=%u seq=%u\n",
+                TOS_NODE_ID, fd, seq);
+
+            if(sendControlPacket(conn, TCP_FLAG_ACK,
+                conn->finSent ? (uint16_t)(conn->finSequence + 1) :
+                conn->sendNext, conn->receiveNext) != SUCCESS) {
+                return FAIL;
+            }
+
+            if(conn->state == ESTABLISHED) {
+                conn->state = CLOSE_WAIT;
+                conn->closeRequested = TRUE;
+            } else if(conn->finAcked ||
+                conn->state == FIN_WAIT_2) {
+                conn->state = TIME_WAIT;
+                conn->timeWaitDeadline = call ControlTimer.getNow() +
+                    TRANSPORT_TIME_WAIT_MS;
+            } else {
+                conn->state = CLOSING;
+            }
+            return SUCCESS;
+        }
+
+        if(flags == TCP_FLAG_ACK && conn->finSent &&
+            ack == (uint16_t)(conn->finSequence + 1)) {
+            conn->finAcked = TRUE;
+            conn->controlDeadline = 0;
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %u received FIN ACK fd=%u ack=%u\n",
+                TOS_NODE_ID, fd, ack);
+
+            if(conn->state == LAST_ACK) {
+                conn->state = CLOSED;
+                signal Transport.closeDone(fd, SUCCESS);
+            } else if(conn->state == FIN_WAIT_1) {
+                if(conn->finReceived) {
+                    conn->state = TIME_WAIT;
+                    conn->timeWaitDeadline = call ControlTimer.getNow() +
+                        TRANSPORT_TIME_WAIT_MS;
+                } else {
+                    conn->state = FIN_WAIT_2;
+                    conn->controlDeadline = call ControlTimer.getNow() +
+                        TRANSPORT_STALL_MS;
+                }
+            } else if(conn->state == CLOSING) {
+                conn->state = TIME_WAIT;
+                conn->timeWaitDeadline = call ControlTimer.getNow() +
+                    TRANSPORT_TIME_WAIT_MS;
+            }
+            return SUCCESS;
+        }
+
+        if(conn->state == TIME_WAIT && flags == TCP_FLAG_ACK) {
+            return SUCCESS;
+        }
+
         if (flags & (TCP_FLAG_SYN | TCP_FLAG_FIN)) 
         {
             return FAIL;
@@ -768,22 +848,37 @@ implementation {
 
             if (conn->state == ESTABLISHED ||
                 conn->state == CLOSE_WAIT ||
-                conn->state == FIN_WAIT_1 ||
                 conn->state == FIN_WAIT_2) {
 
                 pending = TRUE;
 
-                if (call TransportStream.onTick(conn, now)
-                    != SUCCESS) {
-
+                if(conn->state == FIN_WAIT_2 &&
+                    conn->controlDeadline != 0 &&
+                    (int32_t)(now - conn->controlDeadline) >= 0) {
+                    socket_t fd = i + 1;
+                    conn->state = CLOSED;
                     dbg(TRANSPORT_CHANNEL,
-                        "Node %d: Stream tick failed fd=%d\n",
-                        TOS_NODE_ID, i + 1);
+                        "Node %u waiting for FIN timed out fd=%u\n",
+                        TOS_NODE_ID, fd);
+                    signal Transport.closeDone(fd, FAIL);
+                    continue;
                 }
 
-               if ((conn->state == ESTABLISHED ||
+                if (call TransportStream.onTick(conn, now)
+                    != SUCCESS) {
+                    socket_t fd = i + 1;
+                    dbg(TRANSPORT_CHANNEL,
+                        "Node %u transfer failed fd=%u\n",
+                        TOS_NODE_ID, fd);
+                    conn->state = CLOSED;
+                    signal Transport.closeDone(fd, FAIL);
+                    continue;
+                }
+
+                if ((conn->state == ESTABLISHED ||
                     conn->state == CLOSE_WAIT) &&
                     conn->closeRequested &&
+                    (conn->state != CLOSE_WAIT || conn->receiveUsed == 0) &&
                     !conn->finSent &&
                     conn->sendUsed == 0 &&
                     conn->sendUnacked == conn->sendEnd) {
@@ -808,14 +903,7 @@ implementation {
                             conn->controlDeadline = 1;
                         }
 
-                        if (conn->state == CLOSE_WAIT) 
-                        {
-                            conn->state = LAST_ACK;
-                        }
-                        else 
-                        {
-                            conn->state = FIN_WAIT_1;
-                        }
+                        conn->state = FIN_WAIT_1;
 
                         dbg(TRANSPORT_CHANNEL,
                             "Node %d: TCP FIN sent fd=%d seq=%d\n",
@@ -825,6 +913,48 @@ implementation {
                     }
                 }
 
+                continue;
+            }
+
+            if(conn->state == TIME_WAIT) {
+                pending = TRUE;
+                if((int32_t)(now - conn->timeWaitDeadline) >= 0) {
+                    socket_t fd = i + 1;
+                    conn->state = CLOSED;
+                    dbg(TRANSPORT_CHANNEL,
+                        "Node %u finished TIME_WAIT fd=%u\n",
+                        TOS_NODE_ID, fd);
+                    signal Transport.closeDone(fd, SUCCESS);
+                }
+                continue;
+            }
+
+            if(conn->state == FIN_WAIT_1 || conn->state == LAST_ACK ||
+                conn->state == CLOSING) {
+                pending = TRUE;
+                if(conn->controlDeadline == 0 ||
+                    (int32_t)(now - conn->controlDeadline) < 0) {
+                    continue;
+                }
+
+                if(conn->controlRetries >= TRANSPORT_MAX_RETRIES) {
+                    socket_t fd = i + 1;
+                    conn->state = CLOSED;
+                    dbg(TRANSPORT_CHANNEL,
+                        "Node %u FIN timeout fd=%u\n",
+                        TOS_NODE_ID, fd);
+                    signal Transport.closeDone(fd, FAIL);
+                    continue;
+                }
+
+                if(sendControlPacket(conn, TCP_FLAG_FIN,
+                    conn->finSequence, conn->receiveNext) == SUCCESS) {
+                    dbg(TRANSPORT_CHANNEL,
+                        "Node %u resent FIN fd=%u seq=%u\n",
+                        TOS_NODE_ID, i + 1, conn->finSequence);
+                }
+                conn->controlRetries++;
+                conn->controlDeadline = now + TRANSPORT_RTO_MS;
                 continue;
             }
 

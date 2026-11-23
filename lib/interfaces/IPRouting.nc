@@ -10,6 +10,11 @@ interface IPRouting {
         uint8_t length
     );
 
+    command void setTestDrop(uint16_t source, uint16_t destination,
+        uint8_t srcPort, uint8_t destPort, uint8_t flags,
+        uint16_t sequence, uint16_t acknowledgement,
+        uint8_t windowMode, uint8_t count);
+
     event void transportReceived(
         pack* packet
     );

@@ -201,6 +201,13 @@ implementation {
                 return FAIL;
             }
             connection->stats.accepted += written;
+            if(written > 0) {
+                dbg("Project3TGen",
+                    "Node %u accepted %u bytes, total=%lu/%lu\n",
+                    TOS_NODE_ID, written,
+                    (unsigned long)connection->stats.accepted,
+                    (unsigned long)connection->totalBytes);
+            }
         }
 
         if(connection->stats.accepted == connection->totalBytes) {
@@ -247,6 +254,14 @@ implementation {
                 socket->sendUsed > connection->stats.accepted) {
                 connection->stats.failed = TRUE;
             } else {
+                if(connection->stats.acknowledged !=
+                    connection->stats.accepted - socket->sendUsed) {
+                    dbg("Project3TGen",
+                        "Node %u acknowledged %lu bytes\n",
+                        TOS_NODE_ID,
+                        (unsigned long)(connection->stats.accepted -
+                            socket->sendUsed));
+                }
                 connection->stats.acknowledged =
                     connection->stats.accepted - socket->sendUsed;
                 connection->stats.producerDone = connection->allBytesQueued &&

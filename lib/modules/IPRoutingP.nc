@@ -19,6 +19,76 @@ module IPRoutingP {
 implementation {
 
     uint16_t sequenceNum = 0;
+    bool dropActive = FALSE;
+    uint16_t dropSource;
+    uint16_t dropDestination;
+    uint8_t dropSrcPort;
+    uint8_t dropDestPort;
+    uint8_t dropFlags;
+    uint16_t dropSequence;
+    uint16_t dropAcknowledgement;
+    uint8_t dropWindowMode;
+    uint8_t dropCount;
+
+    command void IPRouting.setTestDrop(uint16_t source, uint16_t destination,
+        uint8_t srcPort, uint8_t destPort, uint8_t flags,
+        uint16_t sequence, uint16_t acknowledgement,
+        uint8_t windowMode, uint8_t count) {
+        dropSource = source;
+        dropDestination = destination;
+        dropSrcPort = srcPort;
+        dropDestPort = destPort;
+        dropFlags = flags;
+        dropSequence = sequence;
+        dropAcknowledgement = acknowledgement;
+        dropWindowMode = windowMode;
+        dropCount = count;
+        dropActive = count > 0;
+
+        dbg("Project3TGen",
+            "Node %u will drop transport traffic from %u to %u flags=%u\n",
+            TOS_NODE_ID, source, destination, flags);
+    }
+
+    bool shouldDropForTest(pack* packet) {
+        uint16_t sequence;
+        uint16_t acknowledgement;
+        uint8_t window;
+
+        if(!dropActive || packet->protocol != PROTOCOL_TCP ||
+            packet->dest == TOS_NODE_ID ||
+            packet->src != dropSource || packet->dest != dropDestination ||
+            packet->payload[0] != dropSrcPort ||
+            packet->payload[1] != dropDestPort ||
+            packet->payload[2] != dropFlags) {
+            return FALSE;
+        }
+
+        sequence = ((uint16_t)packet->payload[3] << 8) | packet->payload[4];
+        acknowledgement = ((uint16_t)packet->payload[5] << 8) |
+            packet->payload[6];
+        window = packet->payload[7];
+
+        if((dropSequence != 65535U && sequence != dropSequence) ||
+            (dropAcknowledgement != 65535U &&
+                acknowledgement != dropAcknowledgement) ||
+            (dropWindowMode == 1 && window != 0) ||
+            (dropWindowMode == 2 && window == 0)) {
+            return FALSE;
+        }
+
+        dropCount--;
+        if(dropCount > 0) {
+            return FALSE;
+        }
+
+        dropActive = FALSE;
+        dbg("Project3TGen",
+            "Node %u dropped transport packet from %u to %u flags=%u seq=%u ack=%u wnd=%u\n",
+            TOS_NODE_ID, packet->src, packet->dest, packet->payload[2],
+            sequence, acknowledgement, window);
+        return TRUE;
+    }
 
     command error_t IPRouting.sendTransport(
         uint16_t destination,
@@ -129,6 +199,10 @@ implementation {
         }
 
         incoming = (pack*)payload;
+
+        if(shouldDropForTest(incoming)) {
+            return msg;
+        }
 
         if(incoming->protocol != PROTOCOL_PING &&
         incoming->protocol != PROTOCOL_PINGREPLY &&
