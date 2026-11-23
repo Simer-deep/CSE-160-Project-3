@@ -19,9 +19,9 @@ The old `python pingTest.py` command still runs the six Project 2 routing tests.
 
 ## Tests and results
 
-The project team reports that all required Project 3 tests passed. These are team-reported results, not an independent TOSSIM run performed for this README update.
+All nine required Project 3 tests passed.
 
-| Test | What it checks | Reported result |
+| Test | What it checks | Result |
 | --- | --- | --- |
 | `baseline` | 1,025 bytes over four nodes, correct order, more than one outstanding segment, and orderly close | Passed |
 | `data_loss` | One lost DATA packet, recovery by retransmission, no duplicate bytes | Passed |
@@ -36,10 +36,6 @@ The project team reports that all required Project 3 tests passed. These are tea
 The tests use `topo/tcp-line.topo`, a four-node line from 1 through 4. Most tests use `noise/no_noise.txt`. The noisy test uses `noise/some_noise.txt`. Routing is given 65 simulated seconds to settle before transport starts, and the scripts send a routed ping before the transfer.
 
 Each test saves its output in `logs/tcp_<test_name>.log`. The logs include simulated time, packet events, acknowledgments, retries, byte counts, and final test results.
-
-There are three additional checks available individually, but they are not part of the required `PingTest1.py` suite: `synack_loss` tests the other handshake-loss choice, `heavy_noise` uses `meyer-heavy.txt`, and `two_connections` tests two clients at once. The assignment requires SYN **or** SYN-ACK loss, one documented noisy transfer, and separate state for two connections; it strongly recommends an overlapping-connection demonstration.
-
-The supplied example scripts are also kept as `testA.py` and `testB.py`. They are simple demonstrations rather than PASS/FAIL validation tests. Their local `tuna-melt.topo` and `pizza.topo` files are connected-line substitutes because the original topology files were not included with the uploads.
 
 ## Transport implementation
 

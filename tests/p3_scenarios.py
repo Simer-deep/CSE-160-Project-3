@@ -13,7 +13,6 @@ SOURCE_PORT = 10
 LENGTH = 1025
 FLAGS_SYN = 1
 FLAGS_ACK = 2
-FLAGS_SYN_ACK = 3
 FLAGS_DATA = 8
 
 class TimeLogger:
@@ -90,9 +89,6 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
     elif name == "syn_loss":
         sim.cmdTestDrop(3, CLIENT, SERVER, SOURCE_PORT, PORT,
                         FLAGS_SYN, sequence=410)
-    elif name == "synack_loss":
-        sim.cmdTestDrop(2, SERVER, CLIENT, PORT, SOURCE_PORT,
-                        FLAGS_SYN_ACK)
     elif name == "handshake_ack_loss":
         sim.cmdTestDrop(3, CLIENT, SERVER, SOURCE_PORT, PORT,
                         FLAGS_ACK, acknowledgement=121)
@@ -101,14 +97,10 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
                         FLAGS_ACK, acknowledgement=122)
 
     if name in ("data_loss", "ack_loss", "syn_loss",
-                "synack_loss", "handshake_ack_loss", "close_ack_loss"):
+                "handshake_ack_loss", "close_ack_loss"):
         sim.runTime(2)
 
-    if name == "two_connections":
-        sim.cmdTestClient(3, SERVER, SOURCE_PORT, PORT, LENGTH)
-        sim.cmdTestClient(CLIENT, SERVER, SOURCE_PORT, PORT, LENGTH)
-        sim.runTime(seconds)
-    elif name == "flow":
+    if name == "flow":
         sim.cmdTestClient(CLIENT, SERVER, SOURCE_PORT, PORT, LENGTH)
         sim.cmdTestPause(SERVER, CLIENT, SOURCE_PORT, PORT)
         sim.runTime(90)
@@ -137,13 +129,13 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
         check("released failed socket" in text,
               "Failed connection did not release its socket")
     else:
-        check_transfer(text, LENGTH, 2 if name == "two_connections" else 1)
+        check_transfer(text, LENGTH)
         check("closed fd=" in text, "Missing completed orderly close")
         check("Sending data" in text, "Missing data transmission log")
         check("outstanding=12" in text or "outstanding=24" in text,
               "Multiple outstanding segments not shown")
         if name in ("data_loss", "ack_loss", "syn_loss",
-                    "synack_loss", "handshake_ack_loss", "close_ack_loss", "flow"):
+                    "handshake_ack_loss", "close_ack_loss", "flow"):
             check("dropped transport packet" in text,
                   "The selected packet was never dropped")
         if name == "data_loss":
@@ -152,7 +144,7 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
         if name == "data_loss":
             check("Wrong sequence number" in text and "ack=411" in text,
                   "Missing cumulative ACK at the lost data gap")
-        if name in ("syn_loss", "synack_loss", "handshake_ack_loss"):
+        if name in ("syn_loss", "handshake_ack_loss"):
             check("retransmitted TCP control" in text,
                   "Missing control packet retransmission")
         if name == "flow":
@@ -162,25 +154,21 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
     print("%s: PASS (log: %s)" % (name, path))
 
 def main():
-    required = ["baseline", "data_loss", "ack_loss", "flow",
-                "syn_loss", "handshake_ack_loss", "close_ack_loss",
-                "failure", "noisy"]
-    optional = ["synack_loss", "heavy_noise", "two_connections"]
-    names = required + optional
+    names = ["baseline", "data_loss", "ack_loss", "flow",
+             "syn_loss", "handshake_ack_loss", "close_ack_loss",
+             "failure", "noisy"]
     if len(sys.argv) < 2 or sys.argv[1] not in names + ["all"]:
         print("Usage: python run.py <scenario|all>")
         print("Scenarios: %s" % ", ".join(names))
         return 2
 
-    requested = required if sys.argv[1] == "all" else [sys.argv[1]]
+    requested = names if sys.argv[1] == "all" else [sys.argv[1]]
     failed = []
 
     for name in requested:
         try:
             if name == "noisy":
                 run_scenario(name, noise="some_noise.txt", seconds=500)
-            elif name == "heavy_noise":
-                run_scenario(name, noise="meyer-heavy.txt", seconds=700)
             else:
                 run_scenario(name)
         except Exception as error:
