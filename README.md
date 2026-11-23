@@ -11,9 +11,9 @@ make micaz sim
 python PingTest1.py
 ```
 
-`PingTest1.py` runs all nine required Project 3 tests in order. It calls `run.py all`, prints PASS or FAIL for each test, and returns a failure exit code if any test fails. Every test starts a new simulator with seed 1.
+`PingTest1.py` runs the nine Project 3 tests in order. It calls `run.py all`, and each test runs in a fresh TOSSIM process with seed 1. The terminal shows what the test is doing, including which node starts, when a packet is dropped, and what is being checked. It prints PASS or FAIL for each test and exits with an error if any test fails.
 
-To run one test, use `python run.py baseline`, replacing `baseline` with a test name from the table below.
+Each test has its own file under `tests/`. For example, run `python run.py data_loss` to test lost DATA packets or `python run.py flow` to test flow control. `tests/tcp_common.py` contains the repeated setup and checks used by all nine tests.
 
 The old `python pingTest.py` command still runs the six Project 2 routing tests. It is separate from `PingTest1.py`.
 
@@ -35,7 +35,7 @@ All nine required Project 3 tests passed.
 
 The tests use `topo/tcp-line.topo`, a four-node line from 1 through 4. Most tests use `noise/no_noise.txt`. The noisy test uses `noise/some_noise.txt`. Routing is given 65 simulated seconds to settle before transport starts, and the scripts send a routed ping before the transfer.
 
-Each test saves its output in `logs/tcp_<test_name>.log`. The logs include simulated time, packet events, acknowledgments, retries, byte counts, and final test results.
+Each test saves its detailed output in `logs/tcp_<test_name>.log`. The terminal shows the main steps and the log shows simulated time, packet events, acknowledgments, retries, byte counts, and final results. A successful close is checked on both nodes.
 
 ## Transport implementation
 

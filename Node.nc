@@ -359,38 +359,12 @@ implementation {
     }
 
     
-   event void TransportTest.finished(
-      socket_store_t* socket,
-      error_t result
-   ) 
-   {
-      dbg(TRANSPORT_CHANNEL,
-         "Node %d: Transport test finished result=%d\n",
-         TOS_NODE_ID, result);
+    event void TransportTest.finished(socket_store_t* socket, error_t result) {
+        dbg("Project3TGen", "Node %u test %s\n", TOS_NODE_ID,
+            result == SUCCESS ? "passed" : "failed");
 
-      if (acceptedSocket != 0 && socket == call Transport.getSocketState(acceptedSocket)) 
-      {
-
-         if (result == SUCCESS) 
-         {
-
-            if (call Transport.close(acceptedSocket) == SUCCESS) {
-               dbg(TRANSPORT_CHANNEL,
-                  "Node %d: Server requested graceful close\n",
-                  TOS_NODE_ID);
-            } else {
-               dbg(TRANSPORT_CHANNEL,
-                  "Node %d: Server close request FAILED\n",
-                  TOS_NODE_ID);
-            }
-
-         } 
-         else 
-         {
-            dbg(TRANSPORT_CHANNEL,
-               "Node %d: Server data verification FAILED\n",
-               TOS_NODE_ID);
-         }
-      }
-   }
+        if(socket != NULL) {
+            call TransportTest.stop(socket);
+        }
+    }
 }

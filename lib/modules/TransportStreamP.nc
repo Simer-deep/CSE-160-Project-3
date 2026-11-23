@@ -251,7 +251,13 @@ implementation {
         socket->sendUsed -= acknowledged;
         socket->sendUnacked = acknowledgement;
 
-        if(acknowledged > 0 || window > socket->peerWindow) {
+        if(window != socket->peerWindow) {
+            dbg("Project3TGen",
+                "Node %u peer window changed from %u to %u\n",
+                TOS_NODE_ID, socket->peerWindow, window);
+        }
+
+        if(acknowledged > 0 || window != socket->peerWindow) {
             socket->peerWindow = window;
             socket->stallDeadline = 0;
         }
@@ -349,6 +355,7 @@ implementation {
         }
 
         if(socket->peerWindow == 0) {
+            socket->stallDeadline = 0;
             return SUCCESS;
         }
 
