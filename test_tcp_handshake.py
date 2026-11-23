@@ -4,8 +4,8 @@ sim = TestSim(seed=1)
 
 # Enable logs.
 sim.addChannel("transport")
-sim.addChannel("routing")
-sim.addChannel("command")
+# sim.addChannel("routing")
+# sim.addChannel("command")
 
 # Load our four-node network.
 sim.loadTopo("tcp-line.topo")
@@ -29,6 +29,6 @@ print("Starting TCP client on Node 4...")
 sim.testClient(4)
 
 # Run the simulation long enough for the handshake.
-sim.runTime(30)
+sim.runTime(5)
 
 print("TCP handshake test finished.")
