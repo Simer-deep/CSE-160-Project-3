@@ -1,63 +1,33 @@
 # Congestion Control Extra Credit
 
-This is optional. The regular Project 3 build still uses the fixed 48-byte window.
+This adds slow start and AIMD without changing the regular Project 3 build.
 
-## Run in Docker
+## Run
 
-Run these commands from `/root/project` in this order.
-
-### 1. Run the normal version
+From `/root/project` inside Docker, first run the fixed-window test:
 
 ```bash
-make clean
-make micaz sim
+make clean && make micaz sim
 python2 "extra credit/tests/compare.py" fixed
 ```
 
-### 2. Run the congestion control version
+Then run congestion control and generate the comparison:
 
 ```bash
-make clean
-make EXTRA_CREDIT=1 micaz sim
+make clean && make EXTRA_CREDIT=1 micaz sim
 python2 "extra credit/tests/compare.py" congestion
-```
-
-### 3. Make the comparison
-
-```bash
 python2 "extra credit/tests/report.py"
-```
-
-### 4. Go back to the normal Project 3 version
-
-```bash
-make clean
-make micaz sim
-python2 PingTest1.py
 ```
 
 ## Files
 
-- `interfaces/CongestionControl.nc`: congestion control commands
-- `modules/CongestionControlP.nc`: slow start and AIMD
-- `tests/compare.py`: two 1,025-byte transfers sharing a bottleneck
-- `tests/report.py`: comparison and congestion window graph
+- `modules/CongestionControlP.nc` - slow start and AIMD
+- `interfaces/CongestionControl.nc` - module interface
+- `tests/compare.py` - two clients sharing a network link
+- `tests/report.py` - results and graph
 
 ## How it works
 
-1. Start with a 12-byte congestion window (`cwnd`).
-2. Increase it when data is acknowledged: fast at first, then gradually.
-3. When data times out, cut the threshold in half and reset `cwnd` to 12 bytes.
-4. Limit new data using the congestion window, receiver window, and send buffer.
-5. Compare both modes using the same network and packet drop.
+The congestion window starts at 12 bytes. ACKs increase it, first quickly and then gradually. After a DATA timeout, the threshold is halved and the window resets to 12 bytes. New data is limited by the congestion window, receiver window, and send buffer.
 
-A timeout is treated as congestion, even though wireless loss can also cause one.
-
-## Results
-
-The tests save files in `extra credit/results/`:
-
-- `comparison.md`: throughput, retransmissions, and fairness
-- `comparison.csv`: results for each client
-- `cwnd.svg`: congestion window graph
-- `fixed.log` and `congestion.log`: simulation logs
+The two modes use the same network and packet drop. Results are saved in `extra credit/results/` as `comparison.md`, `comparison.csv`, and `cwnd.svg`.
