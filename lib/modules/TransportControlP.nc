@@ -266,11 +266,14 @@ implementation {
     ) {
         socket_store_t* conn = getSocket(fd);
 
+        
         if (conn == NULL || buff == NULL ||
             conn->state != ESTABLISHED ||
+            conn->closeRequested ||
             bufflen == 0) {
             return 0;
         }
+
 
         return call TransportStream.write(
             conn,
@@ -606,9 +609,27 @@ implementation {
         return result;
     }
 
-    command error_t Transport.close(socket_t fd) 
+    command error_t Transport.close(socket_t fd)
     {
-        return FAIL;
+        socket_store_t* conn = getSocket(fd);
+
+        if (conn == NULL || conn->state != ESTABLISHED) 
+        {
+            return FAIL;
+        }
+
+        if (conn->closeRequested) 
+        {
+            return FAIL;
+        }
+
+        conn->closeRequested = TRUE;
+
+        dbg(TRANSPORT_CHANNEL,
+            "Node %d: TCP close requested fd=%d\n",
+            TOS_NODE_ID, fd);
+
+        return SUCCESS;
     }
 
     command error_t Transport.release(socket_t fd) 
