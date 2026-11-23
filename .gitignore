@@ -1,0 +1,21 @@
+# TinyOS and TOSSIM build outputs
+build/
+simbuild/
+pp/
+doc/
+appdoc/
+app.xml
+_TOSSIMmodule.so
+TOSSIM.py
+VolumeMapC.nc
+NodeC.cmap
+NodeC.dot
+NodeC.html
+NodeC.png
+
+# Python caches
+*.pyc
+__pycache__/
+
+# Simulator test output
+logs/

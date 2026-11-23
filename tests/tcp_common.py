@@ -27,12 +27,10 @@ class TransportCase:
         self.output = open(self.path, "w")
         self.sim = TestSim(seed=1)
 
-        self.sim.addChannel("Project3Generate", self.output)
         self.sim.addChannel("Project3TGen", self.output)
         self.sim.addChannel("transport", self.output)
         self.sim.addChannel("routing", self.output)
         self.sim.addChannel("command", self.output)
-        self.sim.addChannel("transport_test", self.output)
 
 
         self.show("Loading tcp-line.topo and " + noise)
@@ -103,7 +101,9 @@ class TransportCase:
         self.check(any(int(x[4]) == 0 and x[5] == "PASS" for x in received),
                    "Server reported missing or incorrect bytes")
         self.check("Sending data" in text, "No DATA transmission was logged")
-        self.check("outstanding=12" in text or "outstanding=24" in text,
+        outstanding = re.findall(
+            r"Sending data[^\n]*outstanding=(\d+)", text)
+        self.check(any(int(count) > 12 for count in outstanding),
                    "Multiple outstanding segments were not observed")
         self.show("1025 bytes sent, acknowledged, and received correctly")
 

@@ -80,4 +80,4 @@ sim.cmdTestResume(1, 4, 10, 20)
 
 The client command supplies the client node, server node, source port, destination port, and number of bytes. The expected byte count is also sent to the server's test consumer, separately from the transport data. Pause and resume only stop the test application from reading; transport reception continues.
 
-Loss tests use `cmdTestDrop()` on a relay to discard one selected transport packet. The hook is off in normal runs, and each deliberate drop is logged. The `Project3Generate` channel shows data and test progress; `transport` shows connection events. Use `routing` when troubleshooting the network layer.
+Loss tests use `cmdTestDrop()` on a relay to discard one selected transport packet. The hook is off in normal runs, and each deliberate drop is logged. The `Project3TGen` channel shows data and test progress; `transport` shows connection events. Use `routing` when troubleshooting the network layer.

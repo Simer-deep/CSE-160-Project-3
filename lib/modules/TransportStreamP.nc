@@ -23,7 +23,7 @@ implementation {
     void logStream(socket_store_t* socket, char* eventName,
     uint16_t sequence, uint16_t acknowledgement, uint16_t length) {
 
-    dbg("Project3Generate",
+    dbg("Project3TGen",
         "Node %u conn=%u:%u->%u:%u %s seq=%u ack=%u len=%u "
         "outstanding=%u wnd=%u peerWnd=%u\n",
         TOS_NODE_ID,
@@ -252,7 +252,7 @@ implementation {
         socket->sendUnacked = acknowledgement;
 
         if(window != socket->peerWindow) {
-            dbg("Project3Generate",
+            dbg("Project3TGen",
                 "Node %u peer window changed from %u to %u\n",
                 TOS_NODE_ID, socket->peerWindow, window);
         }

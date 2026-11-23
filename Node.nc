@@ -152,7 +152,7 @@ implementation {
         }
 
         if(request == NULL) {
-            dbg("Project3Generate", "Node %u has no free test records\n",
+            dbg("Project3TGen", "Node %u has no free test records\n",
                 TOS_NODE_ID);
             return;
         }
@@ -179,7 +179,7 @@ implementation {
 
         fd = call Transport.socket();
         if(fd == 0) {
-            dbg("Project3Generate", "Node %u could not allocate client socket\n",
+            dbg("Project3TGen", "Node %u could not allocate client socket\n",
                 TOS_NODE_ID);
             return;
         }
@@ -192,13 +192,13 @@ implementation {
         if(call Transport.bind(fd, &local) != SUCCESS ||
             call Transport.connect(fd, &destination) != SUCCESS) {
             call Transport.release(fd);
-            dbg("Project3Generate", "Node %u could not connect to %u:%u\n",
+            dbg("Project3TGen", "Node %u could not connect to %u:%u\n",
                 TOS_NODE_ID, remote, destPort);
             return;
         }
 
         clientBytes[fd] = length;
-        dbg("Project3Generate", "Node %u connecting to %u:%u for %lu bytes\n",
+        dbg("Project3TGen", "Node %u connecting to %u:%u for %lu bytes\n",
             TOS_NODE_ID, remote, destPort, (unsigned long)length);
     }
 
@@ -207,7 +207,7 @@ implementation {
         socket_t fd = findSocket(remote, srcPort, destPort);
 
         if(fd == 0 || call Transport.close(fd) != SUCCESS) {
-            dbg("Project3Generate", "Node %u could not close connection\n",
+            dbg("Project3TGen", "Node %u could not close connection\n",
                 TOS_NODE_ID);
         }
     }
@@ -228,7 +228,7 @@ implementation {
             call TransportTest.pause(socket);
         }
 
-        dbg("Project3Generate", "Node %u paused the receiver\n", TOS_NODE_ID);
+        dbg("Project3TGen", "Node %u paused the receiver\n", TOS_NODE_ID);
     }
 
     event void CommandHandler.setTestResume(uint16_t remote,
@@ -247,7 +247,7 @@ implementation {
             call TransportTest.resume(socket);
         }
 
-        dbg("Project3Generate", "Node %u resumed the receiver\n", TOS_NODE_ID);
+        dbg("Project3TGen", "Node %u resumed the receiver\n", TOS_NODE_ID);
     }
 
     event void CommandHandler.setTestDrop(uint16_t source,
@@ -271,11 +271,11 @@ implementation {
         socket_store_t* socket = call Transport.getSocketState(fd);
 
         if(result != SUCCESS || socket == NULL) {
-            dbg("Project3Generate", "Node %u connection failed fd=%u\n",
+            dbg("Project3TGen", "Node %u connection failed fd=%u\n",
                 TOS_NODE_ID, fd);
             if(socket != NULL && socket->state == CLOSED) {
                 if(call Transport.release(fd) == SUCCESS) {
-                    dbg("Project3Generate",
+                    dbg("Project3TGen",
                         "Node %u released failed socket fd=%u\n",
                         TOS_NODE_ID, fd);
                 }
@@ -286,7 +286,7 @@ implementation {
 
         if(call TransportTest.startProducer(fd, socket,
             clientBytes[fd]) != SUCCESS) {
-            dbg("Project3Generate", "Node %u could not start sender fd=%u\n",
+            dbg("Project3TGen", "Node %u could not start sender fd=%u\n",
                 TOS_NODE_ID, fd);
         }
     }
@@ -305,7 +305,7 @@ implementation {
             socket->localPort, socket->remotePort);
 
         if(request == NULL) {
-            dbg("Project3Generate", "Node %u missing expected size for %u:%u\n",
+            dbg("Project3TGen", "Node %u missing expected size for %u:%u\n",
                 TOS_NODE_ID, socket->remoteAddr, socket->remotePort);
             return;
         }
@@ -314,7 +314,7 @@ implementation {
 
         if(call TransportTest.startConsumer(connectedFd, socket,
             request->bytes) != SUCCESS) {
-            dbg("Project3Generate", "Node %u could not start receiver fd=%u\n",
+            dbg("Project3TGen", "Node %u could not start receiver fd=%u\n",
                 TOS_NODE_ID, connectedFd);
             return;
         }
@@ -323,7 +323,7 @@ implementation {
             call TransportTest.pause(socket);
         }
 
-        dbg("Project3Generate", "Node %u accepted %u:%u expecting %lu bytes\n",
+        dbg("Project3TGen", "Node %u accepted %u:%u expecting %lu bytes\n",
             TOS_NODE_ID, socket->remoteAddr, socket->remotePort,
             (unsigned long)request->bytes);
     }
@@ -332,7 +332,7 @@ implementation {
         socket_store_t* socket = call Transport.getSocketState(fd);
         uint8_t i;
 
-        dbg("Project3Generate", "Node %u closed fd=%u result=%u\n",
+        dbg("Project3TGen", "Node %u closed fd=%u result=%u\n",
             TOS_NODE_ID, fd, result);
 
         for(i = 0; i < MAX_NUM_OF_SOCKETS; i++) {
@@ -359,7 +359,7 @@ implementation {
         fd = findSocket(socket->remoteAddr,
             socket->localPort, socket->remotePort);
         if(fd != 0) {
-            dbg("Project3Generate", "Node %u queued all data on fd=%u\n",
+            dbg("Project3TGen", "Node %u queued all data on fd=%u\n",
                 TOS_NODE_ID, fd);
             call Transport.close(fd);
         }
@@ -370,7 +370,7 @@ implementation {
         socket_store_t* socket,
         error_t result
     ) {
-        dbg("Project3Generate",
+        dbg("Project3TGen",
             "Node %u: Transport test finished result=%u\n",
             TOS_NODE_ID, result);
 
