@@ -14,6 +14,12 @@ class TestSim:
 
     CMD_TEST_CLIENT = 4
     CMD_TEST_SERVER = 5
+    CMD_TEST_EXPECTED = 7
+    CMD_TEST_CLOSE = 8
+    CMD_TEST_PAUSE = 10
+    CMD_TEST_RESUME = 11
+    CMD_TEST_DROP = 12
+    TEST_CHANNEL = "Project3TGen"
 
     COMMAND_CHANNEL = "command"
     GENERAL_CHANNEL = "general"
@@ -133,19 +139,79 @@ class TestSim:
         self.sendCMD(self.CMD_ROUTE_DUMP, destination, "routing command")
 
     
+    def bytes16(self, value):
+        return [(value >> 8) & 255, value & 255]
+
+    def bytes32(self, value):
+        return [(value >> 24) & 255, (value >> 16) & 255,
+                (value >> 8) & 255, value & 255]
+
+    def sendTransportCommand(self, command, node, values, delay=5):
+        if len(values) > 25:
+            raise ValueError("Transport command is too long")
+        packet = self.t.newPacket()
+        message = CommandMsg()
+        message.set_dest(node)
+        message.set_id(command)
+        for index in range(25):
+            message.setElement_payload(index, 0)
+        for index, value in enumerate(values):
+            if not 0 <= value <= 255:
+                raise ValueError("Command value must fit in a byte")
+            message.setElement_payload(index, value)
+        packet.setType(message.get_amType())
+        packet.setData(message.data)
+        packet.setDestination(node)
+        packet.deliver(node, self.t.time() + delay)
+        self.injected.append(packet)
+
+    def cmdTestServer(self, serverAddress, listenPort):
+        self.sendTransportCommand(self.CMD_TEST_SERVER,
+                                  serverAddress, [listenPort])
+
+    def cmdTestClient(self, clientAddress, serverAddress,
+                      srcPort, destPort, transferBytes):
+        if not 0 <= transferBytes <= 60000:
+            raise ValueError("Transfer size must be between 0 and 60000")
+        info = self.bytes16(clientAddress) + [srcPort, destPort]
+        info += self.bytes32(transferBytes)
+        self.sendTransportCommand(self.CMD_TEST_EXPECTED,
+                                  serverAddress, info)
+        values = self.bytes16(serverAddress) + [srcPort, destPort]
+        values += self.bytes32(transferBytes)
+        self.sendTransportCommand(self.CMD_TEST_CLIENT,
+                                  clientAddress, values, delay=10)
+
+    def cmdClientClose(self, clientAddress, serverAddress, srcPort, destPort):
+        values = self.bytes16(serverAddress) + [srcPort, destPort]
+        self.sendTransportCommand(self.CMD_TEST_CLOSE,
+                                  clientAddress, values)
+
+    def cmdTestPause(self, serverAddress, clientAddress, srcPort, destPort):
+        values = self.bytes16(clientAddress) + [srcPort, destPort]
+        self.sendTransportCommand(self.CMD_TEST_PAUSE,
+                                  serverAddress, values)
+
+    def cmdTestResume(self, serverAddress, clientAddress, srcPort, destPort):
+        values = self.bytes16(clientAddress) + [srcPort, destPort]
+        self.sendTransportCommand(self.CMD_TEST_RESUME,
+                                  serverAddress, values)
+
+    def cmdTestDrop(self, relayAddress, source, destination,
+                    srcPort, destPort, flags, sequence=65535,
+                    acknowledgement=65535, windowMode=0, count=1):
+        values = self.bytes16(source) + self.bytes16(destination)
+        values += [srcPort, destPort, flags]
+        values += self.bytes16(sequence) + self.bytes16(acknowledgement)
+        values += [windowMode, count]
+        self.sendTransportCommand(self.CMD_TEST_DROP,
+                                  relayAddress, values)
+
     def testServer(self, nodeID):
-        self.sendCMD(
-            self.CMD_TEST_SERVER,
-            nodeID,
-            "server"
-        )
+        self.cmdTestServer(nodeID, 20)
 
     def testClient(self, nodeID):
-        self.sendCMD(
-            self.CMD_TEST_CLIENT,
-            nodeID,
-            "client"
-        )
+        self.cmdTestClient(nodeID, 1, 10, 20, 1025)
 
     def injectRaw(self, source, receiver, amType, data):
         packet = self.t.newPacket()

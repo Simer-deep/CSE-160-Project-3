@@ -21,6 +21,16 @@ module CommandHandlerP {
 }
 
 implementation {
+    uint16_t read16(uint8_t* data) {
+        return ((uint16_t)data[0] << 8) | data[1];
+    }
+
+    uint32_t read32(uint8_t* data) {
+        return ((uint32_t)data[0] << 24) |
+            ((uint32_t)data[1] << 16) |
+            ((uint32_t)data[2] << 8) | data[3];
+    }
+
     task void processCommand() {
         if(!call Queue.empty()) {
             CommandMsg *msg;
@@ -85,13 +95,36 @@ implementation {
                 break;
 
             case CMD_TEST_CLIENT:
-                dbg(COMMAND_CHANNEL, "Command Type: Client\n");
-                signal CommandHandler.setTestClient();
+                signal CommandHandler.setTestClient(read16(buff), buff[2],
+                    buff[3], read32(&buff[4]));
                 break;
 
             case CMD_TEST_SERVER:
-                dbg(COMMAND_CHANNEL, "Command Type: Client\n");
-                signal CommandHandler.setTestServer();
+                signal CommandHandler.setTestServer(buff[0]);
+                break;
+
+            case CMD_TEST_EXPECTED:
+                signal CommandHandler.setTestExpected(read16(buff), buff[2],
+                    buff[3], read32(&buff[4]));
+                break;
+
+            case CMD_TEST_CLOSE:
+                signal CommandHandler.setTestClose(read16(buff), buff[2], buff[3]);
+                break;
+
+            case CMD_TEST_PAUSE:
+                signal CommandHandler.setTestPause(read16(buff), buff[2], buff[3]);
+                break;
+
+            case CMD_TEST_RESUME:
+                signal CommandHandler.setTestResume(read16(buff), buff[2], buff[3]);
+                break;
+
+            case CMD_TEST_DROP:
+                signal CommandHandler.setTestDrop(read16(buff),
+                    read16(&buff[2]), buff[4], buff[5], buff[6],
+                    read16(&buff[7]), read16(&buff[9]),
+                    buff[11], buff[12]);
                 break;
 
             default:

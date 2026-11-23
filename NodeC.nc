@@ -33,8 +33,6 @@ implementation {
 
    components TransportControlP;
    components TransportStreamP;
-   components new TimerMilliC() as AppTestTimerC;
-   Node.AppTestTimer -> AppTestTimerC;
 
    components TransportTestP;
    components new TimerMilliC() as TransportTestTimer;
