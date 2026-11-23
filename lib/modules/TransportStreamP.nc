@@ -2,6 +2,9 @@
 
 module TransportStreamP {
     provides interface TransportStream;
+#ifdef EXTRA_CREDIT_CONGESTION
+    uses interface CongestionControl;
+#endif
 }
 
 implementation {
@@ -84,6 +87,9 @@ implementation {
         socket->sendHead = 0;
         socket->sendUsed = 0;
         socket->sendWindow = TRANSPORT_SEND_WINDOW;
+#ifdef EXTRA_CREDIT_CONGESTION
+        call CongestionControl.start(socket);
+#endif
         socket->peerWindow = peerWindow;
 
         if(socket->peerWindow > SOCKET_BUFFER_SIZE) {
@@ -250,6 +256,11 @@ implementation {
             SOCKET_BUFFER_SIZE;
         socket->sendUsed -= acknowledged;
         socket->sendUnacked = acknowledgement;
+#ifdef EXTRA_CREDIT_CONGESTION
+        if(acknowledged > 0) {
+            call CongestionControl.acknowledged(socket, acknowledged);
+        }
+#endif
 
         if(window != socket->peerWindow) {
             dbg("Project3TGen",
@@ -300,6 +311,7 @@ implementation {
         uint16_t outstanding;
         uint16_t limit;
         uint16_t length;
+        uint16_t retryLimit;
         uint8_t sent;
 
         if(socket == NULL || !socket->inUse) {
@@ -359,7 +371,11 @@ implementation {
             return SUCCESS;
         }
 
+#ifdef EXTRA_CREDIT_CONGESTION
+        limit = call CongestionControl.window(socket);
+#else
         limit = socket->sendWindow;
+#endif
 
         if(limit > SOCKET_BUFFER_SIZE) {
             limit = SOCKET_BUFFER_SIZE;
@@ -385,6 +401,9 @@ implementation {
 
                 socket->retransmitting = TRUE;
                 socket->retryOffset = 0;
+#ifdef EXTRA_CREDIT_CONGESTION
+                call CongestionControl.timedOut(socket);
+#endif
 
                 logStream(socket, "Timed out waiting for ACK",
                 socket->sendUnacked, socket->receiveNext, outstanding);
@@ -392,10 +411,16 @@ implementation {
         }
 
         if(socket->retransmitting) {
+            retryLimit = outstanding;
+#ifdef EXTRA_CREDIT_CONGESTION
+            if(retryLimit > call CongestionControl.window(socket)) {
+                retryLimit = call CongestionControl.window(socket);
+            }
+#endif
             for(sent = 0; sent < 2 &&
-                socket->retryOffset < outstanding; sent++) {
+                socket->retryOffset < retryLimit; sent++) {
 
-                length = outstanding - socket->retryOffset;
+                length = retryLimit - socket->retryOffset;
 
                 if(length > TRANSPORT_MAX_DATA_SIZE) {
                     length = TRANSPORT_MAX_DATA_SIZE;
@@ -416,7 +441,7 @@ implementation {
                 socket->retryOffset += length;
             }
 
-            if(socket->retryOffset >= outstanding) {
+            if(socket->retryOffset >= retryLimit) {
                 socket->retransmitting = FALSE;
                 socket->retryOffset = 0;
                 socket->dataDeadline = now + TRANSPORT_RTO_MS;

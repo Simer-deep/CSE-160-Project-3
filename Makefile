@@ -4,6 +4,12 @@ COMPONENT=NodeC
 INCLUDE=-IdataStructures
 INCLUDE+=-IdataStructures/interfaces/ -IdataStructures/modules
 INCLUDE+=-Ilib/interfaces -Ilib/modules
+
+ifeq ($(EXTRA_CREDIT),1)
+INCLUDE+=-I"extra credit/interfaces" -I"extra credit/modules"
+CFLAGS += -DEXTRA_CREDIT_CONGESTION
+endif
+
 CFLAGS += -DTOSH_DATA_LENGTH=29
 CFLAGS+=$(INCLUDE)
 

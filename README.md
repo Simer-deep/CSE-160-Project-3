@@ -81,3 +81,7 @@ sim.cmdTestResume(1, 4, 10, 20)
 The client command supplies the client node, server node, source port, destination port, and number of bytes. The expected byte count is also sent to the server's test consumer, separately from the transport data. Pause and resume only stop the test application from reading; transport reception continues.
 
 Loss tests use `cmdTestDrop()` on a relay to discard one selected transport packet. The hook is off in normal runs, and each deliberate drop is logged. The `Project3TGen` channel shows data and test progress; `transport` shows connection events. Use `routing` when troubleshooting the network layer.
+
+## Optional extra credit
+
+The separate `extra credit/` directory contains an optional slow-start/AIMD mode and reproducible two-flow bottleneck comparison. The default build and nine required tests use the original fixed window. To run the optional experiment in the course Docker environment, use `sh "extra credit/run.sh"` from the repository root. See `extra credit/README.md` for the implementation order, test setup, and generated reports.

@@ -87,7 +87,12 @@ typedef struct socket_store_t {
     uint32_t windowDeadline;
     bool retransmitting;
     uint16_t retryOffset;
-    uint32_t stallDeadline;    
+    uint32_t stallDeadline;
+#ifdef EXTRA_CREDIT_CONGESTION
+    uint16_t cwnd;
+    uint16_t ssthresh;
+    uint16_t congestionAckCredit;
+#endif    
 
 } socket_store_t;
 

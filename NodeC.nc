@@ -34,6 +34,11 @@ implementation {
    components TransportControlP;
    components TransportStreamP;
 
+#ifdef EXTRA_CREDIT_CONGESTION
+   components CongestionControlP;
+   TransportStreamP.CongestionControl -> CongestionControlP.CongestionControl;
+#endif
+
    components TransportTestP;
    components new TimerMilliC() as TransportTestTimer;
 
