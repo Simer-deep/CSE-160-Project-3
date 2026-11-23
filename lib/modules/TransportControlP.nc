@@ -4,7 +4,8 @@
 #include <string.h>
 #include <Timer.h>
 
-module TransportControlP {
+module TransportControlP 
+{
     provides interface Transport;
 
     uses interface TransportStream;
@@ -13,15 +14,18 @@ module TransportControlP {
     uses interface Timer<TMilli> as ControlTimer;
 }
 
-implementation {
+implementation 
+{
 
     socket_store_t sockets[MAX_NUM_OF_SOCKETS];
 
     socket_t allocateSocket() {
         uint8_t i;
 
-        for (i = 0; i < MAX_NUM_OF_SOCKETS; i++) {
-            if (!sockets[i].inUse) {
+        for (i = 0; i < MAX_NUM_OF_SOCKETS; i++) 
+        {
+            if (!sockets[i].inUse) 
+            {
                 memset(&sockets[i], 0, sizeof(socket_store_t));
 
                 sockets[i].inUse = TRUE;
@@ -54,7 +58,8 @@ implementation {
 
     command socket_store_t* Transport.getSocketState(
         socket_t fd
-    ) {
+    ) 
+    {
         return getSocket(fd);
     }
 
@@ -63,13 +68,16 @@ implementation {
         uint8_t localPort,
         uint16_t remoteAddr,
         uint8_t remotePort
-    ) {
+    ) 
+    {
         uint8_t i;
 
-        for (i = 0; i < MAX_NUM_OF_SOCKETS; i++) {
+        for (i = 0; i < MAX_NUM_OF_SOCKETS; i++)
+        {
             socket_store_t* conn = &sockets[i];
 
-            if (!conn->inUse || conn->state == LISTEN) {
+            if (!conn->inUse || conn->state == LISTEN) 
+            {
                 continue;
             }
 
@@ -84,7 +92,8 @@ implementation {
         return 0;
     }
 
-    socket_t findListener(uint8_t port) {
+    socket_t findListener(uint8_t port) 
+    {
         uint8_t i;
 
         for (i = 0; i < MAX_NUM_OF_SOCKETS; i++) {
@@ -99,7 +108,8 @@ implementation {
         return 0;
     }
 
-    command socket_t Transport.socket() {
+    command socket_t Transport.socket() 
+    {
         return allocateSocket();
     }
 
@@ -109,15 +119,18 @@ implementation {
     ) {
         socket_store_t* conn = getSocket(fd);
 
-        if (conn == NULL || addr == NULL) {
+        if (conn == NULL || addr == NULL) 
+        {
             return FAIL;
         }
 
-        if (conn->state != CLOSED) {
+        if (conn->state != CLOSED) 
+        {
             return FAIL;
         }
 
-        if (addr->addr != TOS_NODE_ID) {
+        if (addr->addr != TOS_NODE_ID) 
+        {
             return FAIL;
         }
 
@@ -127,18 +140,22 @@ implementation {
         return SUCCESS;
     }
 
-    command error_t Transport.listen(socket_t fd) {
+    command error_t Transport.listen(socket_t fd) 
+    {
         socket_store_t* conn = getSocket(fd);
 
-        if (conn == NULL || conn->state != CLOSED) {
+        if (conn == NULL || conn->state != CLOSED) 
+        {
             return FAIL;
         }
 
-        if (conn->localPort == 0) {
+        if (conn->localPort == 0) 
+        {
             return FAIL;
         }
 
-        if (findListener(conn->localPort) != 0) {
+        if (findListener(conn->localPort) != 0) 
+        {
             return FAIL;
         }
 
@@ -146,7 +163,8 @@ implementation {
         return SUCCESS;
     }
 
-    command socket_t Transport.accept(socket_t fd) {
+    command socket_t Transport.accept(socket_t fd) 
+    {
         return 0;
     }
 
