@@ -3,6 +3,13 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
+restore_default() {
+    echo "== Restoring default fixed-window build =="
+    make clean
+    make micaz sim
+}
+trap restore_default 0
+
 echo "== Fixed-window baseline =="
 make clean
 make micaz sim
@@ -15,9 +22,5 @@ python2 "extra credit/tests/compare.py" congestion
 
 echo "== Results =="
 python2 "extra credit/tests/report.py"
-
-echo "== Restore default build =="
-make clean
-make micaz sim
 
 echo "Extra credit results: extra credit/results/"

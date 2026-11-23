@@ -122,6 +122,12 @@ def main():
         })
 
     results["passed"] = all_pass
+    results["congestion_ack_events"] = len(re.findall(
+        r"CC node=(?:3|4) port=\d+ cwnd=\d+ ssthresh=\d+ reason=ack",
+        logs))
+    results["congestion_timeout_events"] = len(re.findall(
+        r"CC node=(?:3|4) port=\d+ cwnd=\d+ ssthresh=\d+ reason=timeout",
+        logs))
     results_file = os.path.join(RESULTS, mode + ".json")
     with open(results_file, "w") as result_file:
         json.dump(results, result_file, indent=2, sort_keys=True)
@@ -133,7 +139,15 @@ def main():
                flow["data_retransmissions"]))
 
     print("[%s] Log: %s" % (mode, path))
-    return 0 if all_pass and results["dropped_packets"] > 0 else 1
+    controller_worked = (mode == "fixed" or
+                         (results["congestion_ack_events"] > 0 and
+                          results["congestion_timeout_events"] > 0))
+    if mode == "congestion":
+        print("[%s] AIMD ACK events: %d, timeout responses: %d" %
+              (mode, results["congestion_ack_events"],
+               results["congestion_timeout_events"]))
+    return 0 if (all_pass and results["dropped_packets"] > 0 and
+                 controller_worked) else 1
 
 
 if __name__ == "__main__":
