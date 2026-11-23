@@ -21,6 +21,8 @@ implementation
    socket_t serverSocket = 0;
    socket_t clientSocket = 0;
    socket_t acceptedSocket = 0;
+   uint16_t testReceivedBytes = 0;
+   bool testDataFailed = FALSE;
 
    event void Boot.booted() {
       call AMControl.start();
@@ -179,27 +181,27 @@ implementation
       call Transport.receive(packet);
    }
    
+   
    event void Transport.connectDone(
       socket_t fd,
       error_t result
    ) {
-      uint8_t message[12] = {
-         'H', 'e', 'l', 'l', 'o', ' ',
-         'N', 'o', 'd', 'e', ' ', '1'
-      };
+      uint8_t message[48];
+      uint8_t i;
       uint16_t written;
 
       if (result != SUCCESS || fd != clientSocket) 
       {
          dbg(TRANSPORT_CHANNEL,
-             "Node %d: TCP connection failed\n",
-             TOS_NODE_ID);
+               "Node %d: TCP connection failed\n",
+               TOS_NODE_ID);
          return;
       }
 
-      dbg(TRANSPORT_CHANNEL,
-          "Node %d: TCP client ESTABLISHED\n",
-          TOS_NODE_ID);
+      for (i = 0; i < sizeof(message); i++) 
+      {
+         message[i] = 'A' + (i % 26);
+      }
 
       written = call Transport.write(
          fd,
@@ -208,8 +210,8 @@ implementation
       );
 
       dbg(TRANSPORT_CHANNEL,
-          "Node %d: TCP wrote %d of 12 bytes\n",
-          TOS_NODE_ID, written);
+         "Node %d: TCP wrote %d of 48 bytes\n",
+         TOS_NODE_ID, written);
    }
 
    event void Transport.acceptDone(
@@ -217,6 +219,9 @@ implementation
       socket_t connectedFd
    ) {
       acceptedSocket = connectedFd;
+
+      testReceivedBytes = 0;
+      testDataFailed = FALSE;
 
       dbg(TRANSPORT_CHANNEL,
           "Node %d: TCP server ESTABLISHED fd=%d\n",
@@ -237,14 +242,9 @@ implementation
    event void AppTestTimer.fired() 
    {
       uint8_t received[12];
-      uint8_t expected[12] = {
-         'H', 'e', 'l', 'l', 'o', ' ',
-         'N', 'o', 'd', 'e', ' ', '1'
-      };
-
       uint16_t count;
       uint8_t i;
-      bool matches = TRUE;
+      uint8_t expected;
 
       if (acceptedSocket == 0) 
       {
@@ -262,40 +262,39 @@ implementation
          return;
       }
 
-      if (count != sizeof(expected)) 
+      for (i = 0; i < count; i++) 
       {
-         matches = FALSE;
-      } 
-      else 
-      {
-         for (i = 0; i < sizeof(expected); i++) 
+         expected = 'A' + ((testReceivedBytes + i) % 26);
+
+         if (received[i] != expected) 
          {
-            if (received[i] != expected[i])
-            {
-               matches = FALSE;
-               break;
-            }
+               testDataFailed = TRUE;
          }
       }
 
+      testReceivedBytes += count;
+
       dbg(TRANSPORT_CHANNEL,
-          "Node %d: TCP received %d bytes\n",
-          TOS_NODE_ID, count);
+         "Node %d: TCP received %d bytes, total=%d/48\n",
+         TOS_NODE_ID, count, testReceivedBytes);
 
-      if (matches) 
+      if (testReceivedBytes >= 48) 
       {
-         dbg(TRANSPORT_CHANNEL,
-             "Node %d: TCP DATA TEST PASSED\n",
-             TOS_NODE_ID);
-      } 
-      else 
-      {
-         dbg(TRANSPORT_CHANNEL,
-             "Node %d: TCP DATA TEST FAILED\n",
-             TOS_NODE_ID);
+         if (!testDataFailed && testReceivedBytes == 48) 
+         {
+               dbg(TRANSPORT_CHANNEL,
+                  "Node %d: TCP 48-BYTE TEST PASSED\n",
+                  TOS_NODE_ID);
+         } 
+         else 
+         {
+            dbg(TRANSPORT_CHANNEL,
+               "Node %d: TCP 48-BYTE TEST FAILED\n",
+               TOS_NODE_ID);
+         }
+
+         acceptedSocket = 0;
+         call AppTestTimer.stop();
       }
-
-      acceptedSocket = 0;
-      call AppTestTimer.stop();
    }
 }

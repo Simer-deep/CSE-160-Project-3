@@ -29,6 +29,6 @@ print("Starting TCP client on Node 4...")
 sim.testClient(4)
 
 # Run the simulation long enough for the handshake.
-sim.runTime(5)
+sim.runTime(20)
 
 print("TCP handshake test finished.")
