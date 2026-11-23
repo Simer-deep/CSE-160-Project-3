@@ -14,11 +14,13 @@ module Node {
    uses interface DistanceVector as DV;
 
    uses interface Transport;
+   uses interface Timer<TMilli> as AppTestTimer;
 }
 implementation 
 {
    socket_t serverSocket = 0;
    socket_t clientSocket = 0;
+   socket_t acceptedSocket = 0;
 
    event void Boot.booted() {
       call AMControl.start();
@@ -176,23 +178,51 @@ implementation
 
       call Transport.receive(packet);
    }
-
+   
    event void Transport.connectDone(
       socket_t fd,
       error_t result
    ) {
+      uint8_t message[12] = {
+         'H', 'e', 'l', 'l', 'o', ' ',
+         'N', 'o', 'd', 'e', ' ', '1'
+      };
+      uint16_t written;
+
+      if (result != SUCCESS || fd != clientSocket) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: TCP connection failed\n",
+             TOS_NODE_ID);
+         return;
+      }
+
       dbg(TRANSPORT_CHANNEL,
-         "Node %d: TCP client connected fd=%d result=%d\n",
-         TOS_NODE_ID, fd, result);
+          "Node %d: TCP client ESTABLISHED\n",
+          TOS_NODE_ID);
+
+      written = call Transport.write(
+         fd,
+         message,
+         sizeof(message)
+      );
+
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: TCP wrote %d of 12 bytes\n",
+          TOS_NODE_ID, written);
    }
 
    event void Transport.acceptDone(
       socket_t listenFd,
       socket_t connectedFd
    ) {
+      acceptedSocket = connectedFd;
+
       dbg(TRANSPORT_CHANNEL,
-         "Node %d: TCP server accepted connection fd=%d listener=%d\n",
-         TOS_NODE_ID, connectedFd, listenFd);
+          "Node %d: TCP server ESTABLISHED fd=%d\n",
+          TOS_NODE_ID, connectedFd);
+
+      call AppTestTimer.startPeriodic(250);
    }
 
    event void Transport.closeDone(
@@ -202,5 +232,70 @@ implementation
       dbg(TRANSPORT_CHANNEL,
          "Node %d: TCP connection closed fd=%d result=%d\n",
          TOS_NODE_ID, fd, result);
+   }
+
+   event void AppTestTimer.fired() 
+   {
+      uint8_t received[12];
+      uint8_t expected[12] = {
+         'H', 'e', 'l', 'l', 'o', ' ',
+         'N', 'o', 'd', 'e', ' ', '1'
+      };
+
+      uint16_t count;
+      uint8_t i;
+      bool matches = TRUE;
+
+      if (acceptedSocket == 0) 
+      {
+         return;
+      }
+
+      count = call Transport.read(
+         acceptedSocket,
+         received,
+         sizeof(received)
+      );
+
+      if (count == 0) 
+      {
+         return;
+      }
+
+      if (count != sizeof(expected)) 
+      {
+         matches = FALSE;
+      } 
+      else 
+      {
+         for (i = 0; i < sizeof(expected); i++) 
+         {
+            if (received[i] != expected[i])
+            {
+               matches = FALSE;
+               break;
+            }
+         }
+      }
+
+      dbg(TRANSPORT_CHANNEL,
+          "Node %d: TCP received %d bytes\n",
+          TOS_NODE_ID, count);
+
+      if (matches) 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: TCP DATA TEST PASSED\n",
+             TOS_NODE_ID);
+      } 
+      else 
+      {
+         dbg(TRANSPORT_CHANNEL,
+             "Node %d: TCP DATA TEST FAILED\n",
+             TOS_NODE_ID);
+      }
+
+      acceptedSocket = 0;
+      call AppTestTimer.stop();
    }
 }
