@@ -558,8 +558,39 @@ implementation {
         if (conn->state == ESTABLISHED &&
             flags == (TCP_FLAG_SYN | TCP_FLAG_ACK) &&
             seq == conn->initialReceiveSequence &&
-            ack == (uint16_t)(
-                conn->initialSendSequence + 1)) {
+            ack == (uint16_t)(conn->initialSendSequence + 1)) 
+            {
+                return sendControlPacket(
+                    conn,
+                    TCP_FLAG_ACK,
+                    conn->sendNext,
+                    conn->receiveNext
+                );
+            }
+
+        if (flags == TCP_FLAG_FIN) 
+        {
+
+            if (conn->state != ESTABLISHED) {
+                return FAIL;
+            }
+
+            if (seq != conn->receiveNext) {
+                return sendControlPacket(
+                    conn,
+                    TCP_FLAG_ACK,
+                    conn->sendNext,
+                    conn->receiveNext
+                );
+            }
+
+            conn->receiveNext++;
+            conn->finReceived = TRUE;
+            conn->state = CLOSE_WAIT;
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d: TCP FIN received fd=%d seq=%d\n",
+                TOS_NODE_ID, fd, seq);
 
             return sendControlPacket(
                 conn,
@@ -581,6 +612,21 @@ implementation {
             return FAIL;
         }
 
+        if (conn->state == FIN_WAIT_1 &&
+            flags == TCP_FLAG_ACK &&
+            ack == (uint16_t)(conn->finSequence + 1)) {
+
+            conn->finAcked = TRUE;
+            conn->controlRetries = 0;
+            conn->controlDeadline = 0;
+            conn->state = FIN_WAIT_2;
+
+            dbg(TRANSPORT_CHANNEL,
+                "Node %d: TCP FIN acknowledged fd=%d ack=%d\n",
+                TOS_NODE_ID, fd, ack);
+
+            return SUCCESS;
+        }
 
         if (flags & TCP_FLAG_ACK) 
         {
@@ -611,7 +657,7 @@ implementation {
     {
         socket_store_t* conn = getSocket(fd);
 
-        if (conn == NULL || conn->state != ESTABLISHED) 
+        if (conn == NULL || (conn->state != ESTABLISHED && conn->state != CLOSE_WAIT)) 
         {
             return FAIL;
         }
@@ -735,7 +781,8 @@ implementation {
                         TOS_NODE_ID, i + 1);
                 }
 
-                if (conn->state == ESTABLISHED &&
+               if ((conn->state == ESTABLISHED ||
+                    conn->state == CLOSE_WAIT) &&
                     conn->closeRequested &&
                     !conn->finSent &&
                     conn->sendUsed == 0 &&
@@ -761,7 +808,14 @@ implementation {
                             conn->controlDeadline = 1;
                         }
 
-                        conn->state = FIN_WAIT_1;
+                        if (conn->state == CLOSE_WAIT) 
+                        {
+                            conn->state = LAST_ACK;
+                        }
+                        else 
+                        {
+                            conn->state = FIN_WAIT_1;
+                        }
 
                         dbg(TRANSPORT_CHANNEL,
                             "Node %d: TCP FIN sent fd=%d seq=%d\n",
