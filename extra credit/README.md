@@ -1,49 +1,44 @@
-# Optional extra credit: congestion control
+# Congestion Control Extra Credit
 
-This folder contains the optional congestion-control implementation, experiment, and results generator. The nine required tests and fixed-window protocol are unchanged by default.
+This is separate from the required Project 3 tests. The normal build still uses the fixed 48-byte window.
 
-## How to run
+## Run
 
-From the repository root in the course TinyOS Docker container:
+In the TinyOS Docker container, from the project folder:
 
 ```sh
 sh "extra credit/run.sh"
 ```
 
-The script builds **fixed-window mode**, runs a two-flow bottleneck experiment, builds **congestion mode**, runs the identical experiment, writes comparison files, and restores the normal fixed-window build.
+This builds both versions, runs the same two-flow test, saves the results, and rebuilds the regular version at the end.
 
-To compile one mode yourself:
+## Files
 
-```sh
-make clean && make micaz sim
-make clean && make EXTRA_CREDIT=1 micaz sim
-```
+- `interfaces/CongestionControl.nc` - commands used by the stream
+- `modules/CongestionControlP.nc` - slow start and AIMD
+- `tests/compare.py` - sends two 1,025-byte flows through node 2
+- `tests/report.py` - makes the comparison table and graph
+- `run.sh` - runs everything
 
-## The code in presentation order
+The extra-credit build uses `make EXTRA_CREDIT=1 micaz sim`. The regular build uses `make micaz sim`.
 
-1. `interfaces/CongestionControl.nc` declares the four commands.
-2. `modules/CongestionControlP.nc` implements slow start, additive increase, and timeout-based multiplicative decrease.
-3. `includes/socket.h` adds per-connection `cwnd`, `ssthresh`, and ACK credit **only in extra-credit builds**.
-4. `lib/modules/TransportStreamP.nc` calls the module on connection initialization, newly acknowledged bytes, and retransmission timeout. The sender enforces the minimum of `cwnd`, the original 48-byte cap, advertised receiver window, and buffer availability.
-5. `tests/compare.py` runs two simultaneous 1,025-byte flows through the same link (nodes 3 and 4 send to node 1 through node 2). Both modes use the same topology, drop, traffic, and random seed.
-6. `tests/report.py` writes a CSV summary and congestion-window SVG from observed log events.
+## How it works
 
-## Algorithm
+1. Start `cwnd` at 12 bytes, or one DATA packet.
+2. Increase it when new bytes are acknowledged. At first it grows quickly (slow start), then more slowly (additive increase).
+3. When a DATA timeout happens, cut `ssthresh` in half and reset `cwnd` to 12 bytes.
+4. Before sending new data, use the smallest of `cwnd`, the receiver window, and the normal send limit. Previously sent data can still be retransmitted.
+5. Compare the two modes using the same topology, traffic, and packet drop.
 
-- Start at 12 bytes (one DATA segment).
-- Slow start: increase `cwnd` by newly acknowledged bytes while below `ssthresh`.
-- Congestion avoidance: accumulate acknowledged bytes and add one segment per window acknowledged.
-- On DATA retransmission timeout: halve the threshold (at least one segment), reset `cwnd` to one segment, and retransmit.
-- The original send window remains the cap: this is a simple, bounded educational AIMD design rather than full TCP Reno.
-- Congestion signal: DATA retransmission timeout. This may also reflect wireless packet loss, so a timeout is an imperfect congestion estimate.
+The timeout is our congestion signal. A wireless packet loss can also cause a timeout, so the congestion version is not guaranteed to be faster.
 
-## Reported measurements
+## Results
 
-- Per-flow completed bytes, approximate completion time and throughput (measured in 5-second simulation steps)
-- DATA retransmissions by source node and deliberate packet drops
-- Jain fairness index based on measured per-flow throughput
-- `cwnd` evolution by ACK/timeout event index in an SVG
+After running, look in `extra credit/results/`:
 
-The comparison is evidence from a **single deterministic TOSSIM run per mode**, not a statistical claim of improved throughput or fairness. A congestion controller does not always outperform the fixed-window baseline, especially when packet losses are unrelated to congestion.
+- `comparison.md` - throughput, retransmissions, and fairness
+- `comparison.csv` - results for each client
+- `cwnd.svg` - congestion window changes
+- `fixed.log` and `congestion.log` - simulator output
 
-Generated `results/` files are excluded from Git. Keep them for the extra-credit submission after running the experiment.
+Both clients must transfer all 1,025 bytes. The experiment also checks that the congestion window increases and reacts to a timeout.
