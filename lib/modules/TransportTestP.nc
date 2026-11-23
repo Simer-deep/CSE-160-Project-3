@@ -202,7 +202,7 @@ implementation {
             }
             connection->stats.accepted += written;
             if(written > 0) {
-                dbg("Project3TGen",
+                dbg("transport_test",
                     "Node %u accepted %u bytes, total=%lu/%lu\n",
                     TOS_NODE_ID, written,
                     (unsigned long)connection->stats.accepted,
@@ -256,7 +256,7 @@ implementation {
             } else {
                 if(connection->stats.acknowledged !=
                     connection->stats.accepted - socket->sendUsed) {
-                    dbg("Project3TGen",
+                    dbg("transport_test",
                         "Node %u acknowledged %lu bytes\n",
                         TOS_NODE_ID,
                         (unsigned long)(connection->stats.accepted -
@@ -298,7 +298,7 @@ implementation {
         if(complete || connection->stats.failed) {
             connection->resultSent = TRUE;
 
-            dbg("Project3TGen",
+            dbg("transport_test",
                 "Node %u conn=%u:%u->%u:%u accepted=%lu acknowledged=%lu "
                 "consumed=%lu mismatches=%lu result=%s\n",
                 TOS_NODE_ID,

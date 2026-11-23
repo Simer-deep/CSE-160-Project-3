@@ -19,7 +19,7 @@ class TestSim:
     CMD_TEST_PAUSE = 10
     CMD_TEST_RESUME = 11
     CMD_TEST_DROP = 12
-    TEST_CHANNEL = "Project3TGen"
+    TEST_CHANNEL = "transport_test"
 
     COMMAND_CHANNEL = "command"
     GENERAL_CHANNEL = "general"

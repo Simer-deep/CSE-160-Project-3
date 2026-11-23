@@ -43,7 +43,7 @@ class TransportCase:
         self.path = os.path.join(logFolder, "tcp_%s.log" % name)
         self.output = open(self.path, "w")
         self.sim = TestSim(seed=1)
-        self.sim.addChannel("Project3TGen", self.output)
+        self.sim.addChannel("transport_test", self.output)
         self.sim.addChannel("transport", self.output)
         self.sim.addChannel("routing", self.output)
 
