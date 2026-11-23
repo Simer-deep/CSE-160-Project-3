@@ -17,11 +17,11 @@ def run():
                "Server did not finish the handshake after the lost ACK")
 
     recovery = log[droppedAt:establishedAt]
-    clientAck = any("Node 4 conn=" in line and "ACK_TX" in line and
-                    "ack=121 " in line for line in recovery.splitlines())
-    serverRetry = "Node 1 retransmitted TCP control flags=3" in recovery
-    test.check(clientAck or serverRetry,
-               "No retransmitted ACK or SYN-ACK was observed")
+    replacementAck = any("Node 1 TCP receive:" in line and
+                         "flags=2 seq=411 ack=121 len=0" in line
+                         for line in recovery.splitlines())
+    test.check(replacementAck,
+               "Server did not receive a replacement handshake ACK")
     test.show("Confirmed handshake recovered after the lost ACK")
 
     test.checkTransfer()
