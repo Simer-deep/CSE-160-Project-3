@@ -1,33 +1,47 @@
 # Congestion Control Extra Credit
 
-This adds slow start and AIMD without changing the regular Project 3 build.
+This is the optional slow start and AIMD version of Project 3. Run these commands inside Docker from `/root/project`.
 
-## Run
-
-From `/root/project` inside Docker, first run the fixed-window test:
+## 1. Fixed-window test
 
 ```bash
 make clean && make micaz sim
 python2 "extra credit/tests/compare.py" fixed
 ```
 
-Then run congestion control and generate the comparison:
+## 2. Congestion-control test
 
 ```bash
 make clean && make EXTRA_CREDIT=1 micaz sim
 python2 "extra credit/tests/compare.py" congestion
+```
+
+## 3. Generate results
+
+```bash
 python2 "extra credit/tests/report.py"
 ```
 
+Run both tests before generating the report.
+
 ## Files
 
+- `interfaces/CongestionControl.nc` - congestion-control interface
 - `modules/CongestionControlP.nc` - slow start and AIMD
-- `interfaces/CongestionControl.nc` - module interface
-- `tests/compare.py` - two clients sharing a network link
-- `tests/report.py` - results and graph
+- `tests/compare.py` - two 1,025-byte flows sharing node 2
+- `tests/report.py` - throughput, retransmissions, fairness, and window graph
 
 ## How it works
 
-The congestion window starts at 12 bytes. ACKs increase it, first quickly and then gradually. After a DATA timeout, the threshold is halved and the window resets to 12 bytes. New data is limited by the congestion window, receiver window, and send buffer.
+The sender starts with a 12-byte congestion window. New ACKs increase the window, first quickly and then gradually. On a DATA timeout, the threshold is halved and the congestion window resets to 12 bytes. New transmissions are limited by the congestion window, receiver window, and available send buffer.
 
-The two modes use the same network and packet drop. Results are saved in `extra credit/results/` as `comparison.md`, `comparison.csv`, and `cwnd.svg`.
+Both tests use the same topology, traffic, random seed, and packet drop. A timeout is the congestion signal, but wireless loss can also cause timeouts.
+
+Results are saved in `extra credit/results/`:
+
+- `comparison.md` - readable comparison
+- `comparison.csv` - per-flow numbers
+- `cwnd.svg` - congestion-window graph
+- `fixed.log` and `congestion.log` - raw logs
+
+Keep the results when submitting; the generated results folder is not tracked by Git.
