@@ -12,6 +12,9 @@ class TestSim:
     CMD_NEIGHBOR_DUMP = 1
     CMD_ROUTE_DUMP = 3
 
+    CMD_TEST_CLIENT = 4
+    CMD_TEST_SERVER = 5
+
     COMMAND_CHANNEL = "command"
     GENERAL_CHANNEL = "general"
     NEIGHBOR_CHANNEL = "neighbor"
@@ -128,6 +131,21 @@ class TestSim:
 
     def routeDMP(self, destination):
         self.sendCMD(self.CMD_ROUTE_DUMP, destination, "routing command")
+
+    
+    def testServer(self, nodeID):
+        self.sendCMD(
+            self.CMD_TEST_SERVER,
+            nodeID,
+            "server"
+        )
+
+    def testClient(self, nodeID):
+        self.sendCMD(
+            self.CMD_TEST_CLIENT,
+            nodeID,
+            "client"
+        )
 
     def injectRaw(self, source, receiver, amType, data):
         packet = self.t.newPacket()
