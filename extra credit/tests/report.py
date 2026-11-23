@@ -46,7 +46,7 @@ def make_svg(events):
     parts = [
         '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
         'viewBox="0 0 %d %d">' % (width, height, width, height),
-        '<rect width="100%%" height="100%%" fill="white"/>',
+        '<rect width="%d" height="%d" fill="white"/>' % (width, height),
         '<text x="70" y="20" font-family="sans-serif" font-size="16">'
         'Congestion window (bytes) by control event</text>'
     ]

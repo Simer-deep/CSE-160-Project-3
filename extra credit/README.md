@@ -1,44 +1,47 @@
 # Congestion Control Extra Credit
 
-This is separate from the required Project 3 tests. The normal build still uses the fixed 48-byte window.
+This is the optional slow start and AIMD version of Project 3. Run these commands inside Docker from `/root/project`.
 
-## Run
+## 1. Fixed-window test
 
-In the TinyOS Docker container, from the project folder:
-
-```sh
-sh "extra credit/run.sh"
+```bash
+make clean && make micaz sim
+python2 "extra credit/tests/compare.py" fixed
 ```
 
-This builds both versions, runs the same two-flow test, saves the results, and rebuilds the regular version at the end.
+## 2. Congestion-control test
+
+```bash
+make clean && make EXTRA_CREDIT=1 micaz sim
+python2 "extra credit/tests/compare.py" congestion
+```
+
+## 3. Generate results
+
+```bash
+python2 "extra credit/tests/report.py"
+```
+
+Run both tests before generating the report.
 
 ## Files
 
-- `interfaces/CongestionControl.nc` - commands used by the stream
+- `interfaces/CongestionControl.nc` - congestion-control interface
 - `modules/CongestionControlP.nc` - slow start and AIMD
-- `tests/compare.py` - sends two 1,025-byte flows through node 2
-- `tests/report.py` - makes the comparison table and graph
-- `run.sh` - runs everything
-
-The extra-credit build uses `make EXTRA_CREDIT=1 micaz sim`. The regular build uses `make micaz sim`.
+- `tests/compare.py` - two 1,025-byte flows sharing node 2
+- `tests/report.py` - throughput, retransmissions, fairness, and window graph
 
 ## How it works
 
-1. Start `cwnd` at 12 bytes, or one DATA packet.
-2. Increase it when new bytes are acknowledged. At first it grows quickly (slow start), then more slowly (additive increase).
-3. When a DATA timeout happens, cut `ssthresh` in half and reset `cwnd` to 12 bytes.
-4. Before sending new data, use the smallest of `cwnd`, the receiver window, and the normal send limit. Previously sent data can still be retransmitted.
-5. Compare the two modes using the same topology, traffic, and packet drop.
+The sender starts with a 12-byte congestion window. New ACKs increase the window, first quickly and then gradually. On a DATA timeout, the threshold is halved and the congestion window resets to 12 bytes. New transmissions are limited by the congestion window, receiver window, and available send buffer.
 
-The timeout is our congestion signal. A wireless packet loss can also cause a timeout, so the congestion version is not guaranteed to be faster.
+Both tests use the same topology, traffic, random seed, and packet drop. A timeout is the congestion signal, but wireless loss can also cause timeouts.
 
-## Results
+Results are saved in `extra credit/results/`:
 
-After running, look in `extra credit/results/`:
+- `comparison.md` - readable comparison
+- `comparison.csv` - per-flow numbers
+- `cwnd.svg` - congestion-window graph
+- `fixed.log` and `congestion.log` - raw logs
 
-- `comparison.md` - throughput, retransmissions, and fairness
-- `comparison.csv` - results for each client
-- `cwnd.svg` - congestion window changes
-- `fixed.log` and `congestion.log` - simulator output
-
-Both clients must transfer all 1,025 bytes. The experiment also checks that the congestion window increases and reacts to a timeout.
+Keep the results when submitting; the generated results folder is not tracked by Git.

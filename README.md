@@ -84,4 +84,4 @@ Loss tests use `cmdTestDrop()` on a relay to discard one selected transport pack
 
 ## Optional extra credit
 
-The separate `extra credit/` directory contains an optional slow-start/AIMD mode and reproducible two-flow bottleneck comparison. The default build and nine required tests use the original fixed window. To run the optional experiment in the course Docker environment, use `sh "extra credit/run.sh"` from the repository root. See `extra credit/README.md` for the implementation order, test setup, and generated reports.
+The optional congestion-control code and two-flow comparison are in `extra credit/`. The default build uses the original fixed window. See `extra credit/README.md` for the exact `make micaz sim` and Python test commands, in order.
