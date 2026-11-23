@@ -1,48 +1,78 @@
-# CSE 160 Project 3: Reliable Transport
+# Project 3: Reliable Transport
 
-This is our Project 3 transport implementation on top of the distance-vector routing code from Project 2. It uses routed unicast packets, not flooding, for transport traffic.
+This project adds reliable byte transfer on top of our Project 2 distance-vector routing. Transport packets use the normal routed IP service. The client opens a connection, sends bytes, waits for acknowledgments, and closes when the transfer is done.
 
-We have kept the connection handling, byte-stream logic, and transfer tests separate so they are easier to follow.
+## Build and run
 
-## Building it
-
-Use the course TinyOS environment with nesC, micaz, TOSSIM, and Python 2.7. From the project folder:
+Use the course TinyOS environment with TOSSIM and Python 2.7.
 
 ```sh
 make micaz sim
-python test_tcp_handshake.py
-python run.py baseline
+python PingTest1.py
 ```
 
-Rebuild after changing an `.nc` or `.h` file. The scripts need the generated TOSSIM module. They should be run in the course environment, not a regular Python-only installation.
+`PingTest1.py` runs all nine required Project 3 tests in order. It calls `run.py all`, prints PASS or FAIL for each test, and returns a failure exit code if any test fails. Every test starts a new simulator with seed 1.
 
-For the older routing regression tests:
+To run one test, use `python run.py baseline`, replacing `baseline` with a test name from the table below.
 
-```sh
-python pingTest.py
-```
+The old `python pingTest.py` command still runs the six Project 2 routing tests. It is separate from `PingTest1.py`.
 
-## How it works
+## Tests and results
 
-`TransportControlP.nc` owns sockets, connection setup, packet parsing, and connection cleanup. `TransportStreamP.nc` owns the send/receive buffers, data sequence numbers, ACKs, and retransmissions. `TransportTestP.nc` generates the data and checks it after the receiver reads it. `Node.nc` joins these pieces together.
+The project team reports that all required Project 3 tests passed. These are team-reported results, not an independent TOSSIM run performed for this README update.
 
-The producer generates byte `k % 256` at offset `k`, so we do not need a large array to test a long transfer. The consumer checks every byte and counts how many it read. It also counts mismatches. The sender tracks how many bytes were accepted into its buffer and how many have actually been acknowledged; those are different numbers.
+| Test | What it checks | Reported result |
+| --- | --- | --- |
+| `baseline` | 1,025 bytes over four nodes, correct order, more than one outstanding segment, and orderly close | Passed |
+| `data_loss` | One lost DATA packet, recovery by retransmission, no duplicate bytes | Passed |
+| `ack_loss` | One lost ACK, continued progress without duplicate delivery | Passed |
+| `flow` | Pause receiver, fill the 128-byte buffer, lose the reopening update, then resume | Passed |
+| `syn_loss` | Lost SYN, handshake retry, no duplicate connection | Passed |
+| `handshake_ack_loss` | Lost final handshake ACK and correct recovery | Passed |
+| `close_ack_loss` | Lost final closing ACK and connection cleanup | Passed |
+| `failure` | Unavailable listener, bounded failure and socket cleanup | Passed |
+| `noisy` | Multi-hop transfer using `some_noise.txt` | Passed |
 
-Our receiver currently accepts only data beginning at the next expected sequence number. A duplicate or out-of-order segment does not enter the application buffer. The receiver sends its current cumulative ACK instead. The sender retransmits outstanding data after a timeout.
+The tests use `topo/tcp-line.topo`, a four-node line from 1 through 4. Most tests use `noise/no_noise.txt`. The noisy test uses `noise/some_noise.txt`. Routing is given 65 simulated seconds to settle before transport starts, and the scripts send a routed ping before the transfer.
 
-## Packet sizes and limits
+Each test saves its output in `logs/tcp_<test_name>.log`. The logs include simulated time, packet events, acknowledgments, retries, byte counts, and final test results.
 
-The TinyOS payload limit in `Makefile` is 29 bytes. The network header is 8 bytes, the transport header is 9 bytes, and up to 12 bytes are left for application data. Transport header fields are source and destination ports (1 byte each), flags (1), sequence and acknowledgment numbers (2 each, big-endian), advertised window (1), and payload length (1). The network layer supplies the node addresses and assigns a fresh network packet number and TTL for every send, including retransmissions.
+There are three additional checks available individually, but they are not part of the required `PingTest1.py` suite: `synack_loss` tests the other handshake-loss choice, `heavy_noise` uses `meyer-heavy.txt`, and `two_connections` tests two clients at once. The assignment requires SYN **or** SYN-ACK loss, one documented noisy transfer, and separate state for two connections; it strongly recommends an overlapping-connection demonstration.
 
-Each connected endpoint has a 128-byte send buffer and a 128-byte receive buffer. The fixed sender window is 48 bytes. The receiver advertises its free storage, so the sender must also obey the smaller advertised window. The maximum socket table has three entries, including listening sockets.
+The supplied example scripts are also kept as `testA.py` and `testB.py`. They are simple demonstrations rather than PASS/FAIL validation tests. Their local `tuna-melt.topo` and `pizza.topo` files are connected-line substitutes because the original topology files were not included with the uploads.
 
-The data retransmission timeout is 2,000 ms, with at most eight counted retries. The code also defines a 60,000 ms stall interval. The configured closing-state retention value is 20,000 ms, longer than the eight 2-second FIN retry intervals. All timing uses the simulated TinyOS clock.
+## Transport implementation
 
-The stream code uses 16-bit sequence numbers with a no-wrap limit. We reserve the top sequence value for the end of the connection. Transfers must fit below sequence position 65534, including their chosen initial sequence. We use short test transfers such as 1,025 bytes so the limit is not an issue. A 128-byte buffer does not limit the total transfer to 128 bytes.
+`TransportControlP.nc` handles connection setup, closing, and socket records. `TransportStreamP.nc` handles data buffers, sequence numbers, ACKs, windows, and retransmissions. `TransportTestP.nc` generates and checks test data. `Node.nc` connects the application tests to transport.
 
-## Running a transfer
+The test producer generates byte `k % 256` at position `k`. The receiver checks each byte as it reads it. It tracks accepted, acknowledged, and consumed bytes separately, so a successful local send is not confused with delivery to the receiver.
 
-`TestSim.py` supplies the commands for Python test scripts:
+The receiver only accepts data in order. If a segment is duplicated or arrives out of order, it keeps its current cumulative ACK. The sender resends unacknowledged bytes after the timeout. When the receiver's buffer is full, the advertised window becomes zero and the sender stops sending new data.
+
+## Packet and timer settings
+
+| Setting | Value |
+| --- | --- |
+| TinyOS packet payload budget | 29 bytes |
+| Network header | 8 bytes |
+| Transport header | 9 bytes |
+| Maximum data per segment | 12 bytes |
+| Send buffer per connection | 128 bytes |
+| Receive buffer per connection | 128 bytes |
+| Fixed sender window | 48 bytes |
+| Socket table | 3 entries |
+| Retransmission timeout | 2 seconds |
+| Retry limit | 8 |
+| Stall timeout | 60 seconds |
+| TIME_WAIT retention | 20 seconds |
+
+The transport header contains source and destination ports, flags, a 16-bit sequence number, a 16-bit acknowledgment, a receive window, and a data length. Multi-byte fields use big-endian order. The network layer adds the end-to-end node addresses, IP packet ID, and TTL.
+
+The stream uses 16-bit sequence numbers without wraparound. Transfers must keep their data and FIN below the documented 65,534 sequence-position limit, including their initial sequence number. The full test transfer is 1,025 bytes, not limited to the 128-byte buffers.
+
+## Test commands
+
+`TestSim.py` provides these helpers:
 
 ```python
 sim.cmdTestServer(1, 20)
@@ -52,79 +82,6 @@ sim.cmdTestPause(1, 4, 10, 20)
 sim.cmdTestResume(1, 4, 10, 20)
 ```
 
-The server command names the server node and listening port. The client command supplies the client node, server node, source port, destination port, and total bytes. The close command identifies the same connection. Pause and resume act on the receiving test application, not on the radio.
+The client command supplies the client node, server node, source port, destination port, and number of bytes. The expected byte count is also sent to the server's test consumer, separately from the transport data. Pause and resume only stop the test application from reading; transport reception continues.
 
-The client command also sends the expected transfer length to the test server before starting the client. This length is test configuration; it is not included in the transport data stream. The actual transfer still consists only of the generated bytes.
-
-The original convenience calls `testServer(node)` and `testClient(node)` remain available for the simple Node 1 / Node 4 demonstration.
-
-## Test scenarios
-
-All scenarios use a fixed random seed of 1, the four-node `tcp-line.topo` route, and the `Project3TGen` and `transport` log channels unless stated otherwise.
-
-```sh
-python run.py baseline
-python run.py data_loss
-python run.py ack_loss
-python run.py flow
-python run.py syn_loss
-python run.py synack_loss
-python run.py handshake_ack_loss
-python run.py close_ack_loss
-python run.py failure
-python run.py noisy
-python run.py heavy_noise
-python run.py two_connections
-python run.py all
-```
-
-The baseline transfers 1,025 bytes, which is longer than the 128-byte buffers and leaves a five-byte final data segment. It checks the sender and receiver totals, the content mismatch count, more than one outstanding segment, and the closing event.
-
-The data-loss test drops the first data segment from Node 4 at relay Node 3. The ACK-loss test drops the first corresponding data ACK from Node 1 at relay Node 2. Both check for the intended drop, retransmission, and a complete ordered transfer.
-
-The flow-control test pauses Node 1's consumer, waits for its 128-byte receive buffer to fill, drops the first nonzero-window ACK after reopening, and checks that the transfer still completes.
-
-The control-loss tests independently drop a SYN, SYN-ACK, final handshake ACK, or final close ACK. The failure test connects without opening the listener and checks for an explicit failure instead of a successful transfer. The two-connection test starts Node 3 and Node 4 as clients to the same listening server.
-
-`noisy` uses `some_noise.txt` and `heavy_noise` uses `meyer-heavy.txt`. Every test writes a log to `logs/tcp_<scenario>.log` and exits unsuccessfully when an assertion fails. The logs contain the packet events, byte totals, and transport results.
-
-The packet-drop hook is disabled by default. For targeted tests the helper is:
-
-```python
-sim.cmdTestDrop(relay, source, destination, srcPort, destPort,
-                flags, sequence=65535, acknowledgement=65535,
-                windowMode=0, count=1)
-```
-
-Sequence and acknowledgment value 65535 mean any value. Window mode 0 matches any advertised window; 1 matches zero; 2 matches a nonzero window. Count chooses which matching packet to drop, normally the first. The hook runs on the ordinary IP receive/forward path at a relay and is never enabled during ordinary traffic.
-
-## Professor-style examples
-
-`testA.py` runs the four-node quiet-network example, and `testB.py` runs a thirteen-node example with `meyer-heavy.txt`. These follow the two supplied example scripts. The original example scripts referred to `tuna-melt.topo` and `pizza.topo`, which were not present in our repository. We added simple connected line topologies under those names so the scripts have usable local fixtures; these are not claimed to reproduce the professor's original topologies exactly.
-
-The example scripts are demonstrations. The `run.py` scenarios are the assertion-based validation tests.
-
-## What the logs mean
-
-Use `Project3TGen` for the stream and test results and `transport` for the connection handshake. Turn on `routing` separately when checking packet forwarding. Sender logs distinguish data accepted into the application buffer, bytes transmitted, ACKs, timeouts, and retransmissions. The receiver logs the bytes read and any mismatches. Each connection's final summary prints accepted, acknowledged, consumed, and mismatch totals.
-
-No results are marked as passed in this README without a recorded simulator run. The sources should be built and exercised in the actual course TinyOS environment before submission.
-
-## Checking the final result
-
-The transport source now includes FIN handling, a close timer, and test commands, but the code still needs to be compiled and run in the course TinyOS environment. The test scripts report PASS only when their expected events and byte totals appear in the recorded output. A timeout or missing test result is a failure, not a success.
-
-After running `python run.py all`, check the files in `logs/` and record the actual results below. They have not been run as part of this repository update.
-
-| Test | Result |
-| --- | --- |
-| Baseline | Not run |
-| Lost DATA | Not run |
-| Lost ACK | Not run |
-| Zero window and reopening | Not run |
-| Lost SYN / SYN-ACK | Not run |
-| Lost handshake ACK | Not run |
-| Lost close ACK | Not run |
-| Failed connection | Not run |
-| Noisy multi-hop | Not run |
-| Independent connections | Not run |
+Loss tests use `cmdTestDrop()` on a relay to discard one selected transport packet. The hook is off in normal runs, and each deliberate drop is logged. The `Project3TGen` channel shows data and test progress; `transport` shows connection events. Use `routing` when troubleshooting the network layer.

@@ -162,15 +162,17 @@ def run_scenario(name, noise="no_noise.txt", seconds=360):
     print("%s: PASS (log: %s)" % (name, path))
 
 def main():
-    names = ["baseline", "data_loss", "ack_loss", "flow", "syn_loss",
-             "synack_loss", "handshake_ack_loss", "close_ack_loss",
-             "failure", "noisy", "heavy_noise", "two_connections"]
+    required = ["baseline", "data_loss", "ack_loss", "flow",
+                "syn_loss", "handshake_ack_loss", "close_ack_loss",
+                "failure", "noisy"]
+    optional = ["synack_loss", "heavy_noise", "two_connections"]
+    names = required + optional
     if len(sys.argv) < 2 or sys.argv[1] not in names + ["all"]:
         print("Usage: python run.py <scenario|all>")
         print("Scenarios: %s" % ", ".join(names))
         return 2
 
-    requested = names if sys.argv[1] == "all" else [sys.argv[1]]
+    requested = required if sys.argv[1] == "all" else [sys.argv[1]]
     failed = []
 
     for name in requested:
