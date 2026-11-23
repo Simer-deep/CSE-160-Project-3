@@ -151,4 +151,6 @@ interface Transport{
 
    event void closeDone(socket_t fd, error_t result);
 
+   command socket_store_t* getSocketState(socket_t fd);
+
 }

@@ -37,16 +37,25 @@ implementation {
         return 0;
     }
 
-    socket_store_t* getSocket(socket_t fd) {
-        if (fd == 0 || fd > MAX_NUM_OF_SOCKETS) {
+    socket_store_t* getSocket(socket_t fd) 
+    {
+        if (fd == 0 || fd > MAX_NUM_OF_SOCKETS) 
+        {
             return NULL;
         }
 
-        if (!sockets[fd - 1].inUse) {
+        if (!sockets[fd - 1].inUse) 
+        {
             return NULL;
         }
 
         return &sockets[fd - 1];
+    }
+
+    command socket_store_t* Transport.getSocketState(
+        socket_t fd
+    ) {
+        return getSocket(fd);
     }
 
     socket_t findConnection(
