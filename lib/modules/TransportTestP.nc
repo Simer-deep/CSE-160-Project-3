@@ -1,4 +1,4 @@
-#include "../../includes/transport_test.h"
+#include "../../includes/Project3Generate.h"
 #include <Timer.h>
 #include <string.h>
 
@@ -18,7 +18,7 @@ implementation {
         bool resultSent;
         uint32_t totalBytes;
         uint32_t expectedBytes;
-        transport_test_stats_t stats;
+        Project3Generate_stats_t stats;
     } test_connection_t;
 
     test_connection_t connections[MAX_NUM_OF_SOCKETS];
@@ -143,7 +143,7 @@ implementation {
     }
 
     command error_t TransportTest.getStats(socket_store_t* socket,
-        transport_test_stats_t* stats) {
+        Project3Generate_stats_t* stats) {
         test_connection_t* connection;
 
         connection = findConnection(socket);
@@ -202,7 +202,7 @@ implementation {
             }
             connection->stats.accepted += written;
             if(written > 0) {
-                dbg("transport_test",
+                dbg("Project3Generate",
                     "Node %u accepted %u bytes, total=%lu/%lu\n",
                     TOS_NODE_ID, written,
                     (unsigned long)connection->stats.accepted,
@@ -256,7 +256,7 @@ implementation {
             } else {
                 if(connection->stats.acknowledged !=
                     connection->stats.accepted - socket->sendUsed) {
-                    dbg("transport_test",
+                    dbg("Project3Generate",
                         "Node %u acknowledged %lu bytes\n",
                         TOS_NODE_ID,
                         (unsigned long)(connection->stats.accepted -
@@ -298,7 +298,7 @@ implementation {
         if(complete || connection->stats.failed) {
             connection->resultSent = TRUE;
 
-            dbg("transport_test",
+            dbg("Project3Generate",
                 "Node %u conn=%u:%u->%u:%u accepted=%lu acknowledged=%lu "
                 "consumed=%lu mismatches=%lu result=%s\n",
                 TOS_NODE_ID,

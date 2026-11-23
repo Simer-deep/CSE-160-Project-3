@@ -45,7 +45,7 @@ implementation {
         dropCount = count;
         dropActive = count > 0;
 
-        dbg("transport_test",
+        dbg("Project3Generate",
             "Node %u will drop transport traffic from %u to %u flags=%u\n",
             TOS_NODE_ID, source, destination, flags);
     }
@@ -83,7 +83,7 @@ implementation {
         }
 
         dropActive = FALSE;
-        dbg("transport_test",
+        dbg("Project3Generate",
             "Node %u dropped transport packet from %u to %u flags=%u seq=%u ack=%u wnd=%u\n",
             TOS_NODE_ID, packet->src, packet->dest, packet->payload[2],
             sequence, acknowledgement, window);
