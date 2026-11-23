@@ -311,7 +311,6 @@ implementation {
         uint16_t outstanding;
         uint16_t limit;
         uint16_t length;
-        uint16_t retryLimit;
         uint8_t sent;
 
         if(socket == NULL || !socket->inUse) {
@@ -411,16 +410,10 @@ implementation {
         }
 
         if(socket->retransmitting) {
-            retryLimit = outstanding;
-#ifdef EXTRA_CREDIT_CONGESTION
-            if(retryLimit > call CongestionControl.window(socket)) {
-                retryLimit = call CongestionControl.window(socket);
-            }
-#endif
             for(sent = 0; sent < 2 &&
-                socket->retryOffset < retryLimit; sent++) {
+                socket->retryOffset < outstanding; sent++) {
 
-                length = retryLimit - socket->retryOffset;
+                length = outstanding - socket->retryOffset;
 
                 if(length > TRANSPORT_MAX_DATA_SIZE) {
                     length = TRANSPORT_MAX_DATA_SIZE;
@@ -441,7 +434,7 @@ implementation {
                 socket->retryOffset += length;
             }
 
-            if(socket->retryOffset >= retryLimit) {
+            if(socket->retryOffset >= outstanding) {
                 socket->retransmitting = FALSE;
                 socket->retryOffset = 0;
                 socket->dataDeadline = now + TRANSPORT_RTO_MS;
