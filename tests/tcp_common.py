@@ -47,6 +47,7 @@ class TransportCase:
         self.sim.addChannel("transport", self.output)
         self.sim.addChannel("Project3Generate", self.output)
         self.sim.addChannel("routing", self.output)
+        self.sim.addChannel("command", self.output)
 
         self.show("Loading tcp-line.topo and " + noise)
         self.sim.loadTopo("tcp-line.topo")
