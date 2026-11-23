@@ -265,7 +265,6 @@ implementation {
         uint16_t bufflen
     ) {
         socket_store_t* conn = getSocket(fd);
-
         
         if (conn == NULL || buff == NULL ||
             conn->state != ESTABLISHED ||
@@ -273,7 +272,6 @@ implementation {
             bufflen == 0) {
             return 0;
         }
-
 
         return call TransportStream.write(
             conn,
@@ -706,7 +704,8 @@ implementation {
 
     }
 
-    event void ControlTimer.fired() {
+    event void ControlTimer.fired() 
+    {
         uint8_t i;
         uint32_t now = call ControlTimer.getNow();
         bool pending = FALSE;
@@ -734,6 +733,42 @@ implementation {
                     dbg(TRANSPORT_CHANNEL,
                         "Node %d: Stream tick failed fd=%d\n",
                         TOS_NODE_ID, i + 1);
+                }
+
+                if (conn->state == ESTABLISHED &&
+                    conn->closeRequested &&
+                    !conn->finSent &&
+                    conn->sendUsed == 0 &&
+                    conn->sendUnacked == conn->sendEnd) {
+
+                    if (sendControlPacket(
+                            conn,
+                            TCP_FLAG_FIN,
+                            conn->sendEnd,
+                            conn->receiveNext
+                        ) == SUCCESS) {
+
+                        conn->finSequence = conn->sendEnd;
+                        conn->finSent = TRUE;
+                        conn->finAcked = FALSE;
+                        conn->controlRetries = 0;
+
+                        conn->controlDeadline =
+                            now + TRANSPORT_RTO_MS;
+
+                        if (conn->controlDeadline == 0) 
+                        {
+                            conn->controlDeadline = 1;
+                        }
+
+                        conn->state = FIN_WAIT_1;
+
+                        dbg(TRANSPORT_CHANNEL,
+                            "Node %d: TCP FIN sent fd=%d seq=%d\n",
+                            TOS_NODE_ID,
+                            i + 1,
+                            conn->finSequence);
+                    }
                 }
 
                 continue;
